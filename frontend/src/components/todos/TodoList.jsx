@@ -5,7 +5,11 @@ export default function TodoList() {
     const { todos } = useTodoContext();
 
     if (todos.length === 0) {
-        return <p className='text-gray-500'>No todos yet!</p>;
+        return (
+            <p className='text-gray-500 dark:text-gray-400'>
+                No todos yet!
+            </p>
+        );
     }
 
     return (

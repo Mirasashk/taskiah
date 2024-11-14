@@ -1,0 +1,36 @@
+/* Global transition styles */
+*,
+*::before,
+*::after {
+    transition-property: background-color, border-color, color, fill,
+        stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 200ms;
+}
+
+/* Background transitions */
+*[class*='bg-'] {
+    transition-property: background-color;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 200ms;
+}
+
+/* Remove transitions from text and borders for instant theme changes */
+*[class*='text-'],
+*[class*='border-'],
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.text-instant {
+    transition: none !important;
+}
+
+/* Exclude form elements from transitions */
+input[type='checkbox'],
+input[type='radio'],
+.no-transition {
+    transition: none !important;
+}
