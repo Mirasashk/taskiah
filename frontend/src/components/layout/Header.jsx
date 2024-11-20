@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -7,7 +7,29 @@ import { useUser } from '../../context/UserContext';
 export default function Header() {
     const { isDarkMode, toggleTheme } = useTheme();
     const { user, logout } = useAuth();
-    const { userData, clearUserData } = useUser();
+    const { userData, userImage } = useUser();
+    const [showUserMenu, setShowUserMenu] = useState(false);
+    const menuRef = useRef(null);
+
+    // Add click outside handler
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (
+                menuRef.current &&
+                !menuRef.current.contains(event.target) &&
+                !event.target.closest('[data-user-display]')
+            ) {
+                setShowUserMenu(false);
+            }
+        }
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () =>
+            document.removeEventListener(
+                'mousedown',
+                handleClickOutside
+            );
+    }, []);
 
     const handleLogout = async () => {
         try {
@@ -18,10 +40,66 @@ export default function Header() {
         }
     };
 
+    const userMenuDisplay = showUserMenu ? (
+        <div className='relative'>
+            <div
+                className='absolute right-0 top-12 w-48 rounded-md shadow-lg py-0 bg-white dark:bg-gray-600 ring-1 ring-black ring-opacity-5'
+                ref={menuRef}
+            >
+                <div className='ml-4 pt-6 pb-3'>
+                    <div className='text-gray-600 text-xl font-medium dark:text-gray-300 flex items-center justify-center space-x-2 cursor-pointer'>
+                        <img
+                            src={userImage || userData?.photoURL}
+                            alt='avatar'
+                            className='w-6 h-6 rounded-full mr-4'
+                        />
+                        {userData.username || userData.email}
+                    </div>
+                </div>
+                <div className='text-gray-600 text-sm dark:text-gray-300 flex items-center space-x-2 cursor-pointer'>
+                    <hr className='w-[90%] mx-auto border-gray-500' />
+                </div>
+                <Link
+                    to='/profile'
+                    className='block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
+                >
+                    Profile
+                </Link>
+                <Link
+                    to='/settings'
+                    className='block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
+                >
+                    Settings
+                </Link>
+                <button
+                    onClick={handleLogout}
+                    className='block w-full text-left px-4 py-2 text-sm rounded-b-md text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
+                >
+                    Sign out
+                </button>
+            </div>
+        </div>
+    ) : null;
+
     const userDisplay = userData ? (
-        <span className='text-gray-600 dark:text-gray-300'>
-            {userData.username || userData.email}
-        </span>
+        <div className='relative'>
+            {userMenuDisplay}
+            <div
+                data-user-display
+                onClick={(e) => {
+                    e.stopPropagation();
+                    setShowUserMenu(!showUserMenu);
+                }}
+                className='text-gray-600 dark:text-gray-300 flex items-center space-x-2 cursor-pointer'
+            >
+                <img
+                    src={userImage || userData?.photoURL}
+                    alt='avatar'
+                    className='w-8 h-8 rounded-full mr-6'
+                />
+                {userData.username || userData.email}
+            </div>
+        </div>
     ) : null;
 
     const navigationLinks = user ? (
