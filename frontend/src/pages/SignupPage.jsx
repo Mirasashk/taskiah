@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { userService } from '../services/api';
 
 export default function SignupPage() {
     const navigate = useNavigate();
@@ -13,9 +14,11 @@ export default function SignupPage() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
+        id: '',
+        email: '',
         firstName: '',
         lastName: '',
-        email: '',
+        username: '',
         password: '',
         confirmPassword: '',
     });
@@ -30,8 +33,6 @@ export default function SignupPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        console.log(formData);
-
         if (formData.password !== formData.confirmPassword) {
             return setError('Passwords do not match');
         }
@@ -39,8 +40,25 @@ export default function SignupPage() {
         try {
             setError('');
             setLoading(true);
-            await signup(formData.email, formData.password);
-            navigate('/todos');
+            const auth = await signup(
+                formData.email,
+                formData.password
+            );
+
+            const userData = {
+                ...formData,
+                id: auth.user.uid,
+            };
+
+            try {
+                await userService.createUser(userData);
+                navigate('/dashboard');
+            } catch (err) {
+                await auth.user.delete();
+                setError(
+                    'Failed to create user in database. Please try again.'
+                );
+            }
         } catch (err) {
             setError('Failed to create an account: ' + err.message);
         } finally {
@@ -190,6 +208,27 @@ export default function SignupPage() {
                                     type='email'
                                     autoComplete='email'
                                     value={formData.email}
+                                    onChange={handleChange}
+                                    required
+                                    className='appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500'
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label
+                                htmlFor='username'
+                                className='block text-sm font-medium text-gray-700'
+                            >
+                                Username
+                            </label>
+                            <div className='mt-1'>
+                                <input
+                                    id='username'
+                                    name='username'
+                                    type='username'
+                                    autoComplete='username'
+                                    value={formData.username}
                                     onChange={handleChange}
                                     required
                                     className='appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500'

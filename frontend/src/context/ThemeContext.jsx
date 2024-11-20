@@ -4,13 +4,30 @@ import {
     useEffect,
     useState,
 } from 'react';
+import { useUser } from './UserContext';
 
 const ThemeContext = createContext(null);
 
 export function ThemeProvider({ children }) {
-    const [isDarkMode, setIsDarkMode] = useState(false);
+    const { userData, clearUserData } = useUser();
+    const [isDarkMode, setIsDarkMode] = useState(
+        userData?.extraInfo?.preferences?.theme === 'dark'
+            ? true
+            : false
+    );
 
     useEffect(() => {
+        if (userData?.extraInfo?.preferences?.theme) {
+            setIsDarkMode(
+                userData?.extraInfo?.preferences?.theme === 'dark'
+                    ? true
+                    : false
+            );
+        }
+    }, []);
+
+    useEffect(() => {
+        console.log(userData);
         if (isDarkMode) {
             document.documentElement.classList.add('dark');
         } else {
