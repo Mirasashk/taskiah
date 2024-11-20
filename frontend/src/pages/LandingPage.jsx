@@ -1,4 +1,6 @@
 import React from 'react';
+import landingProdGraphic from '../assets/images/6667368_3382856.svg';
+import { Link } from 'react-router-dom';
 
 const LandingPage = () => {
     return (
@@ -16,12 +18,12 @@ const LandingPage = () => {
                             focused.
                         </p>
                         <div className='flex gap-4'>
-                            <a
-                                href='/todos'
+                            <Link
+                                to='/login'
                                 className='px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800'
                             >
                                 Get Started
-                            </a>
+                            </Link>
                             <a
                                 href='#learn-more'
                                 className='px-6 py-3 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-white'
@@ -33,9 +35,9 @@ const LandingPage = () => {
                     <div className='md:w-1/2'>
                         {/* Placeholder for hero image */}
                         <img
-                            src='https://via.placeholder.com/600x400'
+                            src={landingProdGraphic}
                             alt='Task Management Illustration'
-                            className='rounded-lg shadow-lg'
+                            className=''
                         />
                     </div>
                 </div>

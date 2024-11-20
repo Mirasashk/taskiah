@@ -18,9 +18,9 @@ export default function Header() {
     return (
         <header className='bg-white dark:bg-gray-800 shadow-sm'>
             <nav className='container mx-auto px-4 py-3'>
-                <div className='flex items-center justify-between'>
+                <div className='grid grid-cols-4 w-full items-center'>
                     {/* Logo */}
-                    <div className='flex items-center'>
+                    <div className='flex col-span-1 justify-center items-center'>
                         <Link
                             to='/'
                             className='text-xl font-bold text-gray-800 dark:text-white'
@@ -30,7 +30,7 @@ export default function Header() {
                     </div>
 
                     {/* Navigation Items */}
-                    <div className='hidden md:flex items-center space-x-8'>
+                    <div className='hidden col-span-2 md:flex items-center justify-center space-x-8'>
                         <Link
                             to='/'
                             className='text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
@@ -38,6 +38,18 @@ export default function Header() {
                             Home
                         </Link>
                         <Link
+                            to='/features'
+                            className='text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+                        >
+                            Features
+                        </Link>
+                        <Link
+                            to='/pricing'
+                            className='text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+                        >
+                            Pricing
+                        </Link>
+                        {/* <Link
                             to='/todos'
                             className='text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
                         >
@@ -48,11 +60,11 @@ export default function Header() {
                             className='text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
                         >
                             Notes
-                        </Link>
+                        </Link> */}
                     </div>
 
                     {/* Auth & Theme Toggle */}
-                    <div className='flex items-center space-x-4'>
+                    <div className='flex col-span-1 items-center justify-center space-x-4'>
                         {user ? (
                             <>
                                 <span className='text-gray-600 dark:text-gray-300'>

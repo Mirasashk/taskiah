@@ -13,15 +13,13 @@ const logger = require('firebase-functions/logger');
 // Create and deploy your first functions
 // https://firebase.google.com/docs/functions/get-started
 
-// exports.helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
 const express = require('express');
 const cors = require('cors');
 const functions = require('firebase-functions');
-const config = require('./config');
+const config = require('./config/dotenv.config');
 const app = express();
+const taskRoutes = require('./routes/taskRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 // Middleware
 app.use(cors());
@@ -32,6 +30,8 @@ app.get('/api/health', (req, res) => {
     res.status(200).json({ status: 'ok' });
 });
 
+app.use('/api/tasks', taskRoutes);
+app.use('/api/users', userRoutes);
 app.listen(config.port, () => {
     console.log(`Server is running on port ${config.port}`);
 });
