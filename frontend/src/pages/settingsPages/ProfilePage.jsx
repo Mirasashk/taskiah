@@ -168,7 +168,7 @@ export default function ProfilePage() {
                     </div>
                     <div className='grid grid-cols-3  space-x-6'>
                         <div className='grid col-span-2'>
-                            <div className='flex justify-between w-full bg-gray-50 dark:bg-gray-700 p-4 rounded-lg'>
+                            <div className='flex justify-between w-full bg-gray-200 dark:bg-gray-700 p-4 rounded-lg'>
                                 <div className='grid grid-flow-row w-full grid-cols-1 gap-6'>
                                     <FormField label='First Name'>
                                         <Input
@@ -271,7 +271,7 @@ export default function ProfilePage() {
                         </div>
                         <div className='grid col-span-1'>
                             <div className='grid grid-flow-row grid-cols-1 gap-6'>
-                                <div className='flex items-center justify-between bg-gray-50 dark:bg-gray-700 p-4 rounded-lg'>
+                                <div className='flex items-center justify-between bg-gray-200 dark:bg-gray-700 p-4 rounded-lg'>
                                     <h3 className='text-lg font-medium text-gray-900 dark:text-white'>
                                         Tasks
                                     </h3>
@@ -279,7 +279,7 @@ export default function ProfilePage() {
                                         {stats.taskCount}
                                     </p>
                                 </div>
-                                <div className='flex items-center justify-between bg-gray-50 dark:bg-gray-700 p-4 rounded-lg'>
+                                <div className='flex items-center justify-between bg-gray-200 dark:bg-gray-700 p-4 rounded-lg'>
                                     <h3 className='text-lg font-medium text-gray-900 dark:text-white '>
                                         Notes
                                     </h3>
@@ -287,7 +287,7 @@ export default function ProfilePage() {
                                         {stats.noteCount}
                                     </p>
                                 </div>
-                                <div className='flex items-center justify-between bg-gray-50 dark:bg-gray-700 p-4 rounded-lg'>
+                                <div className='flex items-center justify-between bg-gray-200 dark:bg-gray-700 p-4 rounded-lg'>
                                     <h3 className='text-lg font-medium text-gray-900 dark:text-white mb-2'>
                                         Shared With
                                     </h3>
@@ -299,7 +299,7 @@ export default function ProfilePage() {
                         </div>
                     </div>
 
-                    <div className='bg-gray-50 dark:bg-gray-700 p-4 rounded-lg'>
+                    <div className='bg-gray-200 dark:bg-gray-700 p-4 rounded-lg'>
                         <h3 className='text-lg font-medium text-gray-900 dark:text-white mb-4'>
                             Shared With
                         </h3>

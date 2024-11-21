@@ -16,7 +16,7 @@ export default function Input({
     const enabledClasses =
         'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white';
     const disabledClasses =
-        'disabled:bg-gray-200 dark:disabled:bg-gray-600 disabled:text-gray-500 dark:disabled:text-gray-400 border-gray-200 dark:border-gray-600';
+        'disabled:bg-gray-50 dark:disabled:bg-gray-600 disabled:text-gray-500 dark:disabled:text-gray-400 border-gray-200 dark:border-gray-600';
 
     return (
         <input
