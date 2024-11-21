@@ -1,5 +1,6 @@
 const User = require('../models/userModel');
 const { db, storage, bucket } = require('../config/firebase');
+const { auth } = require('firebase-admin');
 
 async function addUser(user) {
     const userModel = new User(user);
@@ -15,6 +16,23 @@ async function getUser(userId) {
 
 async function updateUser(userId, user, res) {
     try {
+        // If email is being updated, update it in Firebase Auth first
+        if (user.email) {
+            try {
+                await auth().updateUser(userId, {
+                    email: user.email,
+                });
+            } catch (error) {
+                console.error(
+                    'Error updating email in Firebase Auth:',
+                    error
+                );
+                return res.status(400).json({
+                    error: 'Failed to update email. ' + error.message,
+                });
+            }
+        }
+
         // Update user document in Firestore
         await db
             .collection('users')
