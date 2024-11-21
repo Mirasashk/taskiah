@@ -7,6 +7,14 @@ import SignupPage from '../pages/SignupPage';
 import NotesPage from '../pages/NotesPage';
 import DashboardPage from '../pages/DashboardPage';
 import SettingsPage from '../pages/SettingsPage';
+import ProfilePage from '../pages/settingsPages/ProfilePage';
+import PreferencesPage from '../pages/settingsPages/PreferencesPage';
+import ThemePage from '../pages/settingsPages/ThemePage';
+import SecurityPage from '../pages/settingsPages/SecurityPage';
+import SharedWithMePage from '../pages/settingsPages/SharedWithMePage';
+import CollectionsPage from '../pages/settingsPages/CollectionsPage';
+import NotificationsPage from '../pages/settingsPages/NotificationsPage';
+
 export default function AppRoutes() {
     return (
         <Routes>
@@ -16,7 +24,36 @@ export default function AppRoutes() {
                     path='/dashboard'
                     element={<DashboardPage />}
                 />
-                <Route path='/settings' element={<SettingsPage />} />
+                <Route path='/settings' element={<SettingsPage />}>
+                    <Route
+                        path='/settings/profile'
+                        element={<ProfilePage />}
+                    />
+                    <Route
+                        path='/settings/preferences'
+                        element={<PreferencesPage />}
+                    />
+                    <Route
+                        path='/settings/theme'
+                        element={<ThemePage />}
+                    />
+                    <Route
+                        path='/settings/security'
+                        element={<SecurityPage />}
+                    />
+                    <Route
+                        path='/settings/shared-with-me'
+                        element={<SharedWithMePage />}
+                    />
+                    <Route
+                        path='/settings/collections'
+                        element={<CollectionsPage />}
+                    />
+                    <Route
+                        path='/settings/notifications'
+                        element={<NotificationsPage />}
+                    />
+                </Route>
                 <Route path='/todos' element={<TodosPage />} />
                 <Route path='/login' element={<LoginPage />} />
                 <Route path='/signup' element={<SignupPage />} />

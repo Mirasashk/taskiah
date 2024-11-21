@@ -28,6 +28,26 @@ export default function SettingsSideBar() {
             ),
         },
         {
+            name: 'Preferences',
+            path: '/settings/preferences',
+            icon: (
+                <svg
+                    className='w-5 h-5'
+                    fill='none'
+                    stroke='currentColor'
+                    viewBox='0 0 24 24'
+                    xmlns='http://www.w3.org/2000/svg'
+                >
+                    <path
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                        strokeWidth={2}
+                        d='M10.325 4.317c.426-1.703 1.751-2.623 3.434-2.623 1.687 0 3.012.92 3.434 2.623a1.765 1.765 0 01-.544 1.064c-.757.77-1.676 1.272-2.76 1.272s-2.003-.502-2.76-1.272a1.765 1.765 0 01-.544-1.064zM19 13a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2h14zm-7 4a2 2 0 102-2h-2a2 2 0 10-2 2z'
+                    />
+                </svg>
+            ),
+        },
+        {
             name: 'Security',
             path: '/settings/security',
             icon: (
@@ -89,7 +109,7 @@ export default function SettingsSideBar() {
         },
         {
             name: 'Shared With Me',
-            path: '/settings/shared',
+            path: '/settings/shared-with-me',
             icon: (
                 <svg
                     className='w-5 h-5'
@@ -130,7 +150,7 @@ export default function SettingsSideBar() {
     ];
 
     return (
-        <div className='w-64 h-full bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700'>
+        <div className='w-64 h-full rounded-lg bg-white dark:bg-gray-800 '>
             <nav className='mt-5 px-2'>
                 <div className='space-y-1'>
                     {menuItems.map((item) => (

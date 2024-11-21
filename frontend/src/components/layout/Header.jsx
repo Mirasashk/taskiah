@@ -7,7 +7,7 @@ import { useUser } from '../../context/UserContext';
 export default function Header() {
     const { isDarkMode, toggleTheme } = useTheme();
     const { user, logout } = useAuth();
-    const { userData, userImage } = useUser();
+    const { userData, userImage, clearUserData } = useUser();
     const [showUserMenu, setShowUserMenu] = useState(false);
     const menuRef = useRef(null);
 
@@ -60,13 +60,13 @@ export default function Header() {
                     <hr className='w-[90%] mx-auto border-gray-500' />
                 </div>
                 <Link
-                    to='/profile'
+                    to='/settings/profile'
                     className='block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
                 >
                     Profile
                 </Link>
                 <Link
-                    to='/settings'
+                    to='/settings/preferences'
                     className='block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
                 >
                     Settings

@@ -7,6 +7,7 @@ const serviceAccount = require('../taskiah-53c29-firebase-adminsdk-43twl-80aa86f
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
+    storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
 });
 
 // // Initialize Firebase App (Client-Side Features)
@@ -21,5 +22,20 @@ admin.initializeApp({
 
 const db = admin.firestore(); // Firestore via Admin SDK
 const auth = admin.auth(); // Firebase Authentication via Admin SDK
+const storage = admin.storage();
 
-module.exports = { firebase, admin, db, auth };
+const bucket = storage.bucket();
+bucket.setCorsConfiguration([
+    {
+        origin: [
+            'http://localhost:5000', // Development
+            'http://localhost:5173', // Development
+            'https://your-production-domain.com', // Production
+        ],
+        method: ['GET', 'POST'],
+        maxAgeSeconds: 3600,
+        responseHeader: ['Content-Type'],
+    },
+]);
+
+module.exports = { firebase, admin, db, auth, storage, bucket };

@@ -20,7 +20,6 @@ class User {
         if (!this.lastName) throw new Error('Last Name is required');
         if (!this.email) throw new Error('Email is required');
         if (!this.username) throw new Error('Username is required');
-        if (!this.photoURL) throw new Error('Photo URL is required');
         if (!this.role) throw new Error('Role is required');
 
         // Validate extraInfo format
