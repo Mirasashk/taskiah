@@ -6,10 +6,13 @@ import {
 } from 'react';
 import { userService } from '../services/api';
 import { useAuth } from './AuthContext';
+import { getStorage, ref, getDownloadURL } from 'firebase/storage';
 
 const UserContext = createContext(null);
 
 const CACHE_KEY = 'userData';
+const IMAGE_CACHE_KEY = 'userImage';
+const IMAGE_CACHE_EXPIRY = 1000 * 60 * 60 * 24; // 24 hours in milliseconds
 const CACHE_EXPIRY = 1000 * 60 * 60; // 1 hour in milliseconds
 
 export function UserProvider({ children }) {
@@ -26,7 +29,65 @@ export function UserProvider({ children }) {
         return null;
     });
 
+    const [userImage, setUserImage] = useState(() => {
+        const cachedImage = localStorage.getItem(IMAGE_CACHE_KEY);
+        if (cachedImage) {
+            return JSON.parse(cachedImage).data;
+        }
+        return null;
+    });
     const { user } = useAuth();
+
+    const getUserImage = async (photoURL) => {
+        // Check if image is in cache
+        const cachedImage = localStorage.getItem(IMAGE_CACHE_KEY);
+        if (cachedImage) {
+            const { data, timestamp, url } = JSON.parse(cachedImage);
+            const now = Date.now();
+            if (
+                now - timestamp < IMAGE_CACHE_EXPIRY &&
+                url === photoURL
+            ) {
+                setUserImage(data);
+                return data;
+            }
+            localStorage.removeItem(IMAGE_CACHE_KEY);
+        }
+
+        try {
+            const storage = getStorage();
+            // Remove gs:// prefix if it exists
+            const imagePath = photoURL
+                .replace('gs://', '')
+                .split('/')
+                .slice(1)
+                .join('/');
+            const imageRef = ref(storage, imagePath);
+            const url = await getDownloadURL(imageRef);
+
+            // Download the image using the signed URL
+            const response = await fetch(url);
+            const blob = await response.blob();
+
+            // Convert blob to base64
+            const reader = new FileReader();
+            reader.readAsDataURL(blob);
+            reader.onloadend = () => {
+                const base64data = reader.result;
+                localStorage.setItem(
+                    IMAGE_CACHE_KEY,
+                    JSON.stringify({
+                        data: base64data,
+                        timestamp: Date.now(),
+                        url: photoURL,
+                    })
+                );
+                setUserImage(base64data);
+            };
+        } catch (error) {
+            console.error('Error fetching user image:', error);
+        }
+    };
 
     const updateUserData = async (userId) => {
         try {
@@ -40,6 +101,10 @@ export function UserProvider({ children }) {
                     timestamp: Date.now(),
                 })
             );
+            // If user has a photo URL, get the image
+            if (response.data.photoURL) {
+                await getUserImage(response.data.photoURL);
+            }
         } catch (error) {
             console.error('Error fetching user data:', error);
         }
@@ -47,7 +112,9 @@ export function UserProvider({ children }) {
 
     const clearUserData = () => {
         setUserData(null);
+        setUserImage(null);
         localStorage.removeItem(CACHE_KEY);
+        localStorage.removeItem(IMAGE_CACHE_KEY);
     };
 
     useEffect(() => {
@@ -58,8 +125,10 @@ export function UserProvider({ children }) {
 
     const value = {
         userData,
+        userImage,
         updateUserData,
         clearUserData,
+        getUserImage,
     };
 
     return (
