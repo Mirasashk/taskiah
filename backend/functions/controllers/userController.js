@@ -10,22 +10,40 @@ async function addUser(user) {
 
 async function getUser(userId) {
     const user = await db.collection('users').doc(userId).get();
-
-    // if (user.data().photoURL) {
-    //     const storageRef = bucket.file(user.data().photoURL);
-    //     // Add expiration time and proper configuration for signed URL
-    //     const [url] = await storageRef.getSignedUrl({
-    //         action: 'read',
-    //         expires: Date.now() + 24 * 60 * 60 * 1000, // 24 hours from now
-    //     });
-
-    //     return {
-    //         ...user.data(),
-    //         photoURL: url,
-    //     };
-    // }
-
     return user.data();
 }
 
-module.exports = { addUser, getUser };
+async function updateUser(userId, user, res) {
+    try {
+        // Update user document in Firestore
+        await db
+            .collection('users')
+            .doc(userId)
+            .update({
+                ...user,
+                updatedAt: new Date(),
+            });
+
+        // Get the updated user data
+        const userDoc = await db
+            .collection('users')
+            .doc(userId)
+            .get();
+
+        if (!userDoc.exists) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        return res.json({
+            id: userDoc.id,
+            ...userDoc.data(),
+        });
+    } catch (error) {
+        console.error('Error updating user:', error);
+        return res
+            .status(500)
+            .json({ error: 'Failed to update user' });
+    }
+}
+
+module.exports = { addUser, getUser, updateUser };

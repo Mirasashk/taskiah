@@ -4,6 +4,8 @@ export const userService = {
     createUser: (userData) =>
         axiosInstance.post('/users/add', userData),
     getUser: (userId) => axiosInstance.get(`/users/${userId}`),
+    updateUser: (userId, userData) =>
+        axiosInstance.put(`/users/${userId}`, userData),
     // Add other user-related API calls
 };
 

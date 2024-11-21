@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useUser } from '../../context/UserContext';
 
 export default function Header() {
+    const navigate = useNavigate();
     const { isDarkMode, toggleTheme } = useTheme();
     const { user, logout } = useAuth();
     const { userData, userImage, clearUserData } = useUser();
@@ -35,6 +36,7 @@ export default function Header() {
         try {
             await logout();
             clearUserData();
+            navigate('/');
         } catch (error) {
             console.error('Failed to logout:', error);
         }
@@ -47,7 +49,7 @@ export default function Header() {
                 ref={menuRef}
             >
                 <div className='ml-4 pt-6 pb-3'>
-                    <div className='text-gray-600 text-xl font-medium dark:text-gray-300 flex items-center justify-center space-x-2 cursor-pointer'>
+                    <div className='text-gray-600 text-xl font-medium dark:text-gray-300 flex items-center space-x-2 cursor-pointer'>
                         <img
                             src={userImage || userData?.photoURL}
                             alt='avatar'
