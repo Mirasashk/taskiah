@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useUser } from '../../context/UserContext';
+import TaskiahLogo from '../../assets/TaskiahLogo';
 
 export default function Header() {
     const navigate = useNavigate();
@@ -165,7 +166,7 @@ export default function Header() {
                             to='/'
                             className='text-xl font-bold text-gray-800 dark:text-white'
                         >
-                            TodoApp
+                            <TaskiahLogo className='w-36 h-12 text-gray-800 dark:text-white' />
                         </Link>
                     </div>
 
