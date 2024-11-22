@@ -33,7 +33,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/tasks', taskRoutes);
 app.use('/api/users', userRoutes);
 app.listen(config.port, () => {
-    console.log(`Server is running on port ${config.port}`);
+    console.log(`Server is running on port ${config.serverPort}`);
 });
 
 // Error handling middleware

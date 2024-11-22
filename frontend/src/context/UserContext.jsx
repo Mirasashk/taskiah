@@ -57,11 +57,7 @@ export function UserProvider({ children }) {
         try {
             const storage = getStorage();
             // Remove gs:// prefix if it exists
-            const imagePath = photoURL
-                .replace('gs://', '')
-                .split('/')
-                .slice(1)
-                .join('/');
+            const imagePath = photoURL;
             const imageRef = ref(storage, imagePath);
             const url = await getDownloadURL(imageRef);
 
@@ -89,24 +85,52 @@ export function UserProvider({ children }) {
         }
     };
 
-    const updateUserData = async (userId) => {
+    /**
+     * Updates or fetches user data
+     * @param {string|object} payload - User ID for fetching, or update data object
+     * @returns {Promise<void>}
+     */
+    const updateUserData = async (payload) => {
         try {
-            const response = await userService.getUser(userId);
-            setUserData(response.data);
-            // Cache the user data with timestamp
-            localStorage.setItem(
-                CACHE_KEY,
-                JSON.stringify({
-                    data: response.data,
-                    timestamp: Date.now(),
-                })
-            );
-            // If user has a photo URL, get the image
-            if (response.data.photoURL) {
-                await getUserImage(response.data.photoURL);
+            let response;
+            console.log('payload', payload);
+
+            // If payload is a string, it's a userId for fetching data
+            if (typeof payload === 'string') {
+                response = await userService.getUser(payload);
+            }
+            // If payload is an object, it's an update request
+            else if (typeof payload === 'object') {
+                response = await userService.updateUser(
+                    user.uid,
+                    payload
+                );
+            }
+
+            console.log('response', response);
+
+            if (response?.data) {
+                console.log('response.data', response.data);
+                setUserData(response.data);
+                // Cache the user data with timestamp
+                localStorage.setItem(
+                    CACHE_KEY,
+                    JSON.stringify({
+                        data: response.data,
+                        timestamp: Date.now(),
+                    })
+                );
+                // If user has a photo URL, get the image
+                if (response.data.photoURL) {
+                    await getUserImage(response.data.photoURL);
+                }
             }
         } catch (error) {
-            console.error('Error fetching user data:', error);
+            console.error(
+                'Error updating/fetching user data:',
+                error
+            );
+            throw error; // Rethrow to handle in components
         }
     };
 

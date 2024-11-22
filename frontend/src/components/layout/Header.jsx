@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useUser } from '../../context/UserContext';
+import TaskiahLogo from '../../assets/TaskiahLogo';
 
 export default function Header() {
+    const navigate = useNavigate();
     const { isDarkMode, toggleTheme } = useTheme();
     const { user, logout } = useAuth();
     const { userData, userImage, clearUserData } = useUser();
@@ -35,6 +37,7 @@ export default function Header() {
         try {
             await logout();
             clearUserData();
+            navigate('/');
         } catch (error) {
             console.error('Failed to logout:', error);
         }
@@ -47,7 +50,7 @@ export default function Header() {
                 ref={menuRef}
             >
                 <div className='ml-4 pt-6 pb-3'>
-                    <div className='text-gray-600 text-xl font-medium dark:text-gray-300 flex items-center justify-center space-x-2 cursor-pointer'>
+                    <div className='text-gray-600 text-xl font-medium dark:text-gray-300 flex items-center space-x-2 cursor-pointer'>
                         <img
                             src={userImage || userData?.photoURL}
                             alt='avatar'
@@ -56,23 +59,28 @@ export default function Header() {
                         {userData.username || userData.email}
                     </div>
                 </div>
-                <div className='text-gray-600 text-sm dark:text-gray-300 flex items-center space-x-2 cursor-pointer'>
-                    <hr className='w-[90%] mx-auto border-gray-500' />
+                <div className='text-gray-600 text-sm dark:text-gray-300 flex items-center space-x-2 cursor-pointer mb-2'>
+                    <hr className='w-[90%] mx-auto border-gray-200' />
                 </div>
                 <Link
                     to='/settings/profile'
+                    onClick={() => setShowUserMenu(false)}
                     className='block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
                 >
                     Profile
                 </Link>
                 <Link
                     to='/settings/preferences'
+                    onClick={() => setShowUserMenu(false)}
                     className='block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
                 >
                     Settings
                 </Link>
                 <button
-                    onClick={handleLogout}
+                    onClick={() => {
+                        setShowUserMenu(false);
+                        handleLogout();
+                    }}
                     className='block w-full text-left px-4 py-2 text-sm rounded-b-md text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
                 >
                     Sign out
@@ -158,7 +166,7 @@ export default function Header() {
                             to='/'
                             className='text-xl font-bold text-gray-800 dark:text-white'
                         >
-                            TodoApp
+                            <TaskiahLogo className='w-36 h-12 text-gray-800 dark:text-white' />
                         </Link>
                     </div>
 

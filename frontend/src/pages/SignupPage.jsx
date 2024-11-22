@@ -1,16 +1,74 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { userService } from '../services/api';
+import FormField from '../components/forms/FormField';
+import Input from '../components/forms/Input';
+import { getAvatarURL } from '../utils/UserPhoto';
+import { useUser } from '../context/UserContext';
+
+// Move AvatarSelection to a separate component
+const AvatarSelection = ({ onSelect, selectedAvatar, avatars }) => (
+    <div className='mt-6'>
+        <div className='text-center mb-4 text-gray-700 dark:text-gray-300 font-medium'>
+            Choose your avatar
+        </div>
+        <div className='flex flex-wrap gap-4 w-full justify-center'>
+            {avatars.map((url, index) => (
+                <button
+                    type='button'
+                    key={index}
+                    onClick={() => onSelect(url.path)}
+                    className={`relative p-1 rounded-full transition-all duration-200 
+                        ${
+                            selectedAvatar === url
+                                ? 'ring-2 ring-blue-500 dark:ring-blue-400 scale-110'
+                                : 'hover:ring-2 hover:ring-gray-300 dark:hover:ring-gray-600 hover:scale-105'
+                        }`}
+                >
+                    <img
+                        className='w-20 h-20 rounded-full object-cover'
+                        src={url.url}
+                        alt={`Avatar ${index + 1}`}
+                        loading='lazy'
+                    />
+                    {selectedAvatar === url && (
+                        <div className='absolute inset-0 rounded-full bg-blue-500 bg-opacity-20 dark:bg-opacity-40 flex items-center justify-center'>
+                            <div className='bg-blue-500 rounded-full p-1'>
+                                <svg
+                                    className='w-4 h-4 text-white'
+                                    fill='none'
+                                    stroke='currentColor'
+                                    viewBox='0 0 24 24'
+                                >
+                                    <path
+                                        strokeLinecap='round'
+                                        strokeLinejoin='round'
+                                        strokeWidth={2}
+                                        d='M5 13l4 4L19 7'
+                                    />
+                                </svg>
+                            </div>
+                        </div>
+                    )}
+                </button>
+            ))}
+        </div>
+    </div>
+);
 
 export default function SignupPage() {
     const navigate = useNavigate();
+    const { updateUserData } = useUser();
+    const { isDarkMode } = useTheme();
     const {
         signup,
         signInWithGoogle,
         signInWithGithub,
         signInWithMicrosoft,
     } = useAuth();
+
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
@@ -21,7 +79,26 @@ export default function SignupPage() {
         username: '',
         password: '',
         confirmPassword: '',
+        photoURL: '',
     });
+    const [avatars, setAvatars] = useState([]);
+    const [selectedAvatar, setSelectedAvatar] = useState(null);
+    const [avatarsLoaded, setAvatarsLoaded] = useState(false);
+
+    useEffect(() => {
+        const loadAvatars = async () => {
+            if (!avatarsLoaded) {
+                try {
+                    const urls = await getAvatarURL();
+                    setAvatars(urls);
+                    setAvatarsLoaded(true);
+                } catch (error) {
+                    console.error('Error loading avatars:', error);
+                }
+            }
+        };
+        loadAvatars();
+    }, [avatarsLoaded]); // Only depend on avatarsLoaded
 
     const handleChange = (e) => {
         setFormData({
@@ -52,6 +129,7 @@ export default function SignupPage() {
 
             try {
                 await userService.createUser(userData);
+                await updateUserData(auth.user.uid);
                 navigate('/dashboard');
             } catch (err) {
                 await auth.user.delete();
@@ -79,6 +157,19 @@ export default function SignupPage() {
         }
     };
 
+    const handleAvatarSelect = (url) => {
+        setSelectedAvatar(url);
+        setFormData((prev) => ({
+            ...prev,
+            photoURL: url,
+            extraInfo: {
+                preferences: {
+                    theme: isDarkMode ? 'dark' : 'light',
+                },
+            },
+        }));
+    };
+
     return (
         <div className='min-h-screen bg-gray-50 dark:bg-gray-900 mt-24 flex-col justify-center py-12 sm:px-6 lg:px-8'>
             <div className='sm:mx-auto sm:w-full sm:max-w-md'>
@@ -90,7 +181,7 @@ export default function SignupPage() {
             <div className='mt-8 sm:mx-auto sm:w-full sm:max-w-md'>
                 <div className='bg-white dark:bg-gray-800 py-8 px-4 shadow sm:rounded-lg sm:px-10'>
                     {error && (
-                        <div className='mb-4 p-2 bg-red-100 border border-red-400 text-red-700 rounded'>
+                        <div className='mb-4 p-2 bg-red-100 dark:bg-red-900 border border-red-400 text-red-700 dark:text-red-200 rounded'>
                             {error}
                         </div>
                     )}
@@ -100,7 +191,7 @@ export default function SignupPage() {
                             onClick={() =>
                                 handleSocialLogin(signInWithGoogle)
                             }
-                            className='w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50'
+                            className='w-full inline-flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600'
                             disabled={loading}
                         >
                             <img
@@ -114,7 +205,7 @@ export default function SignupPage() {
                             onClick={() =>
                                 handleSocialLogin(signInWithMicrosoft)
                             }
-                            className='w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50'
+                            className='w-full inline-flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600'
                             disabled={loading}
                         >
                             <img
@@ -128,7 +219,7 @@ export default function SignupPage() {
                             onClick={() =>
                                 handleSocialLogin(signInWithGithub)
                             }
-                            className='w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50'
+                            className='w-full inline-flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600'
                             disabled={loading}
                         >
                             <img
@@ -142,10 +233,10 @@ export default function SignupPage() {
                     <div className='mt-6'>
                         <div className='relative'>
                             <div className='absolute inset-0 flex items-center'>
-                                <div className='w-full border-t border-gray-300' />
+                                <div className='w-full border-t border-gray-300 dark:border-gray-600' />
                             </div>
                             <div className='relative flex justify-center text-sm'>
-                                <span className='px-2 bg-white text-gray-500'>
+                                <span className='px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400'>
                                     Or continue with
                                 </span>
                             </div>
@@ -156,136 +247,103 @@ export default function SignupPage() {
                         onSubmit={handleSubmit}
                         className='space-y-6 mt-6'
                     >
-                        <div>
-                            <label
-                                htmlFor='firstName'
-                                className='block text-sm font-medium text-gray-700 dark:text-gray-300'
-                            >
-                                First Name
-                            </label>
-                            <input
+                        <FormField label='First Name'>
+                            <Input
                                 id='firstName'
                                 name='firstName'
                                 type='text'
                                 required
                                 value={formData.firstName}
                                 onChange={handleChange}
-                                className='mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white'
                             />
-                        </div>
+                        </FormField>
 
-                        <div>
-                            <label
-                                htmlFor='lastName'
-                                className='block text-sm font-medium text-gray-700'
-                            >
-                                Last Name
-                            </label>
-                            <div className='mt-1'>
-                                <input
-                                    id='lastName'
-                                    name='lastName'
-                                    type='text'
-                                    required
-                                    value={formData.lastName}
-                                    onChange={handleChange}
-                                    className='appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500'
-                                />
-                            </div>
-                        </div>
+                        <FormField label='Last Name'>
+                            <Input
+                                id='lastName'
+                                name='lastName'
+                                type='text'
+                                required
+                                value={formData.lastName}
+                                onChange={handleChange}
+                            />
+                        </FormField>
 
-                        <div>
-                            <label
-                                htmlFor='email'
-                                className='block text-sm font-medium text-gray-700'
-                            >
-                                Email address
-                            </label>
-                            <div className='mt-1'>
-                                <input
-                                    id='email'
-                                    name='email'
-                                    type='email'
-                                    autoComplete='email'
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                    required
-                                    className='appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500'
-                                />
-                            </div>
-                        </div>
+                        <FormField label='Email address'>
+                            <Input
+                                id='email'
+                                name='email'
+                                type='email'
+                                autoComplete='email'
+                                required
+                                value={formData.email}
+                                onChange={handleChange}
+                            />
+                        </FormField>
 
-                        <div>
-                            <label
-                                htmlFor='username'
-                                className='block text-sm font-medium text-gray-700'
-                            >
-                                Username
-                            </label>
-                            <div className='mt-1'>
-                                <input
-                                    id='username'
-                                    name='username'
-                                    type='username'
-                                    autoComplete='username'
-                                    value={formData.username}
-                                    onChange={handleChange}
-                                    required
-                                    className='appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500'
-                                />
-                            </div>
-                        </div>
+                        <FormField label='Username'>
+                            <Input
+                                id='username'
+                                name='username'
+                                type='text'
+                                autoComplete='username'
+                                required
+                                value={formData.username}
+                                onChange={handleChange}
+                            />
+                        </FormField>
 
-                        <div>
-                            <label
-                                htmlFor='password'
-                                className='block text-sm font-medium text-gray-700'
-                            >
-                                Password
-                            </label>
-                            <div className='mt-1'>
-                                <input
-                                    id='password'
-                                    name='password'
-                                    type='password'
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                    required
-                                    className='appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500'
-                                />
-                            </div>
-                        </div>
+                        <FormField label='Password'>
+                            <Input
+                                id='password'
+                                name='password'
+                                type='password'
+                                required
+                                value={formData.password}
+                                onChange={handleChange}
+                            />
+                        </FormField>
 
-                        <div>
-                            <label
-                                htmlFor='confirmPassword'
-                                className='block text-sm font-medium text-gray-700'
-                            >
-                                Confirm Password
-                            </label>
-                            <div className='mt-1'>
-                                <input
-                                    id='confirmPassword'
-                                    name='confirmPassword'
-                                    type='password'
-                                    value={formData.confirmPassword}
-                                    onChange={handleChange}
-                                    required
-                                    className='appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500'
-                                />
-                            </div>
+                        <FormField label='Confirm Password'>
+                            <Input
+                                id='confirmPassword'
+                                name='confirmPassword'
+                                type='password'
+                                required
+                                value={formData.confirmPassword}
+                                onChange={handleChange}
+                            />
+                        </FormField>
+
+                        {/* Pick an avatar */}
+
+                        <div className='flex flex-col justify-center'>
+                            <AvatarSelection
+                                onSelect={handleAvatarSelect}
+                                selectedAvatar={selectedAvatar}
+                                avatars={avatars}
+                            />
                         </div>
 
                         <div>
                             <button
                                 type='submit'
-                                disabled={loading}
-                                className='w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50'
+                                disabled={loading || !selectedAvatar}
+                                className='w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-800 disabled:opacity-50'
                             >
                                 {loading
                                     ? 'Signing up...'
                                     : 'Sign up'}
                             </button>
+                        </div>
+
+                        <div className='text-sm text-center'>
+                            <Link
+                                to='/login'
+                                className='font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300'
+                            >
+                                Already have an account? Log in
+                            </Link>
                         </div>
                     </form>
                 </div>
