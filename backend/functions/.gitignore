@@ -2,4 +2,10 @@ node_modules/
 *.local
 
 taskiah-53c29-firebase-adminsdk-43twl-80aa86f054.json
+.env
 .env.dev
+.env.production
+.env.example.development
+.env.example.production
+.env.dev.bak
+.env.production.bak

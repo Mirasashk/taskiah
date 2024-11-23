@@ -14,7 +14,7 @@ export const getUserPhotoURL = async (photoPath) => {
     }
 };
 
-export const getAvatarURL = async (avatarNumber) => {
+export const getAvatarURL = async () => {
     //From firebase storage grab 6 random avatars from /avatars folder and return an array with the blob urls
     const storageRef = ref(storage, `avatars/`);
     const list = await listAll(storageRef);

@@ -22,7 +22,18 @@ const taskRoutes = require('./routes/taskRoutes');
 const userRoutes = require('./routes/userRoutes');
 
 // Middleware
-app.use(cors());
+app.use(
+    cors({
+        origin: [
+            'https://taskiah.web.app',
+            'https://taskiah.firebaseapp.com',
+            'http://localhost:5173',
+            'http://localhost:5000',
+        ],
+        optionsSuccessStatus: 200,
+    })
+);
+
 app.use(express.json());
 
 // Routes
@@ -32,10 +43,12 @@ app.get('/api/health', (req, res) => {
 
 app.use('/api/tasks', taskRoutes);
 app.use('/api/users', userRoutes);
-app.listen(config.port, () => {
-    console.log(`Server is running on port ${config.serverPort}`);
-});
 
+app.listen(config.port, () => {
+    console.log(
+        `Server is running on port ------------------------------------------------------- ${config.serverPort}`
+    );
+});
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);

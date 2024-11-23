@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getStorage } from 'firebase/storage';
+import { getAuth, connectAuthEmulator } from 'firebase/auth';
+import { getStorage, connectStorageEmulator } from 'firebase/storage';
 
 const firebaseConfig = {
     // Your Firebase config object here
@@ -11,5 +11,23 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const storage = getStorage(app);
+const storage = getStorage(app);
+const auth = getAuth(app);
+
+if (
+    location.hostname === 'localhost' ||
+    location.hostname === '127.0.0.1'
+) {
+    // Point to the Storage emulator running on localhost.
+    connectStorageEmulator(
+        storage,
+        import.meta.env.VITE_EMULATOR_HOST,
+        import.meta.env.VITE_STORAGE_EMULATOR_PORT
+    );
+    connectAuthEmulator(
+        auth,
+        import.meta.env.VITE_AUTH_EMULATOR_PORT
+    );
+}
+
+export { auth, storage };
