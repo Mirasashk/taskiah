@@ -1,6 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import LandingPage from '../pages/LandingPage';
-import TodosPage from '../pages/TodosPage';
+import TasksPage from '../pages/TasksPage';
 import Layout from '../components/layout/Layout';
 import LoginPage from '../pages/LoginPage';
 import SignupPage from '../pages/SignupPage';
@@ -49,7 +49,7 @@ export default function AppRoutes() {
                         element={<NotificationsPage />}
                     />
                 </Route>
-                <Route path='/todos' element={<TodosPage />} />
+                <Route path='/tasks' element={<TasksPage />} />
                 <Route path='/login' element={<LoginPage />} />
                 <Route path='/signup' element={<SignupPage />} />
                 <Route path='/notes' element={<NotesPage />} />

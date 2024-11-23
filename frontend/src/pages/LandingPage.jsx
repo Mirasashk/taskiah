@@ -13,7 +13,7 @@ const LandingPage = () => {
                             Organize Your Tasks with Ease
                         </h1>
                         <p className='text-xl text-gray-600 dark:text-gray-300 mb-8'>
-                            Simple, intuitive, and powerful todo
+                            Simple, intuitive, and powerful task
                             management to help you stay productive and
                             focused.
                         </p>

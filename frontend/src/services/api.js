@@ -9,8 +9,8 @@ export const userService = {
     // Add other user-related API calls
 };
 
-export const todoService = {
-    getTodos: () => axiosInstance.get('/todos'),
-    createTodo: (todo) => axiosInstance.post('/todos', todo),
-    // Add other todo-related API calls
+export const taskService = {
+    getTasks: () => axiosInstance.get('/tasks'),
+    createTask: (task) => axiosInstance.post('/tasks', task),
+    // Add other task-related API calls
 };

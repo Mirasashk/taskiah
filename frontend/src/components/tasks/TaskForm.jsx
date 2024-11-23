@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { useTodoContext } from '../../context/TodoContext';
+import { useTaskContext } from '../../context/TaskContext';
 
-export default function TodoForm() {
+export default function TaskForm() {
     const [title, setTitle] = useState('');
-    const { addTodo } = useTodoContext();
+    const { addTask } = useTaskContext();
 
     const handleSubmit = (e) => {
         e.preventDefault();
         if (!title.trim()) return;
-        addTodo(title);
+        addTask(title);
         setTitle('');
     };
 
@@ -19,7 +19,7 @@ export default function TodoForm() {
                     type='text'
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    placeholder='Add a new todo'
+                    placeholder='Add a new task'
                     className='flex-1 p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border-gray-300 dark:border-gray-700'
                 />
                 <button

@@ -98,12 +98,12 @@ export default function Header() {
                     e.stopPropagation();
                     setShowUserMenu(!showUserMenu);
                 }}
-                className='text-gray-600 dark:text-gray-300 flex items-center space-x-2 cursor-pointer'
+                className='text-gray-600 dark:text-gray-300 flex items-center gap-2 cursor-pointer'
             >
                 <img
                     src={userImage || userData?.photoURL}
                     alt='avatar'
-                    className='w-8 h-8 rounded-full mr-6'
+                    className='w-8 h-8 rounded-full'
                 />
                 {userData.username || userData.email}
             </div>
@@ -120,10 +120,10 @@ export default function Header() {
                 Home
             </Link>
             <Link
-                to='/todos'
+                to='/tasks'
                 className='text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
             >
-                Todos
+                tasks
             </Link>
             <Link
                 to='/notes'

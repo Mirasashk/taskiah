@@ -1,6 +1,6 @@
 import './index.css';
 import { BrowserRouter } from 'react-router-dom';
-import { TodoProvider } from './context/TodoContext';
+import { TaskProvider } from './context/TaskContext';
 import AppRoutes from './routes';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -11,7 +11,7 @@ function App() {
         <AuthProvider>
             <UserProvider>
                 <ThemeProvider>
-                    <TodoProvider>
+                    <TaskProvider>
                         <BrowserRouter
                             future={{
                                 v7_startTransition: true,
@@ -20,7 +20,7 @@ function App() {
                         >
                             <AppRoutes />
                         </BrowserRouter>
-                    </TodoProvider>
+                    </TaskProvider>
                 </ThemeProvider>
             </UserProvider>
         </AuthProvider>

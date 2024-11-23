@@ -149,7 +149,7 @@ export default function SignupPage() {
             setError('');
             setLoading(true);
             await socialMethod();
-            navigate('/todos');
+            navigate('/tasks');
         } catch (err) {
             setError('Failed to sign in: ' + err.message);
         } finally {
