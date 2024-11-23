@@ -1,8 +1,13 @@
+import { useEffect } from 'react';
 import { useTaskContext } from '../../context/TaskContext';
 import TaskItem from './TaskItem';
 
 export default function TaskList() {
-    const { tasks } = useTaskContext();
+    const { getTasks, tasks } = useTaskContext();
+
+    useEffect(() => {
+        getTasks();
+    }, []);
 
     if (tasks.length === 0) {
         return (
