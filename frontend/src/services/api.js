@@ -11,6 +11,7 @@ export const userService = {
 
 export const taskService = {
     getTasks: () => axiosInstance.get('/tasks'),
-    createTask: (task) => axiosInstance.post('/tasks', task),
+    createTask: (task) => axiosInstance.post('/tasks/add', task),
+
     // Add other task-related API calls
 };

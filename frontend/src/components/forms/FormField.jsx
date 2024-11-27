@@ -9,7 +9,7 @@ export default function FormField({
 }) {
     const baseLabelClasses =
         'text-lg font-normal text-gray-900 dark:text-white';
-    const baseContainerClasses = 'flex items-center space-x-8';
+    const baseContainerClasses = 'flex items-center space-x-2';
 
     return (
         <div

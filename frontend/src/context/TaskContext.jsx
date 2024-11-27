@@ -1,20 +1,27 @@
 import { createContext, useContext, useState } from 'react';
+import { taskService } from '../services/api';
 
 const TaskContext = createContext(null); // Initialize with null
 
 export function TaskProvider({ children }) {
-    const [tasks, setTasks] = useState([
-        // Add some initial tasks for testing
-        { id: 1, title: 'Test Task', completed: false },
-    ]);
+    const [tasks, setTasks] = useState([]);
+    const [filteredTasks, setFilteredTasks] = useState([]);
+    const [filter, setFilter] = useState('All tasks');
 
-    const addTask = (title) => {
-        const newTask = {
-            id: Date.now(),
-            title,
-            completed: false,
-        };
-        setTasks([...tasks, newTask]);
+    const addTask = async (task) => {
+        try {
+            const response = await taskService.createTask(task);
+
+            console.log('new task added!', response);
+            setTasks([...tasks, task]);
+        } catch (error) {
+            console.error('Error adding task:', error);
+        }
+    };
+
+    const filterTasks = (filteredTasks, filter) => {
+        setFilteredTasks(filteredTasks);
+        setFilter(filter);
     };
 
     const deleteTask = (id) => {
@@ -31,11 +38,20 @@ export function TaskProvider({ children }) {
         );
     };
 
+    const getTasks = async () => {
+        const response = await taskService.getTasks();
+        setTasks(response.data);
+    };
+
     const value = {
         tasks,
+        filter,
+        filteredTasks,
         addTask,
         deleteTask,
         toggleTask,
+        getTasks,
+        filterTasks,
     };
 
     return (

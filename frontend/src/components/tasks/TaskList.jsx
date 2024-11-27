@@ -1,10 +1,49 @@
+import { useEffect, useState } from 'react';
 import { useTaskContext } from '../../context/TaskContext';
 import TaskItem from './TaskItem';
 
-export default function TaskList() {
-    const { tasks } = useTaskContext();
+const TaskList = ({}) => {
+    const { getTasks, tasks, filteredTasks, filter } =
+        useTaskContext();
+    const [localTasks, setLocalTasks] = useState([]);
 
-    if (tasks.length === 0) {
+    // useEffect(() => {
+    //     if (!filteredTasks) {
+    //         setTasks(Array.isArray(getTasks()) ? getTasks() : []);
+    //     } else {
+    //         setTasks(
+    //             Array.isArray(filteredTasks) ? filteredTasks : []
+    //         );
+    //     }
+    // }, []);
+
+    useEffect(() => {
+        getTasks();
+    }, []);
+
+    useEffect(() => {
+        console.log('These are the filtered tasks:', filteredTasks);
+        setLocalTasks(filteredTasks);
+    }, [filteredTasks]);
+
+    useEffect(() => {
+        setLocalTasks(tasks);
+    }, [tasks]);
+
+    // useEffect(() => {
+    //     getTasks();
+    //     if (!filteredTasks) {
+    //         setLocalTasks(tasks);
+    //     } else {
+    //         setLocalTasks(filteredTasks);
+    //     }
+    // }, []);
+
+    // useEffect(() => {
+    //     console.log('These are the tasks:', localTasks);
+    // }, [localTasks]);
+
+    if (localTasks.length === 0) {
         return (
             <p className='text-gray-500 dark:text-gray-400'>
                 No tasks yet!
@@ -14,9 +53,16 @@ export default function TaskList() {
 
     return (
         <div className='space-y-4'>
-            {tasks.map((task) => (
+            {filter && filter !== 'All tasks' && (
+                <span className='text-gray-500 dark:text-gray-400'>
+                    Filtered by {filter}
+                </span>
+            )}
+            {localTasks.map((task) => (
                 <TaskItem key={task.id} task={task} />
             ))}
         </div>
     );
-}
+};
+
+export default TaskList;
