@@ -3,13 +3,17 @@ import { useTaskContext } from '../../context/TaskContext';
 import { useUser } from '../../context/UserContext';
 import FormField from '../forms/FormField';
 import Input from '../forms/Input';
+import CustomDropdown from '../forms/CustomDropdown';
 
-export default function TaskForm() {
+const TaskForm = () => {
     const { addTask } = useTaskContext();
     const { userData } = useUser();
 
     const [showNewTaskSubForm, setShowNewTaskSubForm] =
         useState(false);
+    const [selectedTag, setSelectedTag] = useState(
+        Object.values(userData.tags)[0]
+    );
 
     const [formData, setFormData] = useState({
         title: '',
@@ -24,6 +28,11 @@ export default function TaskForm() {
     });
 
     useEffect(() => {
+        console.log('Selected Tag:', selectedTag);
+        setFormData({ ...formData, tags: selectedTag.name });
+    }, [selectedTag]);
+
+    useEffect(() => {
         if (formData.title.trim() === '') {
             setShowNewTaskSubForm(false);
         } else {
@@ -36,6 +45,11 @@ export default function TaskForm() {
         if (!formData.title.trim()) return;
 
         await addTask(formData);
+        //clear formData
+        setFormData({
+            title: '',
+            description: '',
+        });
         setShowNewTaskSubForm(false);
     };
 
@@ -47,7 +61,7 @@ export default function TaskForm() {
 
     const displayNewTaskSubForm = () => {
         return (
-            <div className='grid flex-col grid-cols-2 gap-3 pt-2 w-full bg-gray-700 rounded-lg p-4'>
+            <div className='grid flex-col grid-cols-2 gap-4 pt-2 w-full bg-gray-700 rounded-lg p-4'>
                 {/* First Row */}
                 <div className='grid col-span-1 w-full gap-4'>
                     <div className='flex flex-col gap-2'>
@@ -55,17 +69,13 @@ export default function TaskForm() {
                             Description
                         </label>
                         <textarea
-                            className='p-2 h-48 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border-gray-300 dark:border-gray-700'
+                            className='p-2 h-24 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border-gray-300 dark:border-gray-700'
                             name='description'
                             value={formData.description}
                             onChange={handleFormChange}
                             placeholder='Enter task description'
                         />
                     </div>
-                </div>
-
-                {/* Second Row */}
-                <div className='grid col-span-1 gap-4'>
                     <FormField label='Category' className=''>
                         <Input
                             type='text'
@@ -87,7 +97,10 @@ export default function TaskForm() {
                             <option value='high'>High</option>
                         </select>
                     </FormField>
+                </div>
 
+                {/* Second Row */}
+                <div className='grid col-span-1 gap-2'>
                     <FormField label='Status' className='w-36'>
                         <select
                             name='status'
@@ -103,20 +116,12 @@ export default function TaskForm() {
                         </select>
                     </FormField>
 
-                    <FormField
-                        label='Tags'
-                        labelClassName='font-thin text-sm'
-                    >
-                        <select
-                            name='tags'
-                            value={formData.tags}
-                            onChange={handleFormChange}
-                            className='w-full p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700'
-                        >
-                            <option value='work'>Work</option>
-                            <option value='personal'>Personal</option>
-                            <option value='shopping'>Shopping</option>
-                        </select>
+                    <FormField label='Tags' labelClassName=''>
+                        <CustomDropdown
+                            options={Object.values(userData.tags)}
+                            selected={selectedTag}
+                            onChange={setSelectedTag}
+                        />
                     </FormField>
 
                     <FormField label='Due Date' className='w-48'>
@@ -127,6 +132,20 @@ export default function TaskForm() {
                             onChange={handleFormChange}
                         />
                     </FormField>
+                    <div className='flex gap-2 justify-end'>
+                        <button
+                            type='submit'
+                            className='px-4 h-12 w-16 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700'
+                        >
+                            Add
+                        </button>
+                        <button
+                            type='cancel'
+                            className='px-4 py-2 bg-red-800 text-white rounded hover:bg-red-900 dark:bg-gray-500 dark:hover:bg-gray-900 h-12 w-24 justify-self-end'
+                        >
+                            Cancel
+                        </button>
+                    </div>
                 </div>
             </div>
         );
@@ -157,4 +176,6 @@ export default function TaskForm() {
             </div>
         </form>
     );
-}
+};
+
+export default TaskForm;

@@ -5,6 +5,8 @@ const TaskContext = createContext(null); // Initialize with null
 
 export function TaskProvider({ children }) {
     const [tasks, setTasks] = useState([]);
+    const [filteredTasks, setFilteredTasks] = useState([]);
+    const [filter, setFilter] = useState('All tasks');
 
     const addTask = async (task) => {
         try {
@@ -15,6 +17,11 @@ export function TaskProvider({ children }) {
         } catch (error) {
             console.error('Error adding task:', error);
         }
+    };
+
+    const filterTasks = (filteredTasks, filter) => {
+        setFilteredTasks(filteredTasks);
+        setFilter(filter);
     };
 
     const deleteTask = (id) => {
@@ -38,10 +45,13 @@ export function TaskProvider({ children }) {
 
     const value = {
         tasks,
+        filter,
+        filteredTasks,
         addTask,
         deleteTask,
         toggleTask,
         getTasks,
+        filterTasks,
     };
 
     return (
