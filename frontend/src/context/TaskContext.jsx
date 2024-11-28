@@ -1,5 +1,11 @@
-import { createContext, useContext, useState } from 'react';
+import {
+    createContext,
+    useContext,
+    useState,
+    useEffect,
+} from 'react';
 import { taskService } from '../services/api';
+import { useUser } from './UserContext';
 
 const TaskContext = createContext(null); // Initialize with null
 
@@ -7,6 +13,14 @@ export function TaskProvider({ children }) {
     const [tasks, setTasks] = useState([]);
     const [filteredTasks, setFilteredTasks] = useState([]);
     const [filter, setFilter] = useState('All tasks');
+    const { userData } = useUser();
+
+    useEffect(() => {
+        console.log('User Data:', userData);
+        if (userData) {
+            getTasks(userData.id);
+        }
+    }, [userData]);
 
     const addTask = async (task) => {
         try {
@@ -38,8 +52,8 @@ export function TaskProvider({ children }) {
         );
     };
 
-    const getTasks = async () => {
-        const response = await taskService.getTasks();
+    const getTasks = async (userId) => {
+        const response = await taskService.getTasks(userId);
         setTasks(response.data);
     };
 

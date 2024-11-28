@@ -26,7 +26,9 @@ const TasksSidebar = ({ onFilterTasks }) => {
     const [selectedTagPriority, setSelectedTagPriority] =
         useState('medium');
 
-    const [tags, setTags] = useState(Object.values(userData.tags));
+    const [tags, setTags] = useState(
+        Object.values(userData?.tags || {}) || []
+    );
     const today = new Date();
     const todayTasks = tasks.filter((task) => {
         const taskDate = new Date(task.dueDate);
@@ -61,7 +63,7 @@ const TasksSidebar = ({ onFilterTasks }) => {
     ];
 
     useEffect(() => {
-        setTags(Object.values(userData.tags));
+        setTags(Object.values(userData?.tags || {}));
     }, [userData.tags]);
 
     const handleAddTag = async (tag) => {

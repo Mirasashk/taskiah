@@ -11,8 +11,9 @@ router.post('/add', async (req, res) => {
     res.send('Task added!');
 });
 
-router.get('/', async (req, res) => {
-    const tasks = await getTasks();
+router.get('/:userId', async (req, res) => {
+    const userId = req.params.userId;
+    const tasks = await getTasks(userId);
     res.json(tasks);
 });
 

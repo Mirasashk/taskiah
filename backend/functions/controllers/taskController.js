@@ -9,9 +9,12 @@ async function addTask(task) {
     }
 }
 
-async function getTasks() {
+async function getTasks(userId) {
     try {
-        const tasksSnapshot = await db.collection('tasks').get();
+        const tasksSnapshot = await db
+            .collection('tasks')
+            .where('ownerId', '==', userId)
+            .get();
         const tasks = tasksSnapshot.docs.map((doc) => ({
             id: doc.id,
             ...doc.data(),

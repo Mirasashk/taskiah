@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useTaskContext } from '../../context/TaskContext';
+import { useUser } from '../../context/UserContext';
 import TaskItem from './TaskItem';
 
-const TaskList = ({}) => {
+const TaskList = () => {
     const { getTasks, tasks, filteredTasks, filter } =
         useTaskContext();
+
+    const { userData } = useUser();
     const [localTasks, setLocalTasks] = useState([]);
 
     // useEffect(() => {
@@ -18,7 +21,7 @@ const TaskList = ({}) => {
     // }, []);
 
     useEffect(() => {
-        getTasks();
+        getTasks(userData.id);
     }, []);
 
     useEffect(() => {

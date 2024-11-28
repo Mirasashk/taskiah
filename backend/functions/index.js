@@ -29,6 +29,9 @@ app.use(
             'https://taskiah.firebaseapp.com',
             'http://localhost:5173',
             'http://localhost:5000',
+            'https://taskiah-53c29.web.app',
+            'https://taskiah-53c29.firebaseapp.com',
+            'https://taskiah.com',
         ],
         optionsSuccessStatus: 200,
     })

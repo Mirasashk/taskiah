@@ -12,7 +12,7 @@ const TaskForm = () => {
     const [showNewTaskSubForm, setShowNewTaskSubForm] =
         useState(false);
     const [selectedTag, setSelectedTag] = useState(
-        Object.values(userData.tags)[0]
+        Object.values(userData?.tags || {})[0]
     );
 
     const [formData, setFormData] = useState({
@@ -29,7 +29,7 @@ const TaskForm = () => {
 
     useEffect(() => {
         console.log('Selected Tag:', selectedTag);
-        setFormData({ ...formData, tags: selectedTag.name });
+        setFormData({ ...formData, tags: selectedTag?.name });
     }, [selectedTag]);
 
     useEffect(() => {
@@ -118,7 +118,9 @@ const TaskForm = () => {
 
                     <FormField label='Tags' labelClassName=''>
                         <CustomDropdown
-                            options={Object.values(userData.tags)}
+                            options={Object.values(
+                                userData?.tags || {}
+                            )}
                             selected={selectedTag}
                             onChange={setSelectedTag}
                         />

@@ -11,19 +11,39 @@ const CustomDropdown = ({ options, selected, onChange }) => {
     };
 
     useEffect(() => {
-        console.log('Selected Tag:', selected);
+        console.log('Selected Tag:', selected?.name);
     }, [selected]);
 
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (
+                isOpen &&
+                !event.target.closest('.dropdown-container')
+            ) {
+                setIsOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+
+        return () => {
+            document.removeEventListener(
+                'mousedown',
+                handleClickOutside
+            );
+        };
+    }, [isOpen]);
+
     return (
-        <div className='relative'>
+        <div className='relative dropdown-container'>
             <button
                 type='button'
                 className='w-full p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700'
                 onClick={() => setIsOpen(!isOpen)}
             >
                 <div className='flex items-center justify-between'>
-                    {selected.name}{' '}
-                    <FaCircle color={selected.color} />
+                    {selected?.name || 'Create a new tag'}{' '}
+                    <FaCircle color={selected?.color} />
                 </div>
             </button>
             {isOpen && (
