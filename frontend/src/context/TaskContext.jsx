@@ -12,6 +12,7 @@ const TaskContext = createContext(null); // Initialize with null
 export function TaskProvider({ children }) {
     const [tasks, setTasks] = useState([]);
     const [filteredTasks, setFilteredTasks] = useState([]);
+    const [deletedTasks, setDeletedTasks] = useState([]);
     const [filter, setFilter] = useState('All tasks');
     const { userData } = useUser();
 
@@ -27,40 +28,76 @@ export function TaskProvider({ children }) {
             const response = await taskService.createTask(task);
 
             console.log('new task added!', response);
-            setTasks([...tasks, task]);
+            //Sort tasks by createdAt date
+            const sortedTasks = [...tasks, response.data].sort(
+                (a, b) =>
+                    new Date(b.createdAt) - new Date(a.createdAt)
+            );
+            setTasks(sortedTasks);
         } catch (error) {
             console.error('Error adding task:', error);
         }
     };
 
     const filterTasks = (filteredTasks, filter) => {
-        setFilteredTasks(filteredTasks);
+        // sort filteredTasks by createdAt date
+        const sortedFilteredTasks = filteredTasks.sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        setFilteredTasks(sortedFilteredTasks);
         setFilter(filter);
     };
 
-    const deleteTask = (id) => {
-        setTasks(tasks.filter((task) => task.id !== id));
+    const deleteTask = async (task) => {
+        if (task.status === 'deleted') {
+            console.log('permanently deleting task', task.id);
+            await taskService.deleteTask(task.id);
+            setDeletedTasks(
+                deletedTasks.filter((t) => t.id !== task.id)
+            );
+        } else {
+            console.log('deleting task', task.id);
+            const deletedStatus = {
+                status: 'deleted',
+            };
+            setDeletedTasks([...deletedTasks, task]);
+            setTasks(tasks.filter((t) => t.id !== task.id));
+
+            await taskService.updateTask(task.id, deletedStatus);
+        }
     };
 
-    const toggleTask = (id) => {
+    const toggleTask = async (taskId, taskData) => {
         setTasks(
             tasks.map((task) =>
-                task.id === id
-                    ? { ...task, completed: !task.completed }
-                    : task
+                task.id === taskId ? { ...task, ...taskData } : task
             )
         );
+        await taskService.updateTask(taskId, taskData);
     };
 
     const getTasks = async (userId) => {
         const response = await taskService.getTasks(userId);
-        setTasks(response.data);
+        // sort tasks by createdAt date
+        const deletedTasks = response.data.filter(
+            (task) => task.status === 'deleted'
+        );
+        setDeletedTasks(deletedTasks);
+
+        const filteredTasks = response.data.filter(
+            (task) => task.status !== 'deleted'
+        );
+        const sortedTasks = filteredTasks.sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        setTasks(sortedTasks);
     };
 
     const value = {
         tasks,
         filter,
         filteredTasks,
+        deletedTasks,
         addTask,
         deleteTask,
         toggleTask,

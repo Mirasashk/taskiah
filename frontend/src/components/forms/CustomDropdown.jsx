@@ -11,10 +11,6 @@ const CustomDropdown = ({ options, selected, onChange }) => {
     };
 
     useEffect(() => {
-        console.log('Selected Tag:', selected?.name);
-    }, [selected]);
-
-    useEffect(() => {
         const handleClickOutside = (event) => {
             if (
                 isOpen &&

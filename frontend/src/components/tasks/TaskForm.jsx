@@ -22,13 +22,12 @@ const TaskForm = () => {
         category: '',
         priority: 'low',
         dueDate: '',
-        tags: 'work',
+        tags: '',
         createdAt: new Date(),
         ownerId: userData.id,
     });
 
     useEffect(() => {
-        console.log('Selected Tag:', selectedTag);
         setFormData({ ...formData, tags: selectedTag?.name });
     }, [selectedTag]);
 
@@ -49,6 +48,13 @@ const TaskForm = () => {
         setFormData({
             title: '',
             description: '',
+            status: 'active',
+            category: '',
+            priority: 'low',
+            dueDate: '',
+            tags: 'work',
+            createdAt: new Date(),
+            ownerId: userData.id,
         });
         setShowNewTaskSubForm(false);
     };
