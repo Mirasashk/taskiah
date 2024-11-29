@@ -10,8 +10,11 @@ export const userService = {
 };
 
 export const taskService = {
-    getTasks: () => axiosInstance.get('/tasks'),
+    getTasks: (userId) => axiosInstance.get(`/tasks/${userId}`),
     createTask: (task) => axiosInstance.post('/tasks/add', task),
+    deleteTask: (id) => axiosInstance.delete(`/tasks/${id}`),
+    updateTask: (taskId, taskData) =>
+        axiosInstance.put(`/tasks/${taskId}`, taskData),
 
     // Add other task-related API calls
 };

@@ -3,17 +3,45 @@ const router = express.Router();
 const {
     addTask,
     getTasks,
+    getTaskById,
+    deleteTask,
+    updateTask,
 } = require('../controllers/taskController');
 
 router.post('/add', async (req, res) => {
     const task = req.body;
-    await addTask(task);
-    res.send('Task added!');
+    const newTask = {
+        id: await addTask(task),
+        ...task,
+    };
+    console.log('newTask', newTask);
+    res.json(newTask);
 });
 
-router.get('/', async (req, res) => {
-    const tasks = await getTasks();
+router.get('/:userId', async (req, res) => {
+    const userId = req.params.userId;
+    const tasks = await getTasks(userId);
     res.json(tasks);
+});
+
+router.get('/:id', async (req, res) => {
+    const id = req.params.id;
+    const task = await getTaskById(id);
+    res.json(task);
+});
+
+router.delete('/:id', async (req, res) => {
+    const id = req.params.id;
+    await deleteTask(id);
+    res.send('Task deleted!');
+});
+
+router.put('/:id', async (req, res) => {
+    const id = req.params.id;
+    const taskData = req.body;
+    console.log('taskData', taskData);
+    await updateTask(id, taskData);
+    res.send('Task updated!');
 });
 
 module.exports = router;

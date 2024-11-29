@@ -12,7 +12,7 @@ const TaskForm = () => {
     const [showNewTaskSubForm, setShowNewTaskSubForm] =
         useState(false);
     const [selectedTag, setSelectedTag] = useState(
-        Object.values(userData.tags)[0]
+        Object.values(userData?.tags || {})[0]
     );
 
     const [formData, setFormData] = useState({
@@ -22,14 +22,13 @@ const TaskForm = () => {
         category: '',
         priority: 'low',
         dueDate: '',
-        tags: 'work',
+        tags: '',
         createdAt: new Date(),
         ownerId: userData.id,
     });
 
     useEffect(() => {
-        console.log('Selected Tag:', selectedTag);
-        setFormData({ ...formData, tags: selectedTag.name });
+        setFormData({ ...formData, tags: selectedTag?.name });
     }, [selectedTag]);
 
     useEffect(() => {
@@ -49,6 +48,13 @@ const TaskForm = () => {
         setFormData({
             title: '',
             description: '',
+            status: 'active',
+            category: '',
+            priority: 'low',
+            dueDate: '',
+            tags: 'work',
+            createdAt: new Date(),
+            ownerId: userData.id,
         });
         setShowNewTaskSubForm(false);
     };
@@ -118,7 +124,9 @@ const TaskForm = () => {
 
                     <FormField label='Tags' labelClassName=''>
                         <CustomDropdown
-                            options={Object.values(userData.tags)}
+                            options={Object.values(
+                                userData?.tags || {}
+                            )}
                             selected={selectedTag}
                             onChange={setSelectedTag}
                         />

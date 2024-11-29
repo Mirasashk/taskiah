@@ -4,14 +4,18 @@ async function addTask(task) {
     try {
         const docRef = await db.collection('tasks').add(task);
         console.log('Task added with ID:', docRef.id);
+        return docRef.id;
     } catch (error) {
         console.error('Error adding task:', error);
     }
 }
 
-async function getTasks() {
+async function getTasks(userId) {
     try {
-        const tasksSnapshot = await db.collection('tasks').get();
+        const tasksSnapshot = await db
+            .collection('tasks')
+            .where('ownerId', '==', userId)
+            .get();
         const tasks = tasksSnapshot.docs.map((doc) => ({
             id: doc.id,
             ...doc.data(),

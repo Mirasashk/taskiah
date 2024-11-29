@@ -20,18 +20,22 @@ const TasksSidebar = ({ onFilterTasks }) => {
     const [showNewTagForm, setShowNewTagForm] = useState(false);
     const [newTag, setNewTag] = useState('');
     const { userData, updateUserData } = useUser();
-    const { tasks, filterTasks, filter } = useTaskContext();
+    const { tasks, filterTasks, filter, deletedTasks } =
+        useTaskContext();
     const [selectedTagColor, setSelectedTagColor] =
         useColor('#6590D5');
     const [selectedTagPriority, setSelectedTagPriority] =
         useState('medium');
 
-    const [tags, setTags] = useState(Object.values(userData.tags));
+    const [tags, setTags] = useState(
+        Object.values(userData?.tags || {}) || []
+    );
     const today = new Date();
     const todayTasks = tasks.filter((task) => {
         const taskDate = new Date(task.dueDate);
         return taskDate.toDateString() === today.toDateString();
     });
+
     const importantTasks = tasks.filter(
         (task) =>
             task.priority === 'high' && task.ownerId === userData.id
@@ -58,11 +62,17 @@ const TasksSidebar = ({ onFilterTasks }) => {
             label: 'Important',
             count: importantTasks.length,
         },
+        {
+            icon: <FiTrash2 />,
+            label: 'Deleted',
+            count: deletedTasks.length,
+        },
     ];
 
     useEffect(() => {
-        setTags(Object.values(userData.tags));
-    }, [userData.tags]);
+        setTags(Object.values(userData?.tags || {}));
+        console.log('deletedTasks', deletedTasks);
+    }, [userData?.tags]);
 
     const handleAddTag = async (tag) => {
         if (!tag.trim()) return;
@@ -92,6 +102,8 @@ const TasksSidebar = ({ onFilterTasks }) => {
             filterTasks(todayTasks, label);
         } else if (label === 'Important') {
             filterTasks(importantTasks, label);
+        } else if (label === 'Deleted') {
+            filterTasks(deletedTasks, label);
         }
     };
 
