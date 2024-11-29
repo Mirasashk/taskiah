@@ -69,6 +69,13 @@ const TasksSidebar = ({ onFilterTasks }) => {
         },
     ];
 
+    const [selectedFilter, setSelectedFilter] = useState(filter);
+    const [selectedTag, setSelectedTag] = useState(null);
+
+    useEffect(() => {
+        setSelectedFilter(filter);
+    }, [filter]);
+
     useEffect(() => {
         setTags(Object.values(userData?.tags || {}));
         console.log('deletedTasks', deletedTasks);
@@ -96,6 +103,8 @@ const TasksSidebar = ({ onFilterTasks }) => {
 
     const handleFilter = (label) => {
         console.log('Filtering by:', label);
+        setSelectedFilter(label);
+        setSelectedTag(null);
         if (label === 'All tasks') {
             filterTasks(tasks, label);
         } else if (label === 'Today') {
@@ -109,6 +118,8 @@ const TasksSidebar = ({ onFilterTasks }) => {
 
     const handleFilterByTag = (tag) => {
         console.log('Filtering by tag:', tag);
+        setSelectedTag(tag);
+        setSelectedFilter(null);
         const filteredTasks = tasks.filter(
             (task) => task.tags === tag
         );
@@ -119,7 +130,11 @@ const TasksSidebar = ({ onFilterTasks }) => {
         return tags.map((tag) => (
             <button
                 key={tag.name}
-                className='flex items-center justify-between w-full px-3 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg'
+                className={`flex items-center justify-between w-full px-3 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg ${
+                    selectedTag === tag.name
+                        ? 'bg-gray-200 dark:bg-gray-600'
+                        : ''
+                }`}
                 onClick={() => handleFilterByTag(tag.name)}
             >
                 <div className='flex items-center'>
@@ -200,7 +215,11 @@ const TasksSidebar = ({ onFilterTasks }) => {
                     {filterOptions.map((option, index) => (
                         <button
                             key={index}
-                            className='flex items-center w-full px-3 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg'
+                            className={`flex items-center w-full px-3 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg ${
+                                selectedFilter === option.label
+                                    ? 'bg-gray-200 dark:bg-gray-600'
+                                    : ''
+                            }`}
                             onClick={() => handleFilter(option.label)}
                         >
                             <span className='text-lg mr-3'>

@@ -3,45 +3,53 @@ const {
     getTasks,
     updateTask,
     deleteTask,
+    deleteAllTasks,
 } = require('../../controllers/taskController');
 const { db } = require('../../config/firebase');
 
+const taskCollection = [
+    {
+        id: 'task1',
+        title: 'Test Task',
+        ownerId: '123',
+        status: 'deleted',
+    },
+    {
+        id: 'task2',
+        title: 'Test Task 2',
+        ownerId: '123',
+        status: 'active',
+    },
+];
+
 jest.mock('../../config/firebase', () => {
     const getMock = jest.fn().mockResolvedValue({
-        docs: [
-            {
-                id: 'task1',
-                data: () => ({
-                    title: 'Task 1',
-                    ownerId: '123',
-                }),
-            },
-            {
-                id: 'task2',
-                data: () => ({
-                    title: 'Task 2',
-                    ownerId: '123',
-                }),
-            },
-        ],
-    });
-    const docRef = {
-        update: jest.fn().mockResolvedValue({}),
-        delete: jest.fn().mockResolvedValue({}),
-    };
-    const collectionRef = {
-        add: jest.fn().mockResolvedValue({ id: 'task1' }),
-        doc: jest.fn(() => docRef),
-        where: jest.fn(() => ({
-            get: getMock,
+        docs: taskCollection.map((task) => ({
+            id: task.id,
+            data: () => task,
         })),
+    });
+
+    const whereChain = {
+        get: getMock,
+        where: jest.fn().mockReturnThis(),
+    };
+
+    const mockDoc = {
+        update: jest.fn().mockResolvedValue(),
+        delete: jest.fn().mockResolvedValue(),
+    };
+
+    const mockCollection = {
+        add: jest.fn().mockResolvedValue(taskCollection[0]),
+        where: jest.fn().mockReturnValue(whereChain),
+        doc: jest.fn(() => mockDoc),
     };
 
     return {
         db: {
-            collection: jest.fn(() => collectionRef),
+            collection: jest.fn(() => mockCollection),
         },
-        _getMock: getMock,
     };
 });
 
@@ -52,62 +60,50 @@ describe('Task Controller', () => {
 
     describe('addTask', () => {
         it('should add a task and return its ID', async () => {
-            const task = { title: 'Test Task', ownerId: '123' };
-            const mockDocRef = { id: 'task123' };
-            db.collection().add.mockResolvedValue(mockDocRef);
-
+            const task = {
+                id: 'task1',
+                title: 'Test Task',
+                ownerId: '123',
+            };
             const result = await addTask(task);
-
             expect(db.collection).toHaveBeenCalledWith('tasks');
             expect(db.collection().add).toHaveBeenCalledWith(task);
-            expect(result).toBe(mockDocRef.id);
+            expect(result).toBe(task.id);
         });
 
         it('should log an error if adding a task fails', async () => {
-            const task = { title: 'Test Task', ownerId: '123' };
+            const task = {
+                id: 'task1',
+                title: 'Test Task',
+                ownerId: '123',
+            };
             const consoleSpy = jest
                 .spyOn(console, 'error')
                 .mockImplementation();
             db.collection().add.mockRejectedValue(
                 new Error('Add task error')
             );
-
-            await addTask(task);
-
+            const result = await addTask(task);
+            expect(result).toBeUndefined();
             expect(consoleSpy).toHaveBeenCalledWith(
                 'Error adding task:',
                 expect.any(Error)
             );
-            consoleSpy.mockRestore();
         });
     });
 
     describe('getTasks', () => {
         it('should return tasks for a given user ID', async () => {
             const userId = '123';
-            const mockTasks = [
-                { id: 'task1', title: 'Task 1', ownerId: '123' },
-                { id: 'task2', title: 'Task 2', ownerId: '123' },
-            ];
-            const mockSnapshot = {
-                docs: mockTasks.map((task) => ({
-                    id: task.id,
-                    data: () => task,
-                })),
-            };
-            db.collection()
-                .where()
-                .get.mockResolvedValue(mockSnapshot);
-
             const result = await getTasks(userId);
-
             expect(db.collection).toHaveBeenCalledWith('tasks');
             expect(db.collection().where).toHaveBeenCalledWith(
                 'ownerId',
                 '==',
                 userId
             );
-            expect(result).toEqual(mockTasks);
+            expect(db.collection().where().get).toHaveBeenCalled();
+            expect(result).toEqual(taskCollection);
         });
 
         it('should log an error if getting tasks fails', async () => {
@@ -118,14 +114,13 @@ describe('Task Controller', () => {
             db.collection()
                 .where()
                 .get.mockRejectedValue(new Error('Get tasks error'));
+            const result = await getTasks(userId);
 
-            await getTasks(userId);
-
+            expect(result).toBeUndefined();
             expect(consoleSpy).toHaveBeenCalledWith(
                 'Error getting tasks:',
                 expect.any(Error)
             );
-            consoleSpy.mockRestore();
         });
     });
 
@@ -133,18 +128,18 @@ describe('Task Controller', () => {
         it('should update a task with the given updates', async () => {
             const taskId = 'task1';
             const updates = { title: 'Updated Task' };
-
-            await updateTask(taskId, updates);
-
+            db.collection().doc().update.mockResolvedValue();
+            const result = await updateTask(taskId, updates);
             expect(db.collection).toHaveBeenCalledWith('tasks');
             expect(db.collection().doc).toHaveBeenCalledWith(taskId);
             expect(db.collection().doc().update).toHaveBeenCalledWith(
                 updates
             );
+            expect(result).toBeUndefined();
         });
 
         it('should log an error if updating a task fails', async () => {
-            const taskId = 'task123';
+            const taskId = 'task1';
             const updates = { title: 'Updated Task' };
             const consoleSpy = jest
                 .spyOn(console, 'error')
@@ -154,26 +149,27 @@ describe('Task Controller', () => {
                 .update.mockRejectedValue(
                     new Error('Update task error')
                 );
-
-            await updateTask(taskId, updates);
-
+            const result = await updateTask(taskId, updates);
+            expect(result).toBeUndefined();
             expect(consoleSpy).toHaveBeenCalledWith(
                 'Error updating task:',
                 expect.any(Error)
             );
-            consoleSpy.mockRestore();
         });
     });
 
     describe('deleteTask', () => {
         it('should delete a task by its ID', async () => {
             const taskId = 'task123';
+            db.collection().doc().delete.mockResolvedValue();
 
-            await deleteTask(taskId);
+            const result = await deleteTask(taskId);
 
             expect(db.collection).toHaveBeenCalledWith('tasks');
             expect(db.collection().doc).toHaveBeenCalledWith(taskId);
             expect(db.collection().doc().delete).toHaveBeenCalled();
+
+            expect(result).toBeUndefined();
         });
 
         it('should log an error if deleting a task fails', async () => {
@@ -186,14 +182,61 @@ describe('Task Controller', () => {
                 .delete.mockRejectedValue(
                     new Error('Delete task error')
                 );
-
-            await deleteTask(taskId);
-
+            const result = await deleteTask(taskId);
+            expect(result).toBeUndefined();
             expect(consoleSpy).toHaveBeenCalledWith(
                 'Error deleting task:',
                 expect.any(Error)
             );
-            consoleSpy.mockRestore();
+        });
+    });
+
+    describe('deleteAllTasks', () => {
+        it('should delete all tasks for a given user ID with status "deleted"', async () => {
+            const userId = '123';
+            db.collection()
+                .where()
+                .get.mockResolvedValue({
+                    docs: taskCollection.filter(
+                        (task) => task.status === 'deleted'
+                    ),
+                });
+
+            const result = await deleteAllTasks(userId);
+
+            expect(result).toBeUndefined();
+        });
+
+        it('should log a message if no tasks are found to delete', async () => {
+            const userId = '123';
+            const consoleSpy = jest
+                .spyOn(console, 'log')
+                .mockImplementation();
+            db.collection().where().get.mockResolvedValue({
+                empty: true,
+                docs: [],
+            });
+            await deleteAllTasks(userId);
+            expect(consoleSpy).toHaveBeenCalledWith(
+                'No tasks found to delete.'
+            );
+        });
+
+        it('should log an error if deleting tasks fails', async () => {
+            const userId = '123';
+            const consoleSpy = jest
+                .spyOn(console, 'error')
+                .mockImplementation();
+            db.collection()
+                .where()
+                .get.mockRejectedValue(
+                    new Error('Delete tasks error')
+                );
+            await deleteAllTasks(userId);
+            expect(consoleSpy).toHaveBeenCalledWith(
+                'Error deleting all tasks:',
+                expect.any(Error)
+            );
         });
     });
 });

@@ -4,8 +4,15 @@ import { useUser } from '../../context/UserContext';
 import TaskItem from './TaskItem';
 
 const TaskList = () => {
-    const { getTasks, tasks, filteredTasks, filter, deletedTasks } =
-        useTaskContext();
+    const {
+        getTasks,
+        tasks,
+        filteredTasks,
+        filter,
+        deletedTasks,
+        deleteAllTasks,
+        setFilter,
+    } = useTaskContext();
 
     const { userData } = useUser();
     const [localTasks, setLocalTasks] = useState([]);
@@ -29,6 +36,12 @@ const TaskList = () => {
         setLocalTasks(tasks);
     }, [tasks]);
 
+    const handleDeleteAll = async () => {
+        console.log('deleting all tasks');
+        await deleteAllTasks(userData.id);
+        setFilter('All tasks');
+    };
+
     if (localTasks.length === 0) {
         return (
             <p className='text-gray-500 dark:text-gray-400'>
@@ -46,7 +59,10 @@ const TaskList = () => {
                     </span>
                 )}
                 {showDeletePermBtn && (
-                    <button className='bg-red-500 text-white px-4 py-2 rounded-md'>
+                    <button
+                        onClick={handleDeleteAll}
+                        className='bg-red-500 text-white px-4 py-2 rounded-md'
+                    >
                         Delete all permanently
                     </button>
                 )}

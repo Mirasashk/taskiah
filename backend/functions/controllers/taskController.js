@@ -44,4 +44,34 @@ async function deleteTask(taskId) {
     }
 }
 
-module.exports = { addTask, getTasks, updateTask, deleteTask };
+async function deleteAllTasks(userId) {
+    try {
+        const querySnapshot = await db
+            .collection('tasks')
+            .where('ownerId', '==', userId)
+            .where('status', '==', 'deleted')
+            .get();
+
+        if (querySnapshot.empty) {
+            console.log('No tasks found to delete.');
+            return;
+        }
+
+        const deletePromises = querySnapshot.docs.map((doc) =>
+            doc.ref.delete()
+        );
+        await Promise.all(deletePromises);
+
+        console.log('All tasks deleted successfully.');
+    } catch (error) {
+        console.error('Error deleting all tasks:', error);
+    }
+}
+
+module.exports = {
+    addTask,
+    getTasks,
+    updateTask,
+    deleteTask,
+    deleteAllTasks,
+};
