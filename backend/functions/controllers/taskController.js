@@ -4,6 +4,7 @@ async function addTask(task) {
     try {
         const docRef = await db.collection('tasks').add(task);
         console.log('Task added with ID:', docRef.id);
+        return docRef.id;
     } catch (error) {
         console.error('Error adding task:', error);
     }

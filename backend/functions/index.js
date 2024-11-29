@@ -47,15 +47,23 @@ app.get('/api/health', (req, res) => {
 app.use('/api/tasks', taskRoutes);
 app.use('/api/users', userRoutes);
 
+// Error handling middleware
+
+// Add this route to simulate an error
+app.get('/error', (req, res, next) => {
+    // Throw an error intentionally
+    throw new Error('Test error');
+});
+
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ error: 'Something went wrong!' });
+});
+
 app.listen(config.port, () => {
     console.log(
         `Server is running on port ------------------------------------------------------- ${config.serverPort}`
     );
-});
-// Error handling middleware
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ error: 'Something went wrong!' });
 });
 
 // Export the Express app as a Firebase Cloud Function
