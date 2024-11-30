@@ -22,9 +22,9 @@ const TaskForm = () => {
         category: '',
         priority: 'low',
         dueDate: '',
-        tags: '',
+        tags: Object.values(userData?.tags || {})[0],
         createdAt: new Date(),
-        ownerId: userData.id,
+        ownerId: userData?.id,
     });
 
     useEffect(() => {

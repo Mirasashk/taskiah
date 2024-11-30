@@ -17,7 +17,6 @@ export function TaskProvider({ children }) {
     const { userData } = useUser();
 
     useEffect(() => {
-        console.log('User Data:', userData);
         if (userData) {
             getTasks(userData.id);
         }
