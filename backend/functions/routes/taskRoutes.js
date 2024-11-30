@@ -6,6 +6,7 @@ const {
     getTaskById,
     deleteTask,
     updateTask,
+    deleteAllTasks,
 } = require('../controllers/taskController');
 
 router.post('/add', async (req, res) => {
@@ -42,6 +43,12 @@ router.put('/:id', async (req, res) => {
     console.log('taskData', taskData);
     await updateTask(id, taskData);
     res.send('Task updated!');
+});
+
+router.delete('/all/:userId', async (req, res) => {
+    const userId = req.params.userId;
+    await deleteAllTasks(userId);
+    res.send('All tasks deleted!');
 });
 
 module.exports = router;

@@ -15,6 +15,8 @@ export const taskService = {
     deleteTask: (id) => axiosInstance.delete(`/tasks/${id}`),
     updateTask: (taskId, taskData) =>
         axiosInstance.put(`/tasks/${taskId}`, taskData),
+    deleteAllTasks: (userId) =>
+        axiosInstance.delete(`/tasks/all/${userId}`),
 
     // Add other task-related API calls
 };

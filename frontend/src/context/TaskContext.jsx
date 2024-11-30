@@ -60,10 +60,11 @@ export function TaskProvider({ children }) {
             const deletedStatus = {
                 status: 'deleted',
             };
-            setDeletedTasks([...deletedTasks, task]);
-            setTasks(tasks.filter((t) => t.id !== task.id));
-
             await taskService.updateTask(task.id, deletedStatus);
+            await getTasks(task.ownerId);
+
+            // setDeletedTasks([...deletedTasks, task]);
+            // setTasks(tasks.filter((t) => t.id !== task.id));
         }
     };
 
@@ -93,16 +94,24 @@ export function TaskProvider({ children }) {
         setTasks(sortedTasks);
     };
 
+    const deleteAllTasks = async (userId) => {
+        console.log('deleting all tasks');
+        await taskService.deleteAllTasks(userId);
+        await getTasks(userId);
+    };
+
     const value = {
         tasks,
         filter,
         filteredTasks,
         deletedTasks,
+        setFilter,
         addTask,
         deleteTask,
         toggleTask,
         getTasks,
         filterTasks,
+        deleteAllTasks,
     };
 
     return (

@@ -52,7 +52,7 @@ const TaskForm = () => {
             category: '',
             priority: 'low',
             dueDate: '',
-            tags: 'work',
+            tags: '',
             createdAt: new Date(),
             ownerId: userData.id,
         });
@@ -63,6 +63,21 @@ const TaskForm = () => {
         e.preventDefault();
 
         setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleCancel = () => {
+        setFormData({
+            title: '',
+            description: '',
+            status: 'active',
+            category: '',
+            priority: 'low',
+            dueDate: '',
+            tags: '',
+            createdAt: new Date(),
+            ownerId: userData.id,
+        });
+        setShowNewTaskSubForm(false);
     };
 
     const displayNewTaskSubForm = () => {
@@ -150,6 +165,7 @@ const TaskForm = () => {
                         <button
                             type='cancel'
                             className='px-4 py-2 bg-red-800 text-white rounded hover:bg-red-900 dark:bg-gray-500 dark:hover:bg-gray-900 h-12 w-24 justify-self-end'
+                            onClick={handleCancel}
                         >
                             Cancel
                         </button>
