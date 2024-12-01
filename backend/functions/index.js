@@ -18,8 +18,11 @@ const cors = require('cors');
 const functions = require('firebase-functions');
 const config = require('./config/dotenv.config');
 const app = express();
+
+// Routes
 const taskRoutes = require('./routes/taskRoutes');
 const userRoutes = require('./routes/userRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 
 // Middleware
 app.use(
@@ -46,7 +49,7 @@ app.get('/api/health', (req, res) => {
 
 app.use('/api/tasks', taskRoutes);
 app.use('/api/users', userRoutes);
-
+app.use('/api/notifications', notificationRoutes);
 // Error handling middleware
 
 // Add this route to simulate an error

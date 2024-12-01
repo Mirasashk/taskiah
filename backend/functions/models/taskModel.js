@@ -13,23 +13,16 @@ class Task {
         this.ownerId = data.ownerId;
         this.sharedWith = data.sharedWith || [];
         this.permissions = data.permissions || {};
+        this.notifications = data.notifications || {};
     }
 
     validate() {
         // Required fields validation
         if (!this.title) throw new Error('Title is required');
-        if (!this.description)
-            throw new Error('Description is required');
-        if (!this.category) throw new Error('Category is required');
-        if (!this.priority) throw new Error('Priority is required');
         if (!this.ownerId) throw new Error('Owner ID is required');
 
         // Enum validations
-        const validStatuses = [
-            'incomplete',
-            'in-progress',
-            'completed',
-        ];
+        const validStatuses = ['active', 'completed'];
         const validPriorities = ['low', 'medium', 'high'];
         const validPermissions = ['read', 'edit'];
 
@@ -81,6 +74,7 @@ class Task {
             ownerId: this.ownerId,
             sharedWith: this.sharedWith,
             permissions: this.permissions,
+            notifications: this.notifications,
         };
     }
 }

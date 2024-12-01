@@ -25,23 +25,23 @@ router.get('/:userId', async (req, res) => {
     res.json(tasks);
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:taskId', async (req, res) => {
     const id = req.params.id;
     const task = await getTaskById(id);
     res.json(task);
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:taskId', async (req, res) => {
     const id = req.params.id;
     await deleteTask(id);
     res.send('Task deleted!');
 });
 
-router.put('/:id', async (req, res) => {
-    const id = req.params.id;
-    const taskData = req.body;
-    console.log('taskData', taskData);
-    await updateTask(id, taskData);
+router.put('/:taskId', async (req, res) => {
+    const taskId = req.params.taskId;
+    const newTaskData = req.body;
+    console.log('newTaskData', newTaskData);
+    await updateTask(taskId, newTaskData);
     res.send('Task updated!');
 });
 

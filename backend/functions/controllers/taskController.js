@@ -1,8 +1,25 @@
 const { db } = require('../config/firebase');
+const Task = require('../models/taskModel');
+const Notification = require('../models/notificationModel');
 
 async function addTask(task) {
+    const taskModel = new Task(task);
+    taskModel.validate();
+    const notificationModel = new Notification(
+        Object.values(task.notifications)[0]
+    );
+    notificationModel.validate();
+    console.log('taskModel', taskModel);
+    taskModel.notifications = {
+        [notificationModel.type]: notificationModel.toJSON(),
+    };
+
+    console.log('taskModel', taskModel);
+
     try {
-        const docRef = await db.collection('tasks').add(task);
+        const docRef = await db
+            .collection('tasks')
+            .add(taskModel.toJSON());
         console.log('Task added with ID:', docRef.id);
         return docRef.id;
     } catch (error) {
@@ -26,9 +43,12 @@ async function getTasks(userId) {
     }
 }
 
-async function updateTask(taskId, updates) {
+async function updateTask(taskId, newTaskData) {
+    console.log('taskId', taskId);
+    console.log('newTaskData', newTaskData);
+
     try {
-        await db.collection('tasks').doc(taskId).update(updates);
+        await db.collection('tasks').doc(taskId).update(newTaskData);
         console.log('Task updated successfully.');
     } catch (error) {
         console.error('Error updating task:', error);

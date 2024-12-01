@@ -12,12 +12,32 @@ const taskCollection = [
         id: 'task1',
         title: 'Test Task',
         ownerId: '123',
+        notifications: {
+            reminder: {
+                createdAt: '2024-12-01T07:15:25.608Z',
+                message: 'Test Message',
+                notifyOn: '2024-12-01T07:15:25.609Z',
+                status: 'unread',
+                type: 'reminder',
+                updatedAt: '2024-12-01T07:15:25.609Z',
+            },
+        },
         status: 'deleted',
     },
     {
         id: 'task2',
         title: 'Test Task 2',
         ownerId: '123',
+        notifications: {
+            reminder: {
+                createdAt: '2024-12-01T07:15:25.608Z',
+                message: 'Test Message',
+                notifyOn: '2024-12-01T07:15:25.609Z',
+                status: 'unread',
+                type: 'reminder',
+                updatedAt: '2024-12-01T07:15:25.609Z',
+            },
+        },
         status: 'active',
     },
 ];
@@ -53,6 +73,38 @@ jest.mock('../../config/firebase', () => {
     };
 });
 
+jest.mock('../../models/taskModel', () => {
+    return class Task {
+        constructor(data) {
+            Object.assign(this, data);
+        }
+        validate() {
+            return true;
+        }
+        toJSON() {
+            const json = { ...this };
+            if (json.notifications?.reminder) {
+                json.notifications = json.notifications.reminder;
+            }
+            return json;
+        }
+    };
+});
+
+jest.mock('../../models/notificationModel', () => {
+    return class Notification {
+        constructor(data) {
+            Object.assign(this, data);
+        }
+        validate() {
+            return true;
+        }
+        toJSON() {
+            return { ...this };
+        }
+    };
+});
+
 describe('Task Controller', () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -60,23 +112,19 @@ describe('Task Controller', () => {
 
     describe('addTask', () => {
         it('should add a task and return its ID', async () => {
-            const task = {
-                id: 'task1',
-                title: 'Test Task',
-                ownerId: '123',
-            };
+            const TaskModel = require('../../models/taskModel');
+            const task = new TaskModel(taskCollection[0]);
+            TaskModel.mockValidate = jest.fn().mockReturnValue();
             const result = await addTask(task);
             expect(db.collection).toHaveBeenCalledWith('tasks');
-            expect(db.collection().add).toHaveBeenCalledWith(task);
+            expect(db.collection().add).toHaveBeenCalledWith(
+                task.toJSON()
+            );
             expect(result).toBe(task.id);
         });
 
         it('should log an error if adding a task fails', async () => {
-            const task = {
-                id: 'task1',
-                title: 'Test Task',
-                ownerId: '123',
-            };
+            const task = taskCollection[0];
             const consoleSpy = jest
                 .spyOn(console, 'error')
                 .mockImplementation();
