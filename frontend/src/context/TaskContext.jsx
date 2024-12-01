@@ -15,7 +15,7 @@ export function TaskProvider({ children }) {
     const [deletedTasks, setDeletedTasks] = useState([]);
     const [filter, setFilter] = useState('All tasks');
     const { userData } = useUser();
-
+    const [selectedTask, setSelectedTask] = useState(null);
     useEffect(() => {
         if (userData) {
             getTasks(userData.id);
@@ -24,9 +24,14 @@ export function TaskProvider({ children }) {
 
     const addTask = async (task) => {
         try {
+            await addNotification(task).then((notification) => {
+                task.notifications = {
+                    [notification.type]: notification,
+                };
+                return task;
+            });
             const response = await taskService.createTask(task);
 
-            console.log('new task added!', response);
             //Sort tasks by createdAt date
             const sortedTasks = [...tasks, response.data].sort(
                 (a, b) =>
@@ -49,13 +54,11 @@ export function TaskProvider({ children }) {
 
     const deleteTask = async (task) => {
         if (task.status === 'deleted') {
-            console.log('permanently deleting task', task.id);
             await taskService.deleteTask(task.id);
             setDeletedTasks(
                 deletedTasks.filter((t) => t.id !== task.id)
             );
         } else {
-            console.log('deleting task', task.id);
             const deletedStatus = {
                 status: 'deleted',
             };
@@ -94,7 +97,6 @@ export function TaskProvider({ children }) {
     };
 
     const deleteAllTasks = async (userId) => {
-        console.log('deleting all tasks');
         await taskService.deleteAllTasks(userId);
         await getTasks(userId);
     };
@@ -104,6 +106,8 @@ export function TaskProvider({ children }) {
         filter,
         filteredTasks,
         deletedTasks,
+        selectedTask,
+        setSelectedTask,
         setFilter,
         addTask,
         deleteTask,
@@ -128,4 +132,50 @@ export const useTaskContext = () => {
         );
     }
     return context;
+};
+
+const addNotification = async (task) => {
+    const setNotificationType = (task) => {
+        if (task.priority === 'high') {
+            return 'important';
+        } else if (task.dueDate) {
+            return 'dueDate';
+        } else {
+            return 'reminder';
+        }
+    };
+
+    const setMessage = (task) => {
+        switch (type) {
+            case 'important':
+                return `${task.title} is a high priority task`;
+            case 'dueDate':
+                return `${task.title} is due on ${task.dueDate}`;
+            case 'reminder':
+                return `This is a reminder for ${task.title}`;
+        }
+    };
+
+    const setNotifyOn = (task) => {
+        // set notify date 1 day before due date
+        if (task.dueDate) {
+            const dueDate = new Date(task.dueDate);
+            dueDate.setDate(dueDate.getDate() - 1);
+            return dueDate.toISOString();
+        } else {
+            return null;
+        }
+    };
+
+    const type = setNotificationType(task);
+    const message = setMessage(task);
+    const notifyOn = setNotifyOn(task);
+
+    const notification = {
+        message: message,
+        type: type,
+        notifyOn: notifyOn,
+    };
+
+    return notification;
 };

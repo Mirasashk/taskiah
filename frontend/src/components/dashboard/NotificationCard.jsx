@@ -4,9 +4,9 @@ import { FiX, FiClock, FiCalendar, FiFlag } from 'react-icons/fi';
 const NotificationCard = ({ notification, onDismiss }) => {
     const getIcon = (type) => {
         switch (type) {
-            case 'due_date':
+            case 'dueDate':
                 return <FiCalendar className='text-yellow-500' />;
-            case 'priority':
+            case 'important':
                 return <FiFlag className='text-red-500' />;
             default:
                 return <FiClock className='text-blue-500' />;

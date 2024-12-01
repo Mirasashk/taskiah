@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useTaskContext } from '../../context/TaskContext';
 import { useUser } from '../../context/UserContext';
+import { useNotificationContext } from '../../context/NotificationContext';
 import FormField from '../forms/FormField';
 import Input from '../forms/Input';
 import CustomDropdown from '../forms/CustomDropdown';
 
 const TaskForm = () => {
     const { addTask } = useTaskContext();
+    const { addNotification } = useNotificationContext();
     const { userData } = useUser();
 
     const [showNewTaskSubForm, setShowNewTaskSubForm] =
@@ -44,6 +46,7 @@ const TaskForm = () => {
         if (!formData.title.trim()) return;
 
         await addTask(formData);
+
         //clear formData
         setFormData({
             title: '',
