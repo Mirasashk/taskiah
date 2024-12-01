@@ -12,11 +12,23 @@ export const userService = {
 export const taskService = {
     getTasks: (userId) => axiosInstance.get(`/tasks/${userId}`),
     createTask: (task) => axiosInstance.post('/tasks/add', task),
-    deleteTask: (id) => axiosInstance.delete(`/tasks/${id}`),
-    updateTask: (taskId, taskData) =>
-        axiosInstance.put(`/tasks/${taskId}`, taskData),
+    deleteTask: (taskId) => axiosInstance.delete(`/tasks/${taskId}`),
+    updateTask: (taskId, newTaskData) =>
+        axiosInstance.put(`/tasks/${taskId}`, newTaskData),
     deleteAllTasks: (userId) =>
         axiosInstance.delete(`/tasks/all/${userId}`),
 
     // Add other task-related API calls
+};
+
+export const notificationService = {
+    addNotification: (notification, taskId, task) =>
+        axiosInstance.post(`/notifications/add/${taskId}`, {
+            notification,
+            task,
+        }),
+    getNotifications: (taskId) =>
+        axiosInstance.get(`/notifications/${taskId}`),
+    deleteNotification: (taskId) =>
+        axiosInstance.delete(`/notifications/${taskId}`),
 };

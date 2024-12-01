@@ -8,37 +8,18 @@ import StatsCard from '../components/dashboard/StatsCard';
 import NotificationCard from '../components/dashboard/NotificationCard';
 import TaskCalendar from '../components/dashboard/TaskCalendar';
 import { useTaskContext } from '../context/TaskContext';
+import { useUser } from '../context/UserContext';
+import { useNotificationContext } from '../context/NotificationContext';
 
 const DashboardPage = () => {
     const { tasks } = useTaskContext();
-    const [notifications, setNotifications] = useState([]);
+    const { userData } = useUser();
+    const { notifications, setNotifications, getNotifications } =
+        useNotificationContext();
 
-    // Mock notifications data
     useEffect(() => {
-        setNotifications([
-            {
-                id: 1,
-                type: 'due_date',
-                title: 'Upcoming Due Date',
-                message: 'Project proposal due in 2 days',
-                time: '2 hours ago',
-            },
-            {
-                id: 2,
-                type: 'priority',
-                title: 'High Priority Task',
-                message: 'Client meeting preparation needs attention',
-                time: '5 hours ago',
-            },
-            {
-                id: 3,
-                type: 'reminder',
-                title: 'Task Reminder',
-                message: 'Follow up on team feedback',
-                time: '1 day ago',
-            },
-        ]);
-    }, []);
+        getNotifications();
+    }, [tasks]);
 
     const activeTasks = tasks.filter(
         (task) => task.status === 'active'
@@ -107,13 +88,22 @@ const DashboardPage = () => {
                     <h2 className='text-lg font-semibold text-gray-900 dark:text-white mb-4'>
                         Notifications
                     </h2>
-                    {notifications.map((notification) => (
-                        <NotificationCard
-                            key={notification.id}
-                            notification={notification}
-                            onDismiss={handleDismissNotification}
-                        />
-                    ))}
+                    {notifications.map((notification) => {
+                        // deconstruct notification so that we can create a new object with the child object of notification
+                        const newNotification =
+                            Object.values(notification)[0];
+                        const thisNotification = {
+                            ...newNotification,
+                        };
+
+                        return (
+                            <NotificationCard
+                                key={thisNotification.createdAt}
+                                notification={thisNotification}
+                                onDismiss={handleDismissNotification}
+                            />
+                        );
+                    })}
                 </div>
             </div>
         </div>

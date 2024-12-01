@@ -78,7 +78,6 @@ const TasksSidebar = ({ onFilterTasks }) => {
 
     useEffect(() => {
         setTags(Object.values(userData?.tags || {}));
-        console.log('deletedTasks', deletedTasks);
     }, [userData?.tags]);
 
     const handleAddTag = async (tag) => {

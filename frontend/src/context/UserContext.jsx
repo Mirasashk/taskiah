@@ -93,7 +93,6 @@ export function UserProvider({ children }) {
     const updateUserData = async (payload) => {
         try {
             let response;
-            console.log('payload', payload);
 
             // If payload is a string, it's a userId for fetching data
             if (typeof payload === 'string') {
@@ -107,10 +106,7 @@ export function UserProvider({ children }) {
                 );
             }
 
-            console.log('response', response);
-
             if (response?.data) {
-                console.log('response.data', response.data);
                 setUserData(response.data);
                 // Cache the user data with timestamp
                 localStorage.setItem(
