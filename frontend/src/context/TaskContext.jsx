@@ -101,6 +101,11 @@ export function TaskProvider({ children }) {
         await getTasks(userId);
     };
 
+    const updateTask = async (taskId, newTaskData) => {
+        await taskService.updateTask(taskId, newTaskData);
+        await getTasks(userData.id);
+    };
+
     const value = {
         tasks,
         filter,
@@ -112,6 +117,7 @@ export function TaskProvider({ children }) {
         addTask,
         deleteTask,
         toggleTask,
+        updateTask,
         getTasks,
         filterTasks,
         deleteAllTasks,
