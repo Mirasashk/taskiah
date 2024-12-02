@@ -4,7 +4,7 @@ import { useUser } from '../../context/UserContext';
 import TaskItem from './TaskItem';
 import TaskDetailSideBar from '../layout/TaskDetailSideBar';
 
-const TaskList = () => {
+const TaskList = ({ setIsEditing }) => {
     const {
         getTasks,
         tasks,
@@ -49,6 +49,11 @@ const TaskList = () => {
         setSelectedTask(task);
     };
 
+    const handleTaskEdit = (task) => {
+        setSelectedTask(task);
+        setIsEditing(true);
+    };
+
     return (
         <div className='flex gap-4'>
             <div className='flex-1 flex-col space-y-4'>
@@ -77,6 +82,7 @@ const TaskList = () => {
                             key={task.id}
                             task={task}
                             onTaskSelect={handleTaskSelect}
+                            onTaskEdit={handleTaskEdit}
                         />
                     ))
                 )}

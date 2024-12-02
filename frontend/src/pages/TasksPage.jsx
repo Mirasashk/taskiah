@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import TaskList from '../components/tasks/TaskList';
 import TaskForm from '../components/tasks/TaskForm';
 import TasksSideBar from '../components/layout/TasksSideBar';
@@ -7,7 +7,24 @@ import { useTaskContext } from '../context/TaskContext';
 
 const TasksPage = () => {
     const [filteredTasks, setFilteredTasks] = useState();
-    const { selectedTask, setSelectedTask } = useTaskContext();
+    const { selectedTask, setSelectedTask, filter, updateTask } =
+        useTaskContext();
+    const [isEditing, setIsEditing] = useState(false);
+
+    useEffect(() => {
+        setSelectedTask(null);
+    }, [filter]);
+
+    const handleTaskSave = async (updatedTask) => {
+        await updateTask(updatedTask.id, updatedTask);
+        setSelectedTask(null);
+    };
+
+    const handleOnClose = () => {
+        setSelectedTask(null);
+        setIsEditing(false);
+    };
+
     return (
         <div className='container mx-auto p-4'>
             <div className='flex'>
@@ -22,7 +39,10 @@ const TasksPage = () => {
                     <TaskForm />
                     <div className='flex gap-4'>
                         <div className='flex-1 '>
-                            <TaskList filteredTasks={filteredTasks} />
+                            <TaskList
+                                filteredTasks={filteredTasks}
+                                setIsEditing={setIsEditing}
+                            />
                         </div>
                         {selectedTask && (
                             <div className='flex'>
@@ -31,11 +51,14 @@ const TasksPage = () => {
                                         <div className='fixed'>
                                             <TaskDetailSideBar
                                                 task={selectedTask}
-                                                onClose={() =>
-                                                    setSelectedTask(
-                                                        null
-                                                    )
+                                                onClose={
+                                                    handleOnClose
                                                 }
+                                                onSave={
+                                                    handleTaskSave
+                                                }
+                                                isEditing={isEditing}
+                                                onEdit={setIsEditing}
                                             />
                                         </div>
                                     </div>

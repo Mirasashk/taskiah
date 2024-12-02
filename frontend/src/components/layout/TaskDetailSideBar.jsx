@@ -1,12 +1,34 @@
 import { FiX } from 'react-icons/fi';
 import { FaCircle } from 'react-icons/fa';
 import { useUser } from '../../context/UserContext';
+import { useState } from 'react';
 
-const TaskDetailSideBar = ({ task, onClose }) => {
+// @BUG: There is a bug with states, when a task is selected then the
+//edit button on a different task is clicked the information
+//is the old selected task and not the newly selected task.
+
+const TaskDetailSideBar = ({
+    task,
+    onClose,
+    onSave,
+    isEditing,
+    onEdit,
+}) => {
     const { userData } = useUser();
     const tags = Object.values(userData?.tags || {});
+    const [editedTask, setEditedTask] = useState(task);
 
     if (!task) return null;
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setEditedTask({ ...editedTask, [name]: value });
+    };
+
+    const handleSave = () => {
+        onSave(editedTask);
+        onEdit(false);
+    };
 
     return (
         <aside className='w-96 bg-white dark:bg-gray-800 h-full rounded-lg p-6 shadow-lg'>
@@ -28,21 +50,47 @@ const TaskDetailSideBar = ({ task, onClose }) => {
                     <label className='block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1'>
                         Title
                     </label>
-                    <p className='text-gray-900 dark:text-white'>
-                        {task.title}
-                    </p>
+                    {isEditing ? (
+                        <input
+                            type='text'
+                            name='title'
+                            value={editedTask.title}
+                            onChange={handleInputChange}
+                            className='flex-1 p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border-gray-300 dark:border-gray-700'
+                        />
+                    ) : (
+                        <p className='text-gray-900 dark:text-white'>
+                            {task.title}
+                        </p>
+                    )}
                 </div>
 
                 {/* Description */}
-                {task.description && (
+
+                {isEditing ? (
                     <div>
                         <label className='block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1'>
                             Description
                         </label>
-                        <p className='text-gray-900 dark:text-white whitespace-pre-wrap'>
-                            {task.description}
-                        </p>
+                        <textarea
+                            className='p-2 w-full h-40 max-h-[30rem] border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border-gray-300 dark:border-gray-700'
+                            name='description'
+                            value={editedTask.description}
+                            onChange={handleInputChange}
+                            placeholder='Enter task description'
+                        />
                     </div>
+                ) : (
+                    task.description && (
+                        <div>
+                            <label className='block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1'>
+                                Description
+                            </label>
+                            <p className='text-gray-900 dark:text-white whitespace-pre-wrap'>
+                                {task.description}
+                            </p>
+                        </div>
+                    )
                 )}
 
                 {/* Status */}
@@ -50,9 +98,24 @@ const TaskDetailSideBar = ({ task, onClose }) => {
                     <label className='block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1'>
                         Status
                     </label>
-                    <p className='capitalize text-gray-900 dark:text-white'>
-                        {task.status}
-                    </p>
+                    {isEditing ? (
+                        <select
+                            name='status'
+                            value={editedTask.status}
+                            onChange={handleInputChange}
+                            className='w-full p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700'
+                        >
+                            <option value='active'>Active</option>
+                            <option value='completed'>
+                                Completed
+                            </option>
+                            <option value='deleted'>Deleted</option>
+                        </select>
+                    ) : (
+                        <p className='capitalize text-gray-900 dark:text-white'>
+                            {task.status}
+                        </p>
+                    )}
                 </div>
 
                 {/* Priority */}
@@ -61,9 +124,22 @@ const TaskDetailSideBar = ({ task, onClose }) => {
                         <label className='block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1'>
                             Priority
                         </label>
-                        <p className='capitalize text-gray-900 dark:text-white'>
-                            {task.priority}
-                        </p>
+                        {isEditing ? (
+                            <select
+                                name='priority'
+                                value={editedTask.priority}
+                                onChange={handleInputChange}
+                                className='w-full p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700'
+                            >
+                                <option value='low'>Low</option>
+                                <option value='medium'>Medium</option>
+                                <option value='high'>High</option>
+                            </select>
+                        ) : (
+                            <p className='capitalize text-gray-900 dark:text-white'>
+                                {task.priority}
+                            </p>
+                        )}
                     </div>
                 )}
 
@@ -73,9 +149,19 @@ const TaskDetailSideBar = ({ task, onClose }) => {
                         <label className='block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1'>
                             Category
                         </label>
-                        <p className='text-gray-900 dark:text-white'>
-                            {task.category}
-                        </p>
+                        {isEditing ? (
+                            <input
+                                type='text'
+                                name='category'
+                                value={editedTask.category}
+                                onChange={handleInputChange}
+                                className='flex-1 p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border-gray-300 dark:border-gray-700'
+                            />
+                        ) : (
+                            <p className='text-gray-900 dark:text-white'>
+                                {task.category}
+                            </p>
+                        )}
                     </div>
                 )}
 
@@ -113,10 +199,29 @@ const TaskDetailSideBar = ({ task, onClose }) => {
                         <label className='block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1'>
                             Due Date
                         </label>
-                        <p className='text-gray-900 dark:text-white'>
-                            {task.dueDate}
-                        </p>
+                        {isEditing ? (
+                            <input
+                                type='date'
+                                name='dueDate'
+                                value={editedTask.dueDate}
+                                onChange={handleInputChange}
+                                className='w-full p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700'
+                            />
+                        ) : (
+                            <p className='text-gray-900 dark:text-white'>
+                                {task.dueDate}
+                            </p>
+                        )}
                     </div>
+                )}
+
+                {isEditing && (
+                    <button
+                        onClick={handleSave}
+                        className='bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700'
+                    >
+                        Save
+                    </button>
                 )}
             </div>
         </aside>

@@ -3,8 +3,9 @@ import { useTaskContext } from '../../context/TaskContext';
 import { FaCircle } from 'react-icons/fa';
 import { FiEdit, FiTrash } from 'react-icons/fi';
 import { useUser } from '../../context/UserContext';
+import { FiFlag } from 'react-icons/fi';
 
-export default function TaskItem({ task, onTaskSelect }) {
+export default function TaskItem({ task, onTaskSelect, onTaskEdit }) {
     const { toggleTask, deleteTask } = useTaskContext();
     const { userData } = useUser();
 
@@ -21,7 +22,7 @@ export default function TaskItem({ task, onTaskSelect }) {
 
     const handleEdit = (e, task) => {
         e.stopPropagation();
-        console.log('editing', task);
+        onTaskEdit(task);
     };
 
     if (!task) return null;
@@ -54,7 +55,45 @@ export default function TaskItem({ task, onTaskSelect }) {
                                 : 'text-gray-900 dark:text-white'
                         }`}
                     >
-                        {task.title}
+                        <div className='flex gap-8'>
+                            {task.title.substring(0, 23) +
+                                (task.title.length > 23 ? '...' : '')}
+                            <div className='flex gap-4'>
+                                {task.priority == 'high' && (
+                                    <div className='flex items-center gap-2'>
+                                        <div className='flex gap-0'>
+                                            <FiFlag className='text-red-500' />
+                                            <label className='text-xs text-gray-500 dark:text-gray-400'>
+                                                Priority:
+                                            </label>
+                                        </div>
+                                        <span className='text-xs text-gray-500 dark:text-gray-400'>
+                                            {task.priority}
+                                        </span>
+                                    </div>
+                                )}
+                                {task.dueDate && (
+                                    <div className='flex items-center gap-2'>
+                                        <label className='text-xs text-gray-500 dark:text-gray-400'>
+                                            Due Date:
+                                        </label>
+                                        <span className='text-xs text-gray-500 dark:text-gray-400'>
+                                            {task.dueDate}
+                                        </span>
+                                    </div>
+                                )}
+                                {task.category && (
+                                    <div className='flex items-center gap-2'>
+                                        <label className='text-xs text-gray-500 dark:text-gray-400'>
+                                            Category:
+                                        </label>
+                                        <span className='text-xs text-gray-500 dark:text-gray-400'>
+                                            {task.category}
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </span>
                 </div>
             </div>
