@@ -4,6 +4,8 @@ import '../../components/buttons/social_button.dart';
 import '../../components/forms/custom_text_field.dart';
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }

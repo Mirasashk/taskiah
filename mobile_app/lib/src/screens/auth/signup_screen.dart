@@ -4,6 +4,8 @@ import '../../components/buttons/social_button.dart';
 import '../../components/forms/custom_text_field.dart';
 
 class SignupScreen extends StatefulWidget {
+  const SignupScreen({super.key});
+
   @override
   _SignupScreenState createState() => _SignupScreenState();
 }

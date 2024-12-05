@@ -6,6 +6,8 @@ import '../../providers/theme_provider.dart';
 import 'dart:developer' as developer;
 
 class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
