@@ -10,7 +10,7 @@ void main() {
   });
 
   testWidgets('HomeScreen should render properly', (WidgetTester tester) async {
-    await tester.pumpWidget(const MaterialApp(home: HomeScreen()));
+    await tester.pumpWidget(MaterialApp(home: HomeScreen()));
     await tester.pumpAndSettle();
 
     // Verify basic UI elements
@@ -21,7 +21,7 @@ void main() {
 
   testWidgets('HomeScreen should show empty state initially',
       (WidgetTester tester) async {
-    await tester.pumpWidget(const MaterialApp(home: HomeScreen()));
+    await tester.pumpWidget(MaterialApp(home: HomeScreen()));
     await tester.pumpAndSettle();
 
     // Initially there should be no tasks
