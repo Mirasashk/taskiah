@@ -29,6 +29,24 @@ class User {
   })  : createdAt = createdAt ?? DateTime.now(),
         updatedAt = updatedAt ?? DateTime.now();
 
+  factory User.fromJson(Map<String, dynamic> json) {
+    int seconds = json['updatedAt']['_seconds'];
+    return User(
+      id: json['id'],
+      email: json['email'],
+      firstName: json['firstName'],
+      lastName: json['lastName'],
+      photoUrl: json['photoURL'],
+      role: json['role'],
+      tags: json['tags'],
+      createdAt: DateTime.parse(json['createdAt']),
+      isActive: json['isActive'],
+      username: json['username'],
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(seconds * 1000),
+      extraInfo: json['extraInfo'],
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -38,9 +56,10 @@ class User {
       'photo_url': photoUrl,
       'role': role,
       'tags': tags,
-      'created_at': createdAt,
+      'created_at': createdAt.toIso8601String(),
       'is_active': isActive,
       'username': username,
+      'updated_at': updatedAt.toIso8601String(),
       'extra_info': extraInfo,
     };
   }
@@ -57,8 +76,10 @@ class User {
 
   @override
   int get hashCode => id.hashCode;
+}
 
-  static User? fromJson(Map<String, dynamic> json) {
-    return User.fromJson(json);
-  }
+DateTime parseTimestamp(Map<String, dynamic> timestamp) {
+  return DateTime.fromMillisecondsSinceEpoch(
+    timestamp['_seconds'] * 1000 + timestamp['_nanoseconds'] ~/ 1000000,
+  );
 }

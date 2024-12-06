@@ -116,8 +116,6 @@ class HomeScreen extends StatelessWidget {
 
   Widget _logo(BuildContext context) {
     final theme = Theme.of(context);
-    developer.log(
-        'Here we go !!!!!! ---------------------------------------------------------------');
     return Image(
       image: AssetImage(
         theme.brightness == Brightness.dark

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import '../../components/buttons/primary_button.dart';
 import '../../components/buttons/social_button.dart';
 import '../../components/forms/custom_text_field.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import '../../routes/app_routes.dart';
+import '../../providers/auth_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,7 +16,7 @@ class LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final AuthProvider _authProvider = AuthProvider();
   String? _error;
   bool _loading = false;
 
@@ -108,7 +109,7 @@ class LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 24),
               TextButton(
-                onPressed: () => Navigator.pushNamed(context, '/signup'),
+                onPressed: () => Navigator.pushNamed(context, AppRoutes.signup),
                 child: Text('Don\'t have an account? Sign up'),
               ),
             ],
@@ -126,13 +127,13 @@ class LoginScreenState extends State<LoginScreen> {
       });
 
       try {
-        await _auth.signInWithEmailAndPassword(
-          email: _emailController.text,
-          password: _passwordController.text,
+        await _authProvider.signInEmail(
+          _emailController.text,
+          _passwordController.text,
         );
         await Future.delayed(const Duration(seconds: 2));
         if (!mounted) return;
-        Navigator.pushReplacementNamed(context, '/dashboard');
+        Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
       } catch (e) {
         if (!mounted) return;
         setState(() {
