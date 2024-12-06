@@ -2,18 +2,20 @@ import 'package:flutter/material.dart';
 import '../../components/buttons/primary_button.dart';
 import '../../components/buttons/social_button.dart';
 import '../../components/forms/custom_text_field.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  LoginScreenState createState() => LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   String? _error;
   bool _loading = false;
 
@@ -124,10 +126,15 @@ class _LoginScreenState extends State<LoginScreen> {
       });
 
       try {
-        // Implement login logic
-        await Future.delayed(const Duration(seconds: 2)); // Simulated delay
+        await _auth.signInWithEmailAndPassword(
+          email: _emailController.text,
+          password: _passwordController.text,
+        );
+        await Future.delayed(const Duration(seconds: 2));
+        if (!mounted) return;
         Navigator.pushReplacementNamed(context, '/dashboard');
       } catch (e) {
+        if (!mounted) return;
         setState(() {
           _error = e.toString();
         });

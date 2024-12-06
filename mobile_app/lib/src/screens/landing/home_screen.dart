@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import '../../components/buttons/primary_button.dart';
 import '../../components/buttons/secondary_button.dart';
-import '../../providers/theme_provider.dart';
 import 'dart:developer' as developer;
 
 class HomeScreen extends StatelessWidget {
@@ -26,6 +24,7 @@ class HomeScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
+                        const SizedBox(height: 48),
                         Center(
                           child: Container(
                             constraints: const BoxConstraints(maxWidth: 400),
@@ -35,19 +34,7 @@ class HomeScreen extends StatelessWidget {
                               alignment: WrapAlignment.center,
                               runAlignment: WrapAlignment.center,
                               children: [
-                                ThemeProvider().isDarkMode
-                                    ? Image(
-                                        image: AssetImage(
-                                          'assets/images/Logo_white.png',
-                                        ),
-                                        height: 100,
-                                      )
-                                    : Image(
-                                        image: AssetImage(
-                                          'assets/images/Logo_black.png',
-                                        ),
-                                        height: 100,
-                                      ),
+                                _logo(context),
                                 const Image(
                                   image: AssetImage(
                                     'assets/images/heroImg.png',
@@ -61,7 +48,7 @@ class HomeScreen extends StatelessWidget {
                         const SizedBox(height: 48),
                         // Hero Section
                         Text(
-                          'Organize Your Tasks with Ease',
+                          'Organize Your Tasks with Ease test',
                           style: Theme.of(context)
                               .textTheme
                               .headlineLarge
@@ -115,40 +102,6 @@ class HomeScreen extends StatelessWidget {
                             ),
                           ),
                         ),
-                        // Features Section
-                        // const SizedBox(height: 64),
-                        // Text(
-                        //   'Key Features',
-                        //   style: Theme.of(context)
-                        //       .textTheme
-                        //       .headlineMedium
-                        //       ?.copyWith(
-                        //         fontWeight: FontWeight.bold,
-                        //       ),
-                        //   textAlign: TextAlign.center,
-                        // ),
-                        // const SizedBox(height: 32),
-                        // _buildFeatureCard(
-                        //   context,
-                        //   icon: Icons.touch_app,
-                        //   title: 'Simple Interface',
-                        //   description:
-                        //       'Clean and intuitive design that helps you focus on what matters.',
-                        // ),
-                        // _buildFeatureCard(
-                        //   context,
-                        //   icon: Icons.flash_on,
-                        //   title: 'Quick Actions',
-                        //   description:
-                        //       'Add, complete, and manage tasks with just a few taps.',
-                        // ),
-                        // _buildFeatureCard(
-                        //   context,
-                        //   icon: Icons.trending_up,
-                        //   title: 'Progress Tracking',
-                        //   description:
-                        //       'Keep track of your completed tasks and stay motivated.',
-                        // ),
                       ],
                     ),
                   ),
@@ -161,40 +114,17 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFeatureCard(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    required String description,
-  }) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: 48,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              title,
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              description,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
+  Widget _logo(BuildContext context) {
+    final theme = Theme.of(context);
+    developer.log(
+        'Here we go !!!!!! ---------------------------------------------------------------');
+    return Image(
+      image: AssetImage(
+        theme.brightness == Brightness.dark
+            ? 'assets/images/Logo_white.png'
+            : 'assets/images/Logo_black.png',
       ),
+      height: 100,
     );
   }
 }
