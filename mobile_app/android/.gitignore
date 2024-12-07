@@ -11,3 +11,11 @@ GeneratedPluginRegistrant.java
 key.properties
 **/*.keystore
 **/*.jks
+
+# Network rules
+/app/src/main/res/xml/network_security_config.xml
+
+# Google services
+/app/src/prod/google-services.json
+/app/src/staging/google-services.json
+/app/src/dev/google-services.json

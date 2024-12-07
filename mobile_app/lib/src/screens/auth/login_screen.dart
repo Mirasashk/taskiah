@@ -2,18 +2,21 @@ import 'package:flutter/material.dart';
 import '../../components/buttons/primary_button.dart';
 import '../../components/buttons/social_button.dart';
 import '../../components/forms/custom_text_field.dart';
+import '../../routes/app_routes.dart';
+import '../../providers/auth_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  LoginScreenState createState() => LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final AuthProvider _authProvider = AuthProvider();
   String? _error;
   bool _loading = false;
 
@@ -106,7 +109,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 24),
               TextButton(
-                onPressed: () => Navigator.pushNamed(context, '/signup'),
+                onPressed: () => Navigator.pushNamed(context, AppRoutes.signup),
                 child: Text('Don\'t have an account? Sign up'),
               ),
             ],
@@ -124,10 +127,15 @@ class _LoginScreenState extends State<LoginScreen> {
       });
 
       try {
-        // Implement login logic
-        await Future.delayed(const Duration(seconds: 2)); // Simulated delay
-        Navigator.pushReplacementNamed(context, '/dashboard');
+        await _authProvider.signInEmail(
+          _emailController.text,
+          _passwordController.text,
+        );
+        await Future.delayed(const Duration(seconds: 2));
+        if (!mounted) return;
+        Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
       } catch (e) {
+        if (!mounted) return;
         setState(() {
           _error = e.toString();
         });

@@ -7,10 +7,10 @@ class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
 
   @override
-  _SignupScreenState createState() => _SignupScreenState();
+  SignupScreenState createState() => SignupScreenState();
 }
 
-class _SignupScreenState extends State<SignupScreen> {
+class SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -174,8 +174,10 @@ class _SignupScreenState extends State<SignupScreen> {
       try {
         // Implement signup logic
         await Future.delayed(const Duration(seconds: 2)); // Simulated delay
+        if (!mounted) return;
         Navigator.pushReplacementNamed(context, '/dashboard');
       } catch (e) {
+        if (!mounted) return;
         setState(() {
           _error = e.toString();
         });
