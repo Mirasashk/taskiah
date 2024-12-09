@@ -18,23 +18,51 @@ class AuthProvider with ChangeNotifier {
 
   AuthProvider() {
     _auth.authStateChanges().listen((User? authUser) async {
-      this.authUser = authUser;
+      developer.log('Auth state changed: ${authUser?.uid}');
       if (authUser != null) {
-        await _fetchUserData(authUser.uid);
+        try {
+          this.authUser = authUser;
+          await _fetchUserData(authUser.uid);
+          notifyListeners();
+        } catch (e) {
+          developer.log('Error fetching user data: $e');
+          // Only sign out if it's a critical error
+          if (e.toString().contains('401') ||
+              e.toString().contains('403') ||
+              e.toString().contains('404') ||
+              e.toString().contains('500')) {
+            developer.log('Authentication error, signing out user');
+            user = null;
+            await _auth.signOut();
+          } else {
+            // For other errors, we might want to retry or handle differently
+            developer.log('Non-critical error, keeping user signed in');
+          }
+          notifyListeners();
+        }
       } else {
         user = null;
+        notifyListeners();
       }
-      notifyListeners();
     });
   }
 
   Future<void> _fetchUserData(String uid) async {
     try {
-      final response = await _apiService.getRequest('/users/$uid');
+      developer.log('Fetching user data for UID: $uid');
+      final response = await _apiService.getRequest('api/users/$uid');
+      if (response == null) {
+        throw Exception('Received null response from API');
+      }
+      developer.log('Received user data: $response');
       user = user_model.User.fromJson(response);
-    } catch (e) {
+      if (user == null) {
+        throw Exception('Received null user from API');
+      }
+    } catch (e, stackTrace) {
       developer.log('Error fetching user data: $e');
-      user = null;
+      developer.log('Stack trace: $stackTrace');
+      rethrow;
     }
   }
 
@@ -105,6 +133,9 @@ class AuthProvider with ChangeNotifier {
 
   Future<void> signOut() async {
     await _auth.signOut();
+    developer.log('User signed out');
+    user = null;
+    authUser = null;
     notifyListeners();
   }
 }

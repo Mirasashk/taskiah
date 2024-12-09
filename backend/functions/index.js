@@ -36,6 +36,7 @@ app.use(
             'https://taskiah-53c29.firebaseapp.com',
             'https://taskiah.com',
             'http://10.0.2.2',
+            'http://127.0.0.1',
         ],
         optionsSuccessStatus: 200,
     })
