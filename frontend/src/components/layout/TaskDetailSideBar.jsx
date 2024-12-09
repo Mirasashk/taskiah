@@ -1,8 +1,10 @@
+import { useState, useEffect } from 'react';
 import { FiX } from 'react-icons/fi';
 import { FaCircle } from 'react-icons/fa';
 import { useUser } from '../../context/UserContext';
-import { useState } from 'react';
 
+import CustomDropdown from '../forms/CustomDropdown';
+import FormField from '../forms/FormField';
 // @BUG: There is a bug with states, when a task is selected then the
 //edit button on a different task is clicked the information
 //is the old selected task and not the newly selected task.
@@ -17,8 +19,19 @@ const TaskDetailSideBar = ({
     const { userData } = useUser();
     const tags = Object.values(userData?.tags || {});
     const [editedTask, setEditedTask] = useState(task);
+    const [selectedTags, setSelectedTags] = useState([]);
 
     if (!task) return null;
+
+    useEffect(() => {
+        console.log(task);
+        console.log(userData);
+        if (task.tags) {
+            setSelectedTags(
+                tags.filter((tag) => task.tags.includes(tag.name))[0]
+            );
+        }
+    }, [task]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -26,6 +39,7 @@ const TaskDetailSideBar = ({
     };
 
     const handleSave = () => {
+        editedTask.tags = selectedTags.name;
         onSave(editedTask);
         onEdit(false);
     };
@@ -144,54 +158,44 @@ const TaskDetailSideBar = ({
                 )}
 
                 {/* Category */}
-                {task.category && (
-                    <div>
-                        <label className='block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1'>
-                            Category
-                        </label>
-                        {isEditing ? (
-                            <input
-                                type='text'
-                                name='category'
-                                value={editedTask.category}
-                                onChange={handleInputChange}
-                                className='flex-1 p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border-gray-300 dark:border-gray-700'
-                            />
-                        ) : (
-                            <p className='text-gray-900 dark:text-white'>
-                                {task.category}
-                            </p>
-                        )}
-                    </div>
-                )}
+
+                <div>
+                    <label className='block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1'>
+                        Category
+                    </label>
+                    {isEditing ? (
+                        <input
+                            type='text'
+                            name='category'
+                            value={editedTask.category}
+                            onChange={handleInputChange}
+                            className='flex-1 p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border-gray-300 dark:border-gray-700'
+                        />
+                    ) : (
+                        <p className='text-gray-900 dark:text-white'>
+                            {task.category}
+                        </p>
+                    )}
+                </div>
 
                 {/* Tags */}
-                {task.tags && (
-                    <div>
-                        <label className='block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1'>
-                            Tags
-                        </label>
-                        <div className='flex items-center gap-2'>
-                            <FaCircle
-                                size={16}
-                                color={
-                                    tags.find(
-                                        (tag) =>
-                                            tag.name === task.tags
-                                    )?.color
-                                }
-                            />
-                            <span className='text-gray-900 dark:text-white'>
-                                {tags
-                                    .filter((tag) =>
-                                        task.tags.includes(tag.name)
-                                    )
-                                    .map((tag) => tag.name)
-                                    .join(', ')}
-                            </span>
-                        </div>
-                    </div>
-                )}
+
+                <div>
+                    <label className='block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1'>
+                        Tags
+                    </label>
+                    {isEditing ? (
+                        <CustomDropdown
+                            options={Object.values(tags)}
+                            selected={selectedTags}
+                            onChange={setSelectedTags}
+                        />
+                    ) : (
+                        <p className='text-gray-900 dark:text-white'>
+                            {task.tags}
+                        </p>
+                    )}
+                </div>
 
                 {/* Due Date */}
                 {task.dueDate && (
