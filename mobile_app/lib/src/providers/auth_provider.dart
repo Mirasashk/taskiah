@@ -4,57 +4,63 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mobile_app/src/models/user.dart' as user_model;
 import 'dart:developer' as developer;
 import '../services/api_service.dart' as api_service;
-import 'dart:convert';
 
 class AuthProvider with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final _apiService = api_service.ApiService();
 
   User? authUser;
-  User? get currentAuthUser => authUser;
-
   user_model.User? user;
+
+  // Simplified getters by removing redundant naming
+  User? get currentAuthUser => authUser;
   user_model.User? get currentUser => user;
 
   AuthProvider() {
-    _auth.authStateChanges().listen((User? authUser) async {
-      developer.log('Auth state changed: ${authUser?.uid}');
-      if (authUser != null) {
-        try {
-          this.authUser = authUser;
-          await _fetchUserData(authUser.uid);
-          notifyListeners();
-        } catch (e) {
-          developer.log('Error fetching user data: $e');
-          // Only sign out if it's a critical error
-          if (e.toString().contains('401') ||
-              e.toString().contains('403') ||
-              e.toString().contains('404') ||
-              e.toString().contains('500')) {
-            developer.log('Authentication error, signing out user');
-            user = null;
-            await _auth.signOut();
-          } else {
-            // For other errors, we might want to retry or handle differently
-            developer.log('Non-critical error, keeping user signed in');
-          }
+    _auth.authStateChanges().listen(_handleAuthStateChange);
+  }
+
+  // Extracted auth state change logic to separate method
+  Future<void> _handleAuthStateChange(User? newAuthUser) async {
+    final newUid = newAuthUser?.uid;
+    if (newAuthUser != null) {
+      try {
+        authUser = newAuthUser;
+        await _fetchUserData(newUid!);
+        notifyListeners();
+      } catch (e) {
+        developer.log('Error fetching user data: $e');
+        if (_isAuthError(e.toString())) {
+          developer.log('Authentication error, signing out user');
+          _clearUserData();
+          await _auth.signOut();
           notifyListeners();
         }
-      } else {
-        user = null;
-        notifyListeners();
       }
-    });
+    } else if (authUser != null || user != null) {
+      _clearUserData();
+      notifyListeners();
+    }
+  }
+
+  // Helper methods for cleaner code
+  void _clearUserData() {
+    authUser = null;
+    user = null;
+  }
+
+  bool _isAuthError(String error) {
+    const authErrors = ['401', '403', '404', '500'];
+    return authErrors.any((code) => error.contains(code));
   }
 
   Future<void> _fetchUserData(String uid) async {
     try {
-      developer.log('Fetching user data for UID: $uid');
       final response = await _apiService.getRequest('api/users/$uid');
       if (response == null) {
         throw Exception('Received null response from API');
       }
-      developer.log('Received user data: $response');
+
       user = user_model.User.fromJson(response);
       if (user == null) {
         throw Exception('Received null user from API');
@@ -90,10 +96,8 @@ class AuthProvider with ChangeNotifier {
         '/users/${user!.id}',
         updateData,
       );
-
       // Update local user object
       user = user_model.User.fromJson(response);
-      notifyListeners();
     } catch (e) {
       developer.log('Error updating user profile: $e');
       rethrow;

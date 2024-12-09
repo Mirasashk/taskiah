@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_app/main_prod.dart';
 import '../../components/buttons/primary_button.dart';
 import '../../components/buttons/social_button.dart';
 import '../../components/forms/custom_text_field.dart';
 import '../../routes/app_routes.dart';
 import '../../providers/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -16,9 +18,15 @@ class LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final AuthProvider _authProvider = AuthProvider();
   String? _error;
   bool _loading = false;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +93,7 @@ class LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 24),
               PrimaryButton(
                 label: _loading ? 'Signing in...' : 'Sign in',
-                onPressed: _loading ? null : _handleLogin,
+                onPressed: _loading ? null : () => _handleLogin(context),
               ),
               const SizedBox(height: 24),
               const _DividerWithText(text: 'Or continue with'),
@@ -119,7 +127,8 @@ class LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Future<void> _handleLogin() async {
+  Future<void> _handleLogin(BuildContext context) async {
+    final authProvider = context.read<AuthProvider>();
     if (_formKey.currentState?.validate() ?? false) {
       setState(() {
         _loading = true;
@@ -127,11 +136,10 @@ class LoginScreenState extends State<LoginScreen> {
       });
 
       try {
-        await _authProvider.signInEmail(
+        await authProvider.signInEmail(
           _emailController.text,
           _passwordController.text,
         );
-        await Future.delayed(const Duration(seconds: 2));
         if (!mounted) return;
         Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
       } catch (e) {
@@ -140,9 +148,11 @@ class LoginScreenState extends State<LoginScreen> {
           _error = e.toString();
         });
       } finally {
-        setState(() {
-          _loading = false;
-        });
+        if (mounted) {
+          setState(() {
+            _loading = false;
+          });
+        }
       }
     }
   }

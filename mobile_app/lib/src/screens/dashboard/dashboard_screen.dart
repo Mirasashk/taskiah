@@ -11,16 +11,9 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class DashboardScreenState extends State<DashboardScreen> {
-  late AuthProvider authProvider;
-
-  @override
-  void initState() {
-    super.initState();
-    authProvider = Provider.of<AuthProvider>(context, listen: false);
-  }
-
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
     return Column(
       children: [
         Text('${authProvider.currentAuthUser?.email}'),
