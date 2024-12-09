@@ -9,4 +9,5 @@ taskiah-53c29-firebase-adminsdk-43twl-80aa86f054.json
 .env.example.development
 .env.example.production
 .env.dev.bak
-.env.production.bak
+.env.prod.bak
+.env.staging.bak

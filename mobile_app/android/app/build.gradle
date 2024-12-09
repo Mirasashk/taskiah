@@ -1,5 +1,8 @@
 plugins {
     id "com.android.application"
+    // START: FlutterFire Configuration
+    id 'com.google.gms.google-services'
+    // END: FlutterFire Configuration
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
 }
@@ -18,9 +21,10 @@ if (flutterRoot == null) {
 }
 
 android {
-    namespace "com.example.mobile_app"
+    namespace "com.taskiah.android"
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion "25.1.8937393"
+
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -36,8 +40,8 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.example.mobile_app"
-        minSdkVersion flutter.minSdkVersion
+        applicationId "com.taskiah.android"
+        minSdkVersion 23
         targetSdkVersion flutter.targetSdkVersion
         versionCode 1
         versionName "1.0"
@@ -48,6 +52,23 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+
+    flavorDimensions "environment"
+    productFlavors {
+        dev {
+            dimension "environment"
+            applicationIdSuffix ".dev"
+            versionNameSuffix "-dev"
+        }
+        staging {
+            dimension "environment"
+            applicationIdSuffix ".staging"
+            versionNameSuffix "-staging"
+        }
+        prod {
+            dimension "environment"
+        }
+    }
 }
 
 flutter {
@@ -55,5 +76,9 @@ flutter {
 }
 
 dependencies {
+    implementation(platform("com.google.firebase:firebase-bom:33.6.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-storage")
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 }

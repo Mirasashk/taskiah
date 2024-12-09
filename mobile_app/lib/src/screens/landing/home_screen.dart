@@ -1,79 +1,128 @@
 import 'package:flutter/material.dart';
-import '../../services/task_service.dart';
-import '../../models/task.dart';
+import '../../components/buttons/primary_button.dart';
+import '../../components/buttons/secondary_button.dart';
+import 'dart:developer' as developer;
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
-
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  final TaskService _taskService = TaskService();
-  late List<Task> _tasks = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _initializeTaskService();
-  }
-
-  Future<void> _initializeTaskService() async {
-    await _taskService.init();
-    setState(() {
-      _tasks = _taskService.getAllTasks();
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Tasks'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              // Navigate to settings screen
-              // TODO: Implement settings screen
-            },
-          ),
-        ],
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight,
+                  minWidth: constraints.maxWidth,
+                ),
+                child: IntrinsicHeight(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const SizedBox(height: 48),
+                        Center(
+                          child: Container(
+                            constraints: const BoxConstraints(maxWidth: 400),
+                            child: Wrap(
+                              spacing: 16,
+                              runSpacing: 16,
+                              alignment: WrapAlignment.center,
+                              runAlignment: WrapAlignment.center,
+                              children: [
+                                _logo(context),
+                                const Image(
+                                  image: AssetImage(
+                                    'assets/images/heroImg.png',
+                                  ),
+                                  height: 150,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 48),
+                        // Hero Section
+                        Text(
+                          'Organize Your Tasks with Ease test',
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineLarge
+                              ?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Simple, intuitive, and powerful task management to help you stay productive and focused.',
+                          style:
+                              Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 32),
+                        // Action Buttons
+                        Center(
+                          child: Container(
+                            constraints: const BoxConstraints(maxWidth: 400),
+                            child: Wrap(
+                              alignment: WrapAlignment.center,
+                              spacing: 16,
+                              runSpacing: 16,
+                              children: [
+                                Container(
+                                  constraints:
+                                      const BoxConstraints(maxWidth: 180),
+                                  child: PrimaryButton(
+                                    label: 'Login',
+                                    onPressed: () =>
+                                        Navigator.pushNamed(context, '/login'),
+                                    fullWidth: true,
+                                  ),
+                                ),
+                                Container(
+                                  constraints:
+                                      const BoxConstraints(maxWidth: 180),
+                                  child: SecondaryButton(
+                                    label: 'Sign Up',
+                                    onPressed: () =>
+                                        Navigator.pushNamed(context, '/signup'),
+                                    fullWidth: true,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
       ),
-      body: ListView.builder(
-        itemCount: _tasks.length,
-        itemBuilder: (context, index) {
-          final task = _tasks[index];
-          return ListTile(
-            title: Text(task.title),
-            leading: Checkbox(
-              value: task.isCompleted,
-              onChanged: (bool? value) {
-                setState(() {
-                  task.isCompleted = value ?? false;
-                  _taskService.updateTask(index, task);
-                });
-              },
-            ),
-            trailing: IconButton(
-              icon: const Icon(Icons.delete),
-              onPressed: () {
-                _taskService.deleteTask(index);
-                setState(() {
-                  _tasks.removeAt(index);
-                });
-              },
-            ),
-          );
-        },
+    );
+  }
+
+  Widget _logo(BuildContext context) {
+    final theme = Theme.of(context);
+    return Image(
+      image: AssetImage(
+        theme.brightness == Brightness.dark
+            ? 'assets/images/Logo_white.png'
+            : 'assets/images/Logo_black.png',
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Show add task dialog
-        },
-        child: const Icon(Icons.add),
-      ),
+      height: 100,
     );
   }
 }

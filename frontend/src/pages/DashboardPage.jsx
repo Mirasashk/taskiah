@@ -28,7 +28,7 @@ const DashboardPage = () => {
         (task) =>
             task.status === 'completed' &&
             new Date(task.completedAt) >
-                new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+            new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
     );
 
     const handleDismissNotification = (id) => {
@@ -89,7 +89,6 @@ const DashboardPage = () => {
                         Notifications
                     </h2>
                     {notifications.map((notification) => {
-                        // deconstruct notification so that we can create a new object with the child object of notification
                         const newNotification =
                             Object.values(notification)[0];
                         const thisNotification = {
