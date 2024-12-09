@@ -94,6 +94,9 @@ node_modules/
 # dotenv environment variables file
 .env
 .env.dev
+.env.prod
+.env.staging
+
 
 # dataconnect generated files
 .dataconnect

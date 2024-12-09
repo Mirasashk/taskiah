@@ -19,11 +19,12 @@ if (
     location.hostname === '127.0.0.1'
 ) {
     // Point to the Storage emulator running on localhost.
-    connectStorageEmulator(
-        storage,
-        import.meta.env.VITE_EMULATOR_HOST,
-        import.meta.env.VITE_STORAGE_EMULATOR_PORT
-    );
+    // connectStorageEmulator(
+    //     storage,
+    //     import.meta.env.VITE_EMULATOR_HOST,
+    //     import.meta.env.VITE_STORAGE_EMULATOR_PORT
+    // );
+    connectStorageEmulator(storage, import.meta.env.VITE_EMULATOR_HOST, import.meta.env.VITE_STORAGE_EMULATOR_PORT);
     connectAuthEmulator(
         auth,
         import.meta.env.VITE_AUTH_EMULATOR_PORT
