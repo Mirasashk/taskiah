@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../components/buttons/primary_button.dart';
 import '../../components/buttons/secondary_button.dart';
-import 'dart:developer' as developer;
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});

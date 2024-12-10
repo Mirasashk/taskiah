@@ -17,22 +17,57 @@ class TaskAdapter extends TypeAdapter<Task> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Task(
-      title: fields[0] as String,
-      isCompleted: fields[1] as bool,
-      createdAt: fields[2] as DateTime?,
+      category: fields[0] as String,
+      createdAt: fields[1] as DateTime?,
+      description: fields[2] as String,
+      dueDate: fields[3] as DateTime?,
+      id: fields[4] as String,
+      notifications: (fields[5] as Map).cast<String, dynamic>(),
+      OwnerId: fields[6] as String,
+      permissions: (fields[7] as Map).cast<String, dynamic>(),
+      priority: fields[8] as String,
+      sharedWith: (fields[9] as List)
+          .map((dynamic e) => (e as Map).cast<String, dynamic>())
+          .toList(),
+      status: fields[10] as String,
+      tags: fields[11] as String,
+      title: fields[12] as String,
+      updatedAt: fields[13] as DateTime?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Task obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(14)
       ..writeByte(0)
-      ..write(obj.title)
+      ..write(obj.category)
       ..writeByte(1)
-      ..write(obj.isCompleted)
+      ..write(obj.createdAt)
       ..writeByte(2)
-      ..write(obj.createdAt);
+      ..write(obj.description)
+      ..writeByte(3)
+      ..write(obj.dueDate)
+      ..writeByte(4)
+      ..write(obj.id)
+      ..writeByte(5)
+      ..write(obj.notifications)
+      ..writeByte(6)
+      ..write(obj.OwnerId)
+      ..writeByte(7)
+      ..write(obj.permissions)
+      ..writeByte(8)
+      ..write(obj.priority)
+      ..writeByte(9)
+      ..write(obj.sharedWith)
+      ..writeByte(10)
+      ..write(obj.status)
+      ..writeByte(11)
+      ..write(obj.tags)
+      ..writeByte(12)
+      ..write(obj.title)
+      ..writeByte(13)
+      ..write(obj.updatedAt);
   }
 
   @override

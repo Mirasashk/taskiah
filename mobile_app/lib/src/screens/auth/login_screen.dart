@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_app/main_prod.dart';
 import '../../components/buttons/primary_button.dart';
 import '../../components/buttons/social_button.dart';
 import '../../components/forms/custom_text_field.dart';
@@ -129,6 +128,8 @@ class LoginScreenState extends State<LoginScreen> {
 
   Future<void> _handleLogin(BuildContext context) async {
     final authProvider = context.read<AuthProvider>();
+    final navigator = Navigator.of(context);
+
     if (_formKey.currentState?.validate() ?? false) {
       setState(() {
         _loading = true;
@@ -141,7 +142,7 @@ class LoginScreenState extends State<LoginScreen> {
           _passwordController.text,
         );
         if (!mounted) return;
-        Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
+        navigator.pushReplacementNamed(AppRoutes.dashboard);
       } catch (e) {
         if (!mounted) return;
         setState(() {

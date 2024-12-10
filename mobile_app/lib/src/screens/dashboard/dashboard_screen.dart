@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/task_provider.dart';
 import '../../routes/app_routes.dart';
+import 'dart:developer' as developer;
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -14,6 +16,9 @@ class DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
+    final taskProvider = Provider.of<TaskProvider>(context);
+    final tasks = taskProvider.currentTasks;
+    developer.log('Tasks: $tasks');
     return Column(
       children: [
         Text('${authProvider.currentAuthUser?.email}'),

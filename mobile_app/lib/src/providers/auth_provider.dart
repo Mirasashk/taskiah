@@ -105,18 +105,11 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> updateEmail(String newEmail) async {
-    if (authUser == null) {
-      throw Exception('No authenticated user found');
-    }
+    if (authUser == null) throw Exception('No authenticated user found');
 
     try {
-      // Update email in Firebase Auth
-      await authUser!.updateEmail(newEmail);
-
-      // Update email in backend
+      await authUser!.verifyBeforeUpdateEmail(newEmail);
       await updateUserProfile(extraInfo: {'email': newEmail});
-
-      // Refresh user data
       await _fetchUserData(authUser!.uid);
       notifyListeners();
     } catch (e) {

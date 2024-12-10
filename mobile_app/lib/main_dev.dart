@@ -8,6 +8,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'src/providers/auth_provider.dart' as auth_provider;
+import 'src/providers/task_provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
@@ -30,6 +31,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => auth_provider.AuthProvider()),
+        ChangeNotifierProvider(create: (_) => TaskProvider()),
       ],
       child: const App(),
     ),
