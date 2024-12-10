@@ -1,4 +1,11 @@
-import firebase from '@react-native-firebase/app';
+import {initializeApp} from '@react-native-firebase/app';
+import {getAuth, connectAuthEmulator} from '@react-native-firebase/auth';
+import {getFirestore} from '@react-native-firebase/firestore';
+import {
+  getStorage,
+  connectStorageEmulator,
+} from '@react-native-firebase/storage';
+
 import Config from 'react-native-config';
 
 // Initialize Firebase with config
@@ -11,25 +18,20 @@ const firebaseConfig = {
   appId: Config.FIREBASE_APP_ID,
 };
 
-const app = firebase.app(firebaseConfig);
-const auth = firebase.auth(app);
-const firestore = firebase.firestore(app);
-const storage = firebase.storage(app);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const firestore = getFirestore(app);
+const storage = getStorage(app);
 
 // Connect to emulators in development
 if (__DEV__) {
   if (Config.AUTH_EMULATOR_URL) {
-    auth().useEmulator(Config.AUTH_EMULATOR_URL);
-  }
-
-  if (Config.FIRESTORE_EMULATOR_HOST) {
-    const [host, port] = Config.FIRESTORE_EMULATOR_HOST.split(':');
-    firestore().useEmulator(host, parseInt(port));
+    connectAuthEmulator(auth, Config.AUTH_EMULATOR_URL);
   }
 
   if (Config.STORAGE_EMULATOR_HOST) {
     const [host, port] = Config.STORAGE_EMULATOR_HOST.split(':');
-    storage().useEmulator(host, parseInt(port));
+    connectStorageEmulator(storage, host, parseInt(port));
   }
 }
 

@@ -11,7 +11,7 @@ export const AuthProvider = ({children}) => {
 
   useEffect(() => {
     // Handle user state changes
-    const unsubscribe = auth().onAuthStateChanged(async firebaseUser => {
+    const unsubscribe = auth.onAuthStateChanged(async firebaseUser => {
       try {
         if (firebaseUser) {
           // Get additional user info from backend

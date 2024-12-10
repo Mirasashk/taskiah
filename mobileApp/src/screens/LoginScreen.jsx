@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import {
   View,
   Text,
@@ -9,8 +9,8 @@ import {
   Platform,
   ActivityIndicator,
 } from 'react-native';
-import {useTheme} from '../context/ThemeContext';
-import {useAuth} from '../context/AuthContext';
+import {ThemeContext} from '../context/ThemeContext';
+import {AuthContext} from '../context/AuthContext';
 
 export default function LoginScreen({navigation}) {
   const [email, setEmail] = useState('');
@@ -18,8 +18,8 @@ export default function LoginScreen({navigation}) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const {theme} = useTheme();
-  const {login} = useAuth();
+  const {theme} = useContext(ThemeContext);
+  const {login} = useContext(AuthContext);
 
   const handleLogin = async () => {
     if (!email || !password) {
