@@ -13,12 +13,10 @@ export const ThemeProvider = ({children}) => {
   const systemColorScheme = useColorScheme();
 
   const toggleTheme = () => {
-    if (overrideTheme === null) {
+    if (overrideTheme === 'dark') {
       setOverrideTheme('light');
     } else if (overrideTheme === 'light') {
       setOverrideTheme('dark');
-    } else {
-      setOverrideTheme(null);
     }
   };
 

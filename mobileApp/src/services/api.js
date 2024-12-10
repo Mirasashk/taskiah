@@ -11,27 +11,32 @@ const api = axios.create({
   },
 });
 
-// Add a request interceptor
-api.interceptors.request.use(
-  config => {
-    // Add any request modifications here (like adding auth tokens)
-    return config;
-  },
-  error => {
-    return Promise.reject(error);
-  },
-);
+// Add auth token interceptor
+api.interceptors.request.use(async config => {
+  // Get token from secure storage and add to headers
+  const token = await getAuthToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
-// Add a response interceptor
-api.interceptors.response.use(
-  response => {
-    // Any status code within the range of 2xx triggers this function
-    return response;
-  },
-  error => {
-    // Any status codes outside the range of 2xx trigger this function
-    return Promise.reject(error);
-  },
-);
+export const loginUser = async (email, password) => {
+  try {
+    const response = await api.post('/auth/login', {email, password});
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getUserProfile = async uid => {
+  try {
+    const response = await api.get(`/users/${uid}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
 
 export default api;
