@@ -1,4 +1,4 @@
-import React, {useState, useContext} from 'react';
+import React, {useState, useContext, useEffect} from 'react';
 import {
   View,
   Text,
@@ -13,13 +13,18 @@ import {ThemeContext} from '../context/ThemeContext';
 import {AuthContext} from '../context/AuthContext';
 
 export default function LoginScreen({navigation}) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  // TODO: Remove hardcoded email and password
+  const [email, setEmail] = useState('miras_A@hotmail.com');
+  const [password, setPassword] = useState('Miras2010');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const {theme} = useContext(ThemeContext);
   const {login} = useContext(AuthContext);
+
+  useEffect(() => {
+    console.log('Text color', theme.colors.text);
+  }, []);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -30,6 +35,7 @@ export default function LoginScreen({navigation}) {
     try {
       setLoading(true);
       setError('');
+      console.log(email, password);
       await login(email, password);
       // Navigation will be handled by the navigation container based on auth state
     } catch (err) {
@@ -53,7 +59,7 @@ export default function LoginScreen({navigation}) {
             styles.input,
             {
               borderColor: theme.colors.outline,
-              color: theme.colors.text,
+              color: theme.colors.onBackground,
             },
           ]}
           placeholder="Email"
@@ -69,7 +75,7 @@ export default function LoginScreen({navigation}) {
             styles.input,
             {
               borderColor: theme.colors.outline,
-              color: theme.colors.text,
+              color: theme.colors.onBackground,
             },
           ]}
           placeholder="Password"
@@ -91,7 +97,7 @@ export default function LoginScreen({navigation}) {
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={() => navigation.navigate('Register')}
+          onPress={() => navigation.navigate('Signup')}
           style={styles.linkContainer}>
           <Text style={[styles.linkText, {color: theme.colors.primary}]}>
             Don't have an account? Sign up

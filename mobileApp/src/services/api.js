@@ -11,17 +11,42 @@ const api = axios.create({
   },
 });
 
-// Add auth token interceptor
-api.interceptors.request.use(async config => {
-  // Get token from secure storage and add to headers
-  const token = await getAuthToken();
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+// // Add auth token interceptor
+// api.interceptors.request.use(async config => {
+//   // Get token from secure storage and add to headers
+//   const token = await getAuthToken();
+//   if (token) {
+//     config.headers.Authorization = `Bearer ${token}`;
+//   }
+//   return config;
+// });
+
+// Add request interceptor to handle errors
+api.interceptors.request.use(
+  config => {
+    console.log('API Request:', config.url); // Add logging
+    return config;
+  },
+  error => {
+    console.error('API Request Error:', error);
+    return Promise.reject(error);
+  },
+);
+
+// Add response interceptor
+api.interceptors.response.use(
+  response => {
+    console.log('API Response:', response.data); // Add logging
+    return response;
+  },
+  error => {
+    console.error('API Response Error:', error);
+    return Promise.reject(error);
+  },
+);
 
 export const loginUser = async (email, password) => {
+  console.log(api.baseURL);
   try {
     const response = await api.post('/auth/login', {email, password});
     return response.data;
