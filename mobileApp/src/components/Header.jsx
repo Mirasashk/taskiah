@@ -36,9 +36,9 @@ const Header = ({title, openDrawer}) => {
     <>
       <Appbar.Header
         style={[styles.header, {backgroundColor: theme.colors.surface}]}>
-        <TouchableOpacity onPress={openDrawer}>
+        {/* <TouchableOpacity onPress={openDrawer}>
           <Icon name="menu" size={24} color={theme.colors.primary} />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         <Text variant="titleLarge" style={styles.title}>
           {title}
@@ -50,7 +50,7 @@ const Header = ({title, openDrawer}) => {
             source={
               user?.photoURL
                 ? {uri: user.photoURL}
-                : require('../assets/default-avatar.png')
+                : require('../assets/images/default_avatar.png')
             }
           />
         </TouchableOpacity>
@@ -71,7 +71,7 @@ const Header = ({title, openDrawer}) => {
                 source={
                   user?.photoURL
                     ? {uri: user.photoURL}
-                    : require('../assets/default-avatar.png')
+                    : require('../assets/images/default_avatar.png')
                 }
               />
               <Text variant="titleMedium" style={styles.userName}>
