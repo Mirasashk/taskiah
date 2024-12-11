@@ -1,16 +1,9 @@
-import React, {useState} from 'react';
-import {View, TouchableOpacity, StyleSheet} from 'react-native';
-import {Text, TextInput, Button} from 'react-native-paper';
+import React from 'react';
+import {View, StyleSheet} from 'react-native';
+import {Text} from 'react-native-paper';
 import SignupForm from '../components/signup/signupForm';
-export default function SignupScreen({navigation}) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleSignup = async () => {
-    // Implement signup logic
-  };
-
+export default function SignupScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Sign Up</Text>
