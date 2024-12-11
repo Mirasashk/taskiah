@@ -5,7 +5,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import LoginScreen from '../screens/LoginScreen';
 import SignupScreen from '../screens/SignupScreen';
 import PrivateStack from './PrivateStack';
-
+import LandingScreen from '../screens/LandingScreen';
 const Stack = createNativeStackNavigator();
 
 export const PublicStack = () => {
@@ -14,8 +14,9 @@ export const PublicStack = () => {
       screenOptions={{
         headerShown: false,
       }}>
+      <Stack.Screen name="Landing" component={LandingScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen name="Register" component={SignupScreen} />
+      <Stack.Screen name="Signup" component={SignupScreen} />
     </Stack.Navigator>
   );
 };

@@ -28,7 +28,7 @@ const AppContent = () => {
   return (
     <>
       <StatusBar
-        backgroundColor={theme.colors.background}
+        backgroundColor={theme.colors.surface}
         barStyle={theme.dark ? 'light-content' : 'dark-content'}
       />
       <NavigationContainer theme={theme}>

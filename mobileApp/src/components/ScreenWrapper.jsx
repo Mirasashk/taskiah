@@ -7,8 +7,7 @@ const ScreenWrapper = ({children, title, navigation}) => {
   const theme = useTheme();
 
   return (
-    <View
-      style={[styles.container, {backgroundColor: theme.colors.background}]}>
+    <View style={[styles.container, {backgroundColor: theme.colors.surface}]}>
       <Header title={title} openDrawer={() => navigation.openDrawer()} />
       {children}
     </View>

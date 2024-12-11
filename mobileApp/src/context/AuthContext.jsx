@@ -1,6 +1,6 @@
 import React, {createContext, useState, useContext, useEffect} from 'react';
 import {auth} from '../config/firebase';
-import {getUserProfile} from '../services/api';
+import {getUserProfile, createUserProfile} from '../services/userApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Config from 'react-native-config';
 
@@ -24,7 +24,7 @@ export const AuthProvider = ({children}) => {
           await AsyncStorage.removeItem('user');
         }
       } catch (error) {
-        logout();
+        signOut();
         console.error('Error handling auth state:', error);
       } finally {
         setLoading(false);
@@ -54,8 +54,9 @@ export const AuthProvider = ({children}) => {
     }
   };
 
-  const logout = async () => {
+  const signOut = async () => {
     try {
+      console.log('Signing out...');
       await auth.signOut();
       setUser(null);
     } catch (error) {
@@ -63,11 +64,27 @@ export const AuthProvider = ({children}) => {
     }
   };
 
+  const signUp = async userData => {
+    console.log('signup', userData);
+    try {
+      const {user: firebaseUser} = await auth
+        .createUserWithEmailAndPassword(userData.email, userData.password)
+        .then(async () => {
+          const userProfile = await createUserProfile(userData);
+          return userProfile;
+        });
+      return firebaseUser;
+    } catch (error) {
+      console.error('Error signing up:', error);
+    }
+  };
+
   const value = {
     user,
     loading,
     login,
-    logout,
+    signOut,
+    signUp,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import {StyleSheet, View, TouchableOpacity} from 'react-native';
 import {
   Appbar,
@@ -13,19 +13,21 @@ import {
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useNavigation} from '@react-navigation/native';
 import {useAuth} from '../context/AuthContext';
+import {ThemeContext} from '../context/ThemeContext';
 
 const Header = ({title, openDrawer}) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const theme = useTheme();
   const navigation = useNavigation();
   const {user, signOut} = useAuth();
-
+  const {toggleTheme} = useContext(ThemeContext);
   const showModal = () => setIsModalVisible(true);
   const hideModal = () => setIsModalVisible(false);
 
   const handleSignOut = async () => {
+    console.log('signing out');
     try {
-      await signOut();
+      await signOut;
       hideModal();
     } catch (error) {
       console.error('Error signing out:', error);
@@ -36,9 +38,9 @@ const Header = ({title, openDrawer}) => {
     <>
       <Appbar.Header
         style={[styles.header, {backgroundColor: theme.colors.surface}]}>
-        {/* <TouchableOpacity onPress={openDrawer}>
-          <Icon name="menu" size={24} color={theme.colors.primary} />
-        </TouchableOpacity> */}
+        <TouchableOpacity onPress={openDrawer}>
+          <Icon name="menu" size={24} color={theme.colors.secondary} />
+        </TouchableOpacity>
 
         <Text variant="titleLarge" style={styles.title}>
           {title}
@@ -75,7 +77,7 @@ const Header = ({title, openDrawer}) => {
                 }
               />
               <Text variant="titleMedium" style={styles.userName}>
-                {user?.displayName || 'User'}
+                {user?.username || 'User'}
               </Text>
               <Text variant="bodyMedium" style={styles.userEmail}>
                 {user?.email}
@@ -83,6 +85,14 @@ const Header = ({title, openDrawer}) => {
             </View>
 
             <Divider />
+
+            <TouchableOpacity onPress={toggleTheme}>
+              <List.Item
+                title="Theme"
+                left={props => <List.Icon {...props} icon="theme-light-dark" />}
+                onPress={toggleTheme}
+              />
+            </TouchableOpacity>
 
             <List.Item
               title="Settings"
@@ -114,7 +124,7 @@ const Header = ({title, openDrawer}) => {
 
 const styles = StyleSheet.create({
   header: {
-    elevation: 4,
+    elevation: 0,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',

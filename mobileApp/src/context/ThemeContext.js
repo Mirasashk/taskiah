@@ -1,5 +1,5 @@
 // src/context/ThemeContext.js
-import React, {createContext, useState, useMemo} from 'react';
+import React, {createContext, useState, useMemo, useEffect} from 'react';
 import {useColorScheme} from 'react-native';
 import {customLightTheme, customDarkTheme} from '../theme';
 
@@ -12,7 +12,12 @@ export const ThemeContext = createContext({
 export const ThemeProvider = ({children}) => {
   const systemColorScheme = useColorScheme();
 
+  useEffect(() => {
+    setOverrideTheme(systemColorScheme);
+  }, [systemColorScheme]);
+
   const toggleTheme = () => {
+    console.log('Toggle theme from:', overrideTheme);
     if (overrideTheme === 'dark') {
       setOverrideTheme('light');
     } else if (overrideTheme === 'light') {

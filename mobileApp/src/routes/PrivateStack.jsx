@@ -1,8 +1,8 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import {useTheme} from 'react-native-paper';
 import ScreenWrapper from '../components/ScreenWrapper';
-import HomeScreen from '../screens/HomeScreen';
+import DashboardScreen from '../screens/DashboardScreen';
 
 const Drawer = createDrawerNavigator();
 
@@ -19,13 +19,13 @@ const PrivateStack = () => {
         drawerActiveTintColor: theme.colors.primary,
       }}>
       <Drawer.Screen
-        name="Home"
+        name="dashboard"
         options={{
-          drawerLabel: 'Home',
+          drawerLabel: 'Dashboard',
         }}>
         {props => (
-          <ScreenWrapper {...props} title="Home">
-            <HomeScreen {...props} />
+          <ScreenWrapper {...props} title="Dashboard">
+            <DashboardScreen {...props} />
           </ScreenWrapper>
         )}
       </Drawer.Screen>
