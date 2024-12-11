@@ -10,6 +10,7 @@ import {
   List,
   Divider,
 } from 'react-native-paper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useNavigation} from '@react-navigation/native';
 import {useAuth} from '../context/AuthContext';
@@ -25,9 +26,9 @@ const Header = ({title, openDrawer}) => {
   const hideModal = () => setIsModalVisible(false);
 
   const handleSignOut = async () => {
-    console.log('signing out');
     try {
-      await signOut;
+      console.log('signing out');
+      await signOut();
       hideModal();
     } catch (error) {
       console.error('Error signing out:', error);

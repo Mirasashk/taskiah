@@ -13,6 +13,7 @@ export const AuthProvider = ({children}) => {
   useEffect(() => {
     // Handle user state changes
     const unsubscribe = auth.onAuthStateChanged(async firebaseUser => {
+      console.log('Unsubscribing...', firebaseUser.uid);
       try {
         if (firebaseUser) {
           // Get additional user info from backend
@@ -69,9 +70,16 @@ export const AuthProvider = ({children}) => {
     try {
       const {user: firebaseUser} = await auth
         .createUserWithEmailAndPassword(userData.email, userData.password)
-        .then(async () => {
-          const userProfile = await createUserProfile(userData);
-          return userProfile;
+        .then(async response => {
+          try {
+            userData.id = response.user.uid;
+            userData.isActive = true;
+            const userProfile = await createUserProfile(userData);
+            await AsyncStorage.setItem('user', JSON.stringify(userProfile));
+            return userProfile;
+          } catch (error) {
+            console.error('Error creating user profile:', error);
+          }
         });
       return firebaseUser;
     } catch (error) {

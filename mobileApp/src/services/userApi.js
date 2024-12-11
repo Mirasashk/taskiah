@@ -24,7 +24,7 @@ const api = axios.create({
 // Add request interceptor to handle errors
 api.interceptors.request.use(
   config => {
-    console.log('API Request:', config.url); // Add logging
+    console.log('API Request:', config); // Add logging
     return config;
   },
   error => {
@@ -36,7 +36,7 @@ api.interceptors.request.use(
 // Add response interceptor
 api.interceptors.response.use(
   response => {
-    console.log('API Response:', response.data); // Add logging
+    console.log('API Response:', response); // Add logging
     return response;
   },
   error => {
@@ -57,7 +57,7 @@ export const loginUser = async (email, password) => {
 
 export const createUserProfile = async userData => {
   try {
-    const response = await api.post('/users', userData);
+    const response = await api.post('/users/add', userData);
     return response.data;
   } catch (error) {
     throw error;
