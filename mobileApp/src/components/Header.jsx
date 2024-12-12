@@ -40,7 +40,7 @@ const Header = ({title, openDrawer}) => {
       <Appbar.Header
         style={[styles.header, {backgroundColor: theme.colors.surface}]}>
         <TouchableOpacity onPress={openDrawer}>
-          <Icon name="menu" size={24} color={theme.colors.secondary} />
+          <Icon name="menu" size={24} color={theme.colors.onSurface} />
         </TouchableOpacity>
 
         <Text variant="titleLarge" style={styles.title}>
