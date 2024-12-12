@@ -2,13 +2,16 @@ import React, {useState, useEffect} from 'react';
 import {View, StyleSheet} from 'react-native';
 import {Card, Text, Checkbox, IconButton} from 'react-native-paper';
 import {format} from 'date-fns';
-import RoundCheckbox from 'rn-round-checkbox';
 import {useTheme} from 'react-native-paper';
+
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {useNavigation} from '@react-navigation/native';
+const Stack = createNativeStackNavigator();
 
 const TaskItem = ({task, onToggleComplete, onDelete}) => {
 	const [isChecked, setIsChecked] = useState();
+	const navigation = useNavigation();
 	const theme = useTheme();
-
 	useEffect(() => {
 		console.log(task);
 		if (task.status === 'completed') {
@@ -44,35 +47,43 @@ const TaskItem = ({task, onToggleComplete, onDelete}) => {
 		setIsChecked(!isChecked);
 	};
 
+	const handleTaskPress = () => {
+		navigation.navigate('TaskDetail', {task});
+	};
+
 	return (
-		<View style={styles.cardContent}>
-			<View style={styles.leftContent}>
-				<IconButton
-					icon={
-						isChecked
-							? 'checkbox-marked-circle-outline'
-							: 'checkbox-blank-circle-outline'
-					}
-					size={20}
-					onPress={handleToggleComplete}
-				/>
-				<View style={styles.textContainer}>
-					<Text
-						variant="titleMedium"
-						style={[
-							styles.title,
-							isChecked && styles.completedText,
-						]}>
-						{task.title}
-					</Text>
+		<>
+			<View style={styles.cardContent}>
+				<View style={styles.leftContent}>
+					<IconButton
+						icon={
+							isChecked
+								? 'checkbox-marked-circle-outline'
+								: 'checkbox-blank-circle-outline'
+						}
+						size={20}
+						onPress={handleToggleComplete}
+						style={styles.checkbox}
+					/>
+					<View style={styles.textContainer}>
+						<Text
+							variant="titleMedium"
+							style={[
+								styles.title,
+								isChecked && styles.completedText,
+							]}
+							onPress={handleTaskPress}>
+							{task.title}
+						</Text>
+					</View>
 				</View>
+				<IconButton
+					icon="delete"
+					size={20}
+					onPress={() => onDelete(task.id)}
+				/>
 			</View>
-			<IconButton
-				icon="delete"
-				size={20}
-				onPress={() => onDelete(task.id)}
-			/>
-		</View>
+		</>
 	);
 };
 
@@ -96,6 +107,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	title: {
+		width: '100%',
 		marginBottom: 4,
 	},
 	completedText: {

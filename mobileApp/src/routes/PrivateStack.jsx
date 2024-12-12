@@ -7,6 +7,8 @@ import {getHeaderTitle} from '@react-navigation/elements';
 import Header from '../components/Header';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import DrawerMain from '../components/DrawerMain';
+import TaskNavigator from '../components/task/TaskNavigator';
+
 const Drawer = createDrawerNavigator();
 
 const PrivateStack = () => {
@@ -80,7 +82,7 @@ const PrivateStack = () => {
 						/>
 					),
 				}}
-				component={TasksScreen}
+				component={TaskNavigator}
 			/>
 		</Drawer.Navigator>
 	);
