@@ -30,7 +30,8 @@ const TaskList = () => {
 		card: {
 			marginBottom: 10,
 			borderRadius: 10,
-			backgroundColor: theme.colors.surface,
+
+			backgroundColor: theme.colors.surfaceContainerLow,
 		},
 		emptyContainer: {
 			flex: 1,
