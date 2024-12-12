@@ -70,7 +70,10 @@ const Header = ({title, openDrawer}) => {
 				<Modal
 					visible={isModalVisible}
 					onDismiss={hideModal}
-					contentContainerStyle={[styles.modal]}>
+					contentContainerStyle={[
+						styles.modal,
+						{backgroundColor: theme.colors.surfaceContainerHigh},
+					]}>
 					<View style={styles.modalContent}>
 						<View style={styles.userInfo}>
 							<Avatar.Image
@@ -152,6 +155,7 @@ const styles = StyleSheet.create({
 		maxWidth: 400,
 		alignSelf: 'center',
 		width: '90%',
+		bottom: 200,
 	},
 	modalContent: {
 		borderRadius: 8,

@@ -69,7 +69,7 @@ const PrivateStack = () => {
 				component={DashboardScreen}
 			/>
 			<Drawer.Screen
-				name="TasksScreen"
+				name="Tasks"
 				options={{
 					drawerLabel: 'Tasks',
 					drawerIcon: ({color, size}) => (

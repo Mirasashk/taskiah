@@ -1,29 +1,42 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {FlatList, StyleSheet, View} from 'react-native';
 import {Text, Card} from 'react-native-paper';
 import TaskItem from './TaskItem';
 import {useTheme} from 'react-native-paper';
-
-const TaskList = ({tasks, onToggleComplete, onDelete}) => {
+import {useTaskContext} from '../../context/TaskContext';
+const TaskList = () => {
 	const theme = useTheme();
+	const {tasks} = useTaskContext();
+
+	const handleToggleComplete = taskId => {
+		console.log('taskId', taskId);
+	};
+
+	const handleDelete = taskId => {
+		console.log('taskId', taskId);
+	};
+
+	useEffect(() => {
+		console.log('tasks', tasks);
+	}, [tasks]);
 
 	const styles = StyleSheet.create({
 		listContainer: {
 			paddingVertical: 8,
 			flex: 1,
 			paddingHorizontal: 20,
+			backgroundColor: theme.colors.surfaceContainerHigh,
 		},
 		card: {
 			marginBottom: 10,
-			backgroundColor: theme.colors.surfaceContainerHigh,
 			borderRadius: 10,
-			borderWidth: 1,
-			borderColor: theme.colors.outline,
+			backgroundColor: theme.colors.surface,
 		},
 		emptyContainer: {
 			flex: 1,
 			justifyContent: 'center',
 			alignItems: 'center',
+			backgroundColor: theme.colors.surfaceContainerHigh,
 		},
 	});
 
@@ -44,8 +57,8 @@ const TaskList = ({tasks, onToggleComplete, onDelete}) => {
 						<TaskItem
 							key={task.id}
 							task={task}
-							onToggleComplete={onToggleComplete}
-							onDelete={onDelete}
+							onToggleComplete={handleToggleComplete}
+							onDelete={handleDelete}
 						/>
 					))}
 				</Card.Content>
@@ -55,16 +68,3 @@ const TaskList = ({tasks, onToggleComplete, onDelete}) => {
 };
 
 export default TaskList;
-
-// <FlatList
-// 	data={tasks}
-// 	keyExtractor={item => item.id}
-// 	renderItem={({item}) => (
-// 		<TaskItem
-// 			task={item}
-// 			onToggleComplete={onToggleComplete}
-// 			onDelete={onDelete}
-// 		/>
-// 	)}
-// 	contentContainerStyle={styles.listContainer}
-// />

@@ -1,9 +1,23 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, StyleSheet} from 'react-native';
 import {Card, Text, Checkbox, IconButton} from 'react-native-paper';
 import {format} from 'date-fns';
+import RoundCheckbox from 'rn-round-checkbox';
+import {useTheme} from 'react-native-paper';
 
 const TaskItem = ({task, onToggleComplete, onDelete}) => {
+	const [isChecked, setIsChecked] = useState();
+	const theme = useTheme();
+
+	useEffect(() => {
+		console.log(task);
+		if (task.status === 'completed') {
+			setIsChecked(true);
+		} else {
+			setIsChecked(false);
+		}
+	}, [task]);
+
 	const formatDueDate = dueDate => {
 		if (!dueDate) return null;
 
@@ -25,27 +39,32 @@ const TaskItem = ({task, onToggleComplete, onDelete}) => {
 		return null;
 	};
 
+	const handleToggleComplete = () => {
+		console.log('toggle complete');
+		setIsChecked(!isChecked);
+	};
+
 	return (
 		<View style={styles.cardContent}>
 			<View style={styles.leftContent}>
-				<Checkbox
-					status={task.completed ? 'checked' : 'unchecked'}
-					onPress={() => onToggleComplete(task.id)}
+				<IconButton
+					icon={
+						isChecked
+							? 'checkbox-marked-circle-outline'
+							: 'checkbox-blank-circle-outline'
+					}
+					size={20}
+					onPress={handleToggleComplete}
 				/>
 				<View style={styles.textContainer}>
 					<Text
 						variant="titleMedium"
 						style={[
 							styles.title,
-							task.completed && styles.completedText,
+							isChecked && styles.completedText,
 						]}>
 						{task.title}
 					</Text>
-					{task.dueDate && (
-						<Text variant="bodySmall" style={styles.dueDate}>
-							Due: {formatDueDate(task.dueDate)}
-						</Text>
-					)}
 				</View>
 			</View>
 			<IconButton
@@ -85,6 +104,9 @@ const styles = StyleSheet.create({
 	},
 	dueDate: {
 		color: 'gray',
+	},
+	checkboxItem: {
+		borderRadius: 100,
 	},
 });
 

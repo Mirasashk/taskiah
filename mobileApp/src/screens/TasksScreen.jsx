@@ -1,15 +1,40 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
+import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import {View, StyleSheet} from 'react-native';
-import {FAB, Portal, Modal, TextInput, Button, Text} from 'react-native-paper';
+import {Text, useTheme} from 'react-native-paper';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'; // Ensure you have this installed
 import TaskList from '../components/task/TaskList';
 import {useTaskContext} from '../context/TaskContext';
+
+const Tab = createMaterialTopTabNavigator();
+
+const AddListScreen = () => {
+	const theme = useTheme();
+	// This can be a placeholder or a separate component as needed
+	return (
+		<View
+			style={[
+				styles.addListContainer,
+				{backgroundColor: theme.colors.surfaceContainerHigh},
+			]}>
+			<Text>Add new list here</Text>
+		</View>
+	);
+};
+
 const TasksScreen = () => {
+	const theme = useTheme();
+
 	const {tasks, addTask, deleteTask} = useTaskContext();
 	const [visible, setVisible] = useState(false);
 	const [newTaskTitle, setNewTaskTitle] = useState('');
 
 	const showModal = () => setVisible(true);
 	const hideModal = () => setVisible(false);
+
+	useEffect(() => {
+		console.log('theme', theme);
+	}, [theme]);
 
 	const handleAddTask = () => {
 		// Implement task creation logic
@@ -26,51 +51,83 @@ const TasksScreen = () => {
 	};
 
 	return (
-		<View style={styles.container}>
-			<TaskList
-				tasks={tasks}
-				onToggleComplete={handleToggleComplete}
-				onDelete={handleDeleteTask}
+		<Tab.Navigator
+			initialRouteName="Active"
+			screenOptions={{
+				tabBarActiveTintColor: theme.colors.primary,
+				tabBarInactiveTintColor: theme.colors.onSurface,
+				tabBarIndicatorStyle: {
+					backgroundColor: theme.colors.primary,
+				},
+				// Set background color for the tab bar and the screens
+				tabBarStyle: {
+					backgroundColor: theme.colors.surfaceContainerHigh,
+				},
+				contentStyle: {
+					backgroundColor: theme.colors.surfaceContainerHigh,
+				},
+			}}>
+			<Tab.Screen
+				name="Active"
+				component={TaskList}
+				options={{tabBarLabel: 'Active'}}
 			/>
+			<Tab.Screen
+				name="Completed"
+				component={TaskList}
+				options={{tabBarLabel: 'Completed'}}
+			/>
+			<Tab.Screen
+				name="AddList"
+				component={AddListScreen}
+				options={{
+					tabBarItemStyle: {
+						flex: 1,
+						justifyContent: 'center',
+						alignItems: 'center',
+					},
 
-			<Portal>
-				<Modal
-					visible={visible}
-					onDismiss={hideModal}
-					contentContainerStyle={styles.modalContainer}>
-					<Text variant="titleLarge" style={styles.modalTitle}>
-						Add New Task
-					</Text>
-					<TextInput
-						label="Task Title"
-						value={newTaskTitle}
-						onChangeText={setNewTaskTitle}
-						mode="outlined"
-						style={styles.input}
-					/>
-					<View style={styles.buttonContainer}>
-						<Button
-							mode="outlined"
-							onPress={hideModal}
-							style={styles.button}>
-							Cancel
-						</Button>
-						<Button
-							mode="contained"
-							onPress={handleAddTask}
-							style={styles.button}>
-							Add Task
-						</Button>
-					</View>
-				</Modal>
-			</Portal>
-
-			<FAB icon="plus" style={styles.fab} onPress={showModal} />
-		</View>
+					tabBarLabel: ({focused}) => {
+						return (
+							<View
+								style={{
+									flexDirection: 'row',
+									alignItems: 'center',
+									gap: 4,
+								}}>
+								<Text
+									style={{
+										color: focused
+											? theme.colors.primary
+											: theme.colors.onSurface,
+									}}>
+									Add List
+								</Text>
+								<MaterialCommunityIcons
+									name="plus"
+									size={16}
+									style={{
+										color: focused
+											? theme.colors.primary
+											: theme.colors.onSurface,
+									}}
+								/>
+							</View>
+						);
+					},
+				}}
+			/>
+		</Tab.Navigator>
 	);
 };
 
 const styles = StyleSheet.create({
+	addListContainer: {
+		flex: 1,
+		alignItems: 'center',
+		justifyContent: 'center',
+		padding: 16,
+	},
 	container: {
 		flex: 1,
 	},
