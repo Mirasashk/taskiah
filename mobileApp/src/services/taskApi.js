@@ -45,33 +45,14 @@ api.interceptors.response.use(
 	},
 );
 
-export const loginUser = async (email, password) => {
-	console.log(api.baseURL);
-	try {
-		const response = await api.post('/auth/login', {email, password});
-		// await getTasks(response.data.id);
-		return response.data;
-	} catch (error) {
-		throw error;
-	}
+// Define taskService with API calls
+export const taskService = {
+	getTasks: userId => api.get(`/tasks/${userId}`),
+	createTask: task => api.post('/tasks/add', task),
+	deleteTask: taskId => api.delete(`/tasks/${taskId}`),
+	updateTask: (taskId, newTaskData) =>
+		api.put(`/tasks/${taskId}`, newTaskData),
+	deleteAllTasks: userId => api.delete(`/tasks/all/${userId}`),
 };
 
-export const createUserProfile = async userData => {
-	try {
-		const response = await api.post('/users/add', userData);
-		return response.data;
-	} catch (error) {
-		throw error;
-	}
-};
-
-export const getUserProfile = async uid => {
-	try {
-		const response = await api.get(`/users/${uid}`);
-		return response.data;
-	} catch (error) {
-		throw error;
-	}
-};
-
-export default api;
+export default taskService;

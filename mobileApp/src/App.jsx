@@ -11,49 +11,57 @@ import './config/firebase';
 
 import {ThemeProvider, ThemeContext} from './context/ThemeContext';
 import {AuthProvider, useAuth} from './context/AuthContext';
+import {TaskProvider} from './context/TaskContext';
 import {PublicStack, PrivateRoutes} from './routes';
 
 const AppContent = () => {
-  const {user, loading} = useAuth();
-  const {theme} = useContext(ThemeContext);
+	const {user, loading} = useAuth();
+	const {theme} = useContext(ThemeContext);
 
-  if (loading) {
-    return (
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <ActivityIndicator size="large" color={theme.colors.primary} />
-      </View>
-    );
-  }
+	if (loading) {
+		return (
+			<View
+				style={{
+					flex: 1,
+					justifyContent: 'center',
+					alignItems: 'center',
+				}}>
+				<ActivityIndicator size="large" color={theme.colors.primary} />
+			</View>
+		);
+	}
 
-  return (
-    <>
-      <StatusBar
-        backgroundColor={theme.colors.surface}
-        barStyle={theme.dark ? 'light-content' : 'dark-content'}
-      />
-      <NavigationContainer theme={theme}>
-        {user ? <PrivateRoutes /> : <PublicStack />}
-      </NavigationContainer>
-    </>
-  );
+	return (
+		<>
+			<StatusBar
+				backgroundColor={theme.colors.surfaceContainerHigh}
+				barStyle={theme.dark ? 'light-content' : 'dark-content'}
+			/>
+			<NavigationContainer theme={theme}>
+				{user ? <PrivateRoutes /> : <PublicStack />}
+			</NavigationContainer>
+		</>
+	);
 };
 
 export default function App() {
-  return (
-    <GestureHandlerRootView style={{flex: 1}}>
-      <SafeAreaProvider>
-        <ThemeProvider>
-          <AuthProvider>
-            <ThemeContext.Consumer>
-              {({theme}) => (
-                <PaperProvider theme={theme}>
-                  <AppContent />
-                </PaperProvider>
-              )}
-            </ThemeContext.Consumer>
-          </AuthProvider>
-        </ThemeProvider>
-      </SafeAreaProvider>
-    </GestureHandlerRootView>
-  );
+	return (
+		<GestureHandlerRootView style={{flex: 1}}>
+			<SafeAreaProvider>
+				<ThemeProvider>
+					<AuthProvider>
+						<TaskProvider>
+							<ThemeContext.Consumer>
+								{({theme}) => (
+									<PaperProvider theme={theme}>
+										<AppContent />
+									</PaperProvider>
+								)}
+							</ThemeContext.Consumer>
+						</TaskProvider>
+					</AuthProvider>
+				</ThemeProvider>
+			</SafeAreaProvider>
+		</GestureHandlerRootView>
+	);
 }
