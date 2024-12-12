@@ -40,7 +40,7 @@ const Header = ({title, openDrawer}) => {
 			<Appbar.Header
 				style={[
 					styles.header,
-					{backgroundColor: theme.colors.surface},
+					{backgroundColor: theme.colors.surfaceContainerHigh},
 				]}>
 				<TouchableOpacity onPress={openDrawer}>
 					<Icon
@@ -70,10 +70,7 @@ const Header = ({title, openDrawer}) => {
 				<Modal
 					visible={isModalVisible}
 					onDismiss={hideModal}
-					contentContainerStyle={[
-						styles.modal,
-						{backgroundColor: theme.colors.surface},
-					]}>
+					contentContainerStyle={[styles.modal]}>
 					<View style={styles.modalContent}>
 						<View style={styles.userInfo}>
 							<Avatar.Image

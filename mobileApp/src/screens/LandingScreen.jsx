@@ -8,15 +8,12 @@ const LandingScreen = ({navigation}) => {
 	const {theme, toggleTheme, overrideTheme} = useContext(ThemeContext);
 
 	useEffect(() => {
-		console.log(theme.colors.primary);
+		console.log(navigation);
 	}, [theme]);
 
 	return (
 		<ScrollView
-			style={[
-				styles.container,
-				{backgroundColor: theme.colors.surfaceContainerHigh},
-			]}
+			style={[styles.container]}
 			contentContainerStyle={styles.contentContainer}>
 			{/* Header with Logo and Theme Toggle */}
 			<View style={styles.header}>

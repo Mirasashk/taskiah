@@ -48,11 +48,12 @@ export default function LoginScreen({navigation}) {
 	return (
 		<KeyboardAvoidingView
 			behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-			style={[
-				styles.container,
-				{backgroundColor: theme.colors.background},
-			]}>
-			<View style={styles.formContainer}>
+			style={[styles.container]}>
+			<View
+				style={[
+					styles.formContainer,
+					{backgroundColor: theme.colors.surfaceContainerHigh},
+				]}>
 				<Text style={[styles.title, {color: theme.colors.primary}]}>
 					Login
 				</Text>

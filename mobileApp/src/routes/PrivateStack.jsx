@@ -16,7 +16,7 @@ const PrivateStack = () => {
 		<Drawer.Navigator
 			drawerContent={DrawerMain}
 			drawerStyle={{
-				backgroundColor: theme.colors.surface,
+				backgroundColor: theme.colors.surfaceContainerHigh,
 			}}
 			screenOptions={{
 				header: ({navigation, route, options}) => {
@@ -30,6 +30,12 @@ const PrivateStack = () => {
 						/>
 					);
 				},
+				headerStyle: {
+					backgroundColor: theme.colors.surfaceContainerHigh,
+				},
+				sceneStyle: {
+					backgroundColor: theme.colors.surfaceContainerHigh,
+				},
 				drawerLabelStyle: {
 					color: theme.colors.onSurface,
 					fontSize: 16,
@@ -37,12 +43,12 @@ const PrivateStack = () => {
 				},
 				drawerType: 'slide',
 				drawerStyle: {
-					backgroundColor: theme.colors.surface,
+					backgroundColor: theme.colors.surfaceContainerHigh,
 					width: '60%',
 				},
 				drawerActiveTintColor: theme.colors.primary,
 				drawerItemStyle: {
-					backgroundColor: theme.colors.surface,
+					backgroundColor: theme.colors.surfaceContainerHigh,
 					icon: {
 						color: theme.colors.primary,
 					},
