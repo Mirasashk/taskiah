@@ -1,6 +1,6 @@
 import {createContext, useContext, useState, useEffect} from 'react';
 import {taskService} from '../services/taskApi';
-import {useAuth} from './AuthContext';
+import {AuthContext} from './AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 const TaskContext = createContext(null); // Initialize with null
 
@@ -9,8 +9,9 @@ export function TaskProvider({children}) {
 	const [filteredTasks, setFilteredTasks] = useState([]);
 	const [deletedTasks, setDeletedTasks] = useState([]);
 	const [filter, setFilter] = useState('All tasks');
-	const {user} = useAuth();
+	const {user} = useContext(AuthContext);
 	const [selectedTask, setSelectedTask] = useState(null);
+
 	useEffect(() => {
 		if (user) {
 			getTasks(user.id);
@@ -68,10 +69,10 @@ export function TaskProvider({children}) {
 		await taskService.updateTask(taskId, taskData);
 	};
 
-	const getTasks = async userId => {
-		console.log('getTasks', userId);
+	const getTasks = async () => {
+		console.log('getTasks', user.id);
 
-		const response = await taskService.getTasks(userId);
+		const response = await taskService.getTasks(user.id);
 
 		// sort tasks by createdAt date
 		const deletedTasks = response.data.filter(
@@ -95,7 +96,7 @@ export function TaskProvider({children}) {
 
 	const updateTask = async (taskId, newTaskData) => {
 		await taskService.updateTask(taskId, newTaskData);
-		await getTasks(user.uid);
+		await getTasks();
 	};
 
 	const value = {

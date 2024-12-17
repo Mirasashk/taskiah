@@ -22,10 +22,6 @@ export default function LoginScreen({navigation}) {
 	const {theme} = useContext(ThemeContext);
 	const {login} = useContext(AuthContext);
 
-	useEffect(() => {
-		console.log('Text color', theme.colors.text);
-	}, []);
-
 	const handleLogin = async () => {
 		if (!email || !password) {
 			setError('Please fill in all fields');
