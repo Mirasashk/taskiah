@@ -13,7 +13,6 @@ const TaskItem = ({task, onToggleComplete, onDelete}) => {
 	const navigation = useNavigation();
 	const theme = useTheme();
 	useEffect(() => {
-		console.log(task);
 		if (task.status === 'completed') {
 			setIsChecked(true);
 		} else {

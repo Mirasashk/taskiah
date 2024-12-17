@@ -39,14 +39,13 @@ export const AuthProvider = ({children}) => {
 	}, []);
 
 	const login = async (email, password) => {
-		console.log('API_URL:', Config.API_URL);
-		console.log('Making login request...');
-
 		try {
 			const {user: firebaseUser} = await auth.signInWithEmailAndPassword(
 				email,
 				password,
 			);
+			console.log('API_URL:', Config.API_URL);
+			console.log('Making login request...');
 			return firebaseUser;
 		} catch (error) {
 			console.error('Login error details:', {
