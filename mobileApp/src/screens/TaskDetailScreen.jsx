@@ -128,7 +128,7 @@ const TaskDetailScreen = () => {
 
 	const handleTagChange = value => {
 		console.log(value);
-		setTaskState({...taskState, tag: value});
+		setTaskState({...taskState, tags: value});
 		setShowTag(false);
 	};
 

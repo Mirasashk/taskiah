@@ -18,6 +18,12 @@ export function TaskProvider({children}) {
 		}
 	}, [user]);
 
+	useEffect(() => {
+		filterTasks(filteredTasks, filter);
+		console.log('filter in context', filter);
+		console.log('filteredTasks in context', filteredTasks);
+	}, [filteredTasks, filter]);
+
 	const addTask = async task => {
 		try {
 			await addNotification(task).then(notification => {
@@ -39,12 +45,14 @@ export function TaskProvider({children}) {
 	};
 
 	const filterTasks = (filteredTasks, filter) => {
+		console.log(filter);
 		// sort filteredTasks by createdAt date
 		const sortedFilteredTasks = filteredTasks.sort(
 			(a, b) => new Date(b.createdAt) - new Date(a.createdAt),
 		);
-		setFilteredTasks(sortedFilteredTasks);
+		console.log('sortedFilteredTasks', sortedFilteredTasks);
 		setFilter(filter);
+		setFilteredTasks(sortedFilteredTasks);
 	};
 
 	const deleteTask = async task => {
@@ -106,6 +114,7 @@ export function TaskProvider({children}) {
 		deletedTasks,
 		selectedTask,
 		setSelectedTask,
+		setFilteredTasks,
 		setFilter,
 		addTask,
 		deleteTask,
