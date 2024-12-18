@@ -1,42 +1,37 @@
 import 'react-native-gesture-handler';
-import React, {useContext} from 'react';
+import React from 'react';
 import {PaperProvider} from 'react-native-paper';
 import {NavigationContainer} from '@react-navigation/native';
-import {StatusBar, View, ActivityIndicator} from 'react-native';
+import {StyleSheet} from 'react-native';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 
-// Import firebase config first
+// Config
 import './config/firebase';
 
+// Context
 import {ThemeProvider, ThemeContext} from './context/ThemeContext';
 import {AuthProvider, useAuth} from './context/AuthContext';
 import {TaskProvider} from './context/TaskContext';
+
+// Routes
 import {PublicStack, PrivateRoutes} from './routes';
+
+// Components
+import {LoadingView} from './components/common/LoadingView';
+import {StatusBarWrapper} from './components/common/StatusBarWrapper';
 
 const AppContent = () => {
 	const {user, loading} = useAuth();
-	const {theme} = useContext(ThemeContext);
+	const {theme} = React.useContext(ThemeContext);
 
 	if (loading) {
-		return (
-			<View
-				style={{
-					flex: 1,
-					justifyContent: 'center',
-					alignItems: 'center',
-				}}>
-				<ActivityIndicator size="large" color={theme.colors.primary} />
-			</View>
-		);
+		return <LoadingView theme={theme} />;
 	}
 
 	return (
 		<>
-			<StatusBar
-				backgroundColor={theme.colors.surfaceContainerHigh}
-				barStyle={theme.dark ? 'light-content' : 'dark-content'}
-			/>
+			<StatusBarWrapper theme={theme} />
 			<NavigationContainer theme={theme}>
 				{user ? <PrivateRoutes /> : <PublicStack />}
 			</NavigationContainer>
@@ -44,24 +39,30 @@ const AppContent = () => {
 	);
 };
 
-export default function App() {
-	return (
-		<GestureHandlerRootView style={{flex: 1}}>
-			<SafeAreaProvider>
-				<ThemeProvider>
-					<AuthProvider>
-						<TaskProvider>
-							<ThemeContext.Consumer>
-								{({theme}) => (
-									<PaperProvider theme={theme}>
-										<AppContent />
-									</PaperProvider>
-								)}
-							</ThemeContext.Consumer>
-						</TaskProvider>
-					</AuthProvider>
-				</ThemeProvider>
-			</SafeAreaProvider>
-		</GestureHandlerRootView>
-	);
-}
+const App = () => (
+	<GestureHandlerRootView style={styles.root}>
+		<SafeAreaProvider>
+			<ThemeProvider>
+				<AuthProvider>
+					<TaskProvider>
+						<ThemeContext.Consumer>
+							{({theme}) => (
+								<PaperProvider theme={theme}>
+									<AppContent />
+								</PaperProvider>
+							)}
+						</ThemeContext.Consumer>
+					</TaskProvider>
+				</AuthProvider>
+			</ThemeProvider>
+		</SafeAreaProvider>
+	</GestureHandlerRootView>
+);
+
+const styles = StyleSheet.create({
+	root: {
+		flex: 1,
+	},
+});
+
+export default App;

@@ -1,11 +1,68 @@
 import React, {useState, useEffect} from 'react';
 import {StyleSheet, View, ScrollView} from 'react-native';
 import {Text, Card, Icon, IconButton, Portal, List} from 'react-native-paper';
+import PropTypes from 'prop-types';
 import TaskItem from './TaskItem';
 import {useTheme} from 'react-native-paper';
 import {useTaskContext} from '../../context/TaskContext';
 import TaskFilterModal from './TaskFilterModal';
 import ScrollableRefresh from '../PullToRefresh';
+
+const createStyles = theme =>
+	StyleSheet.create({
+		actionButtons: {
+			flexDirection: 'row',
+			paddingRight: 20,
+		},
+		actionButton: {
+			marginHorizontal: 0,
+			paddingHorizontal: 0,
+		},
+		listContainer: {
+			paddingVertical: 8,
+			flex: 1,
+			paddingHorizontal: 20,
+			backgroundColor: theme.colors.surfaceContainerHigh,
+		},
+		card: {
+			marginBottom: 10,
+			borderRadius: 10,
+
+			backgroundColor: theme.colors.surfaceContainerLow,
+		},
+		emptyContainer: {
+			flex: 1,
+			justifyContent: 'center',
+			alignItems: 'center',
+			backgroundColor: theme.colors.surfaceContainerHigh,
+		},
+	});
+
+const ListActions = ({onFilterPress, onSortPress, styles}) => (
+	<View style={styles.actionButtons}>
+		<IconButton
+			icon="sort"
+			onPress={onSortPress}
+			style={styles.actionButton}
+		/>
+		<IconButton
+			icon="filter"
+			onPress={onFilterPress}
+			style={styles.actionButton}
+		/>
+	</View>
+);
+
+ListActions.propTypes = {
+	onFilterPress: PropTypes.func.isRequired,
+	onSortPress: PropTypes.func.isRequired,
+};
+
+const EmptyState = () => (
+	<View style={styles.emptyContainer}>
+		<Text variant="titleMedium">No tasks found</Text>
+	</View>
+);
 
 const TaskList = () => {
 	const theme = useTheme();
@@ -16,6 +73,7 @@ const TaskList = () => {
 	const [completedTasksCount, setCompletedTasksCount] = useState(
 		tasks.filter(task => task.status === 'completed').length,
 	);
+	const styles = createStyles(theme);
 
 	const handleRefresh = async () => {
 		await getTasks();
@@ -43,27 +101,6 @@ const TaskList = () => {
 		console.log('renderSortModal');
 	};
 
-	const styles = StyleSheet.create({
-		listContainer: {
-			paddingVertical: 8,
-			flex: 1,
-			paddingHorizontal: 20,
-			backgroundColor: theme.colors.surfaceContainerHigh,
-		},
-		card: {
-			marginBottom: 10,
-			borderRadius: 10,
-
-			backgroundColor: theme.colors.surfaceContainerLow,
-		},
-		emptyContainer: {
-			flex: 1,
-			justifyContent: 'center',
-			alignItems: 'center',
-			backgroundColor: theme.colors.surfaceContainerHigh,
-		},
-	});
-
 	if (!tasks?.length) {
 		return (
 			<View style={styles.emptyContainer}>
@@ -86,28 +123,11 @@ const TaskList = () => {
 							fontSize: 20,
 						}}
 						right={() => (
-							<View
-								style={{
-									flexDirection: 'row',
-									paddingRight: 20,
-								}}>
-								<IconButton
-									icon="sort"
-									onPress={() => renderSortModal()}
-									style={{
-										marginHorizontal: 0,
-										paddingHorizontal: 0,
-									}}
-								/>
-								<IconButton
-									icon="filter"
-									onPress={() => renderFilterModal()}
-									style={{
-										marginHorizontal: 0,
-										paddingHorizontal: 0,
-									}}
-								/>
-							</View>
+							<ListActions
+								onFilterPress={renderFilterModal}
+								onSortPress={renderSortModal}
+								styles={styles}
+							/>
 						)}
 					/>
 					<Card.Content>

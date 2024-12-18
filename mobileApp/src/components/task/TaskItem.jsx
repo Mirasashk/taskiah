@@ -8,6 +8,19 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {useNavigation} from '@react-navigation/native';
 const Stack = createNativeStackNavigator();
 
+const TaskCheckbox = ({checked, onPress}) => (
+	<IconButton
+		icon={
+			checked
+				? 'checkbox-marked-circle-outline'
+				: 'checkbox-blank-circle-outline'
+		}
+		size={20}
+		onPress={onPress}
+		style={styles.checkbox}
+	/>
+);
+
 const TaskItem = ({task, onToggleComplete, onDelete}) => {
 	const [isChecked, setIsChecked] = useState();
 	const navigation = useNavigation();
@@ -54,15 +67,9 @@ const TaskItem = ({task, onToggleComplete, onDelete}) => {
 		<>
 			<View style={styles.cardContent}>
 				<View style={styles.leftContent}>
-					<IconButton
-						icon={
-							isChecked
-								? 'checkbox-marked-circle-outline'
-								: 'checkbox-blank-circle-outline'
-						}
-						size={20}
+					<TaskCheckbox
+						checked={isChecked}
 						onPress={handleToggleComplete}
-						style={styles.checkbox}
 					/>
 					<View style={styles.textContainer}>
 						<Text
