@@ -73,11 +73,6 @@ const TasksScreen = () => {
 				options={{tabBarLabel: 'Active'}}
 			/>
 			<Tab.Screen
-				name="Completed"
-				component={TaskList}
-				options={{tabBarLabel: 'Completed'}}
-			/>
-			<Tab.Screen
 				name="AddList"
 				component={AddListScreen}
 				options={{
