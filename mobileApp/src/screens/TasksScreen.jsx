@@ -5,7 +5,7 @@ import {Text, useTheme} from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'; // Ensure you have this installed
 import TaskList from '../components/task/TaskList';
 import {useTaskContext} from '../context/TaskContext';
-
+import PullToRefresh from '../components/PullToRefresh';
 const Tab = createMaterialTopTabNavigator();
 
 const AddListScreen = () => {
@@ -25,7 +25,7 @@ const AddListScreen = () => {
 const TasksScreen = () => {
 	const theme = useTheme();
 
-	const {tasks, addTask, deleteTask} = useTaskContext();
+	const {tasks, addTask, deleteTask, getTasks} = useTaskContext();
 	const [visible, setVisible] = useState(false);
 	const [newTaskTitle, setNewTaskTitle] = useState('');
 
@@ -81,7 +81,6 @@ const TasksScreen = () => {
 						justifyContent: 'center',
 						alignItems: 'center',
 					},
-
 					tabBarLabel: ({focused}) => {
 						return (
 							<View
