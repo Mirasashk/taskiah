@@ -11,6 +11,7 @@ module.exports = {
 		['@babel/plugin-transform-private-property-in-object', {loose: true}],
 		['@babel/plugin-transform-runtime', {loose: true}],
 		['@babel/plugin-transform-modules-commonjs', {loose: true}],
+		['@babel/plugin-transform-react-jsx'],
 	],
 	env: {
 		production: {
