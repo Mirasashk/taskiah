@@ -11,16 +11,6 @@ const api = axios.create({
 	},
 });
 
-// // Add auth token interceptor
-// api.interceptors.request.use(async config => {
-//   // Get token from secure storage and add to headers
-//   const token = await getAuthToken();
-//   if (token) {
-//     config.headers.Authorization = `Bearer ${token}`;
-//   }
-//   return config;
-// });
-
 // Add request interceptor to handle errors
 api.interceptors.request.use(
 	config => {
