@@ -1,3 +1,5 @@
+'use strict';
+
 import 'react-native-gesture-handler';
 import React from 'react';
 import {PaperProvider} from 'react-native-paper';
@@ -21,48 +23,51 @@ import {PublicStack, PrivateRoutes} from './routes';
 import {LoadingView} from './components/common/LoadingView';
 import {StatusBarWrapper} from './components/common/StatusBarWrapper';
 
+// Styles defined at the top level
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+  },
+});
+
+// Component definitions
 const AppContent = () => {
-	const {user, loading} = useAuth();
-	const {theme} = React.useContext(ThemeContext);
+  const {user, loading} = useAuth();
+  const {theme} = React.useContext(ThemeContext);
 
-	if (loading) {
-		return <LoadingView theme={theme} />;
-	}
+  if (loading) {
+    return <LoadingView theme={theme} />;
+  }
 
-	return (
-		<>
-			<StatusBarWrapper theme={theme} />
-			<NavigationContainer theme={theme}>
-				{user ? <PrivateRoutes /> : <PublicStack />}
-			</NavigationContainer>
-		</>
-	);
+  return (
+    <>
+      <StatusBarWrapper theme={theme} />
+      <NavigationContainer theme={theme}>
+        {user ? <PrivateRoutes /> : <PublicStack />}
+      </NavigationContainer>
+    </>
+  );
 };
 
 const App = () => (
-	<GestureHandlerRootView style={styles.root}>
-		<SafeAreaProvider>
-			<ThemeProvider>
-				<AuthProvider>
-					<TaskProvider>
-						<ThemeContext.Consumer>
-							{({theme}) => (
-								<PaperProvider theme={theme}>
-									<AppContent />
-								</PaperProvider>
-							)}
-						</ThemeContext.Consumer>
-					</TaskProvider>
-				</AuthProvider>
-			</ThemeProvider>
-		</SafeAreaProvider>
-	</GestureHandlerRootView>
+  <GestureHandlerRootView style={styles.root}>
+    <SafeAreaProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <TaskProvider>
+            <ThemeContext.Consumer>
+              {({theme}) => (
+                <PaperProvider theme={theme}>
+                  <AppContent />
+                </PaperProvider>
+              )}
+            </ThemeContext.Consumer>
+          </TaskProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </SafeAreaProvider>
+  </GestureHandlerRootView>
 );
 
-const styles = StyleSheet.create({
-	root: {
-		flex: 1,
-	},
-});
-
+// Export at the top level
 export default App;
