@@ -1,7 +1,7 @@
 import React from 'react';
 import {View, StyleSheet} from 'react-native';
 import {Text} from 'react-native-paper';
-import SignupForm from '../components/signup/signupForm';
+import SignupForm from '../components/signup/SignupForm';
 
 export default function SignupScreen() {
   return (

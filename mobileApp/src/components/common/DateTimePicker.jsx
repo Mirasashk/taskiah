@@ -25,7 +25,12 @@ import {createStyles} from './styles/dateTimePicker.styles';
  * @param {Date} props.date - Initial date value
  * @param {Function} props.onDateChange - Callback function when date/time is selected
  */
-const DateTimePicker = ({visible, onDismiss, date, onDateChange}) => {
+const DateTimePicker = ({
+  visible = false,
+  onDismiss = () => {},
+  date = new Date(),
+  onDateChange = () => {},
+}) => {
   const theme = useTheme();
   const calendarTheme = useCalendarTheme();
   const styles = createStyles(theme);
@@ -78,6 +83,7 @@ const DateTimePicker = ({visible, onDismiss, date, onDateChange}) => {
                 visible={timePickerVisible}
                 onDismiss={() => setTimePickerVisible(false)}
                 onConfirm={handleTimeConfirm}
+                testID="time-picker-modal"
                 hours={12}
                 minutes={30}
                 style={styles.timePicker}
@@ -114,10 +120,6 @@ DateTimePicker.propTypes = {
   onDismiss: PropTypes.func.isRequired,
   date: PropTypes.instanceOf(Date),
   onDateChange: PropTypes.func.isRequired,
-};
-
-DateTimePicker.defaultProps = {
-  date: new Date(),
 };
 
 export default DateTimePicker;
