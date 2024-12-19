@@ -21,7 +21,7 @@ import {PublicStack, PrivateRoutes} from './routes';
 
 // Components
 import {LoadingView} from './components/common/LoadingView';
-import {StatusBarWrapper} from './components/common/StatusBarWrapper';
+import {StatusBarWrapper} from './components/layout/StatusBarWrapper';
 
 // Styles defined at the top level
 const styles = StyleSheet.create({

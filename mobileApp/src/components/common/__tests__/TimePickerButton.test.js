@@ -20,8 +20,8 @@ describe('TimePickerButton', () => {
   });
 
   test('renders "Pick time" when no time is selected', () => {
-    const {getByText} = render(<TimePickerButton onPress={mockOnPress} />);
-    expect(getByText('Button').children).toBe(<Button>Pick time</Button>);
+    const {getByTestId} = render(<TimePickerButton onPress={mockOnPress} />);
+    expect(getByTestId('time-picker-button')).toHaveTextContent('Pick time');
   });
 
   test('renders formatted time when time is provided', () => {
@@ -35,8 +35,8 @@ describe('TimePickerButton', () => {
   });
 
   test('calls onPress when button is pressed', () => {
-    const {getByText} = render(<TimePickerButton onPress={mockOnPress} />);
-    fireEvent.press(getByText('Pick time'));
+    const {getByTestId} = render(<TimePickerButton onPress={mockOnPress} />);
+    fireEvent.press(getByTestId('time-picker-button'));
     expect(mockOnPress).toHaveBeenCalled();
   });
 });

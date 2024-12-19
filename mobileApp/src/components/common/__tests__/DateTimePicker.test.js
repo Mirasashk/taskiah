@@ -3,7 +3,8 @@ import {render, fireEvent} from '@testing-library/react-native';
 import DateTimePicker from '../DateTimePicker';
 
 jest.mock('react-native-paper', () => ({
-  Card: {Content: 'CardContent'},
+  Card: ({children}) => <div>{children}</div>,
+  CardContent: ({children}) => <div>{children}</div>,
   Portal: 'Portal',
   Modal: 'Modal',
   Button: 'Button',
@@ -39,8 +40,8 @@ describe('DateTimePicker', () => {
   });
 
   test('renders without crashing', () => {
-    const {getByText} = render(<DateTimePicker {...defaultProps} />);
-    expect(getByText('Confirm')).toBeTruthy();
+    const {getByTestId} = render(<DateTimePicker {...defaultProps} />);
+    expect(getByTestId('confirm-button')).toHaveTextContent('Confirm');
   });
 
   test('shows error dialog when confirming without selecting date and time', () => {

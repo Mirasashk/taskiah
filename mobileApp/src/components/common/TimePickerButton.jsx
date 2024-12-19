@@ -30,6 +30,7 @@ const TimePickerButton = ({onPress, time}) => {
     <Button
       onPress={onPress}
       textColor={theme.colors.onSurface}
+      testID="time-picker-button"
       mode="text"
       icon="clock-outline">
       {time ? (

@@ -86,6 +86,7 @@ const DateTimePicker = ({visible, onDismiss, date, onDateChange}) => {
                 <Button
                   onPress={handleSubmit}
                   icon="check"
+                  testID="confirm-button"
                   mode="text"
                   textColor={theme.colors.onPrimary}
                   style={styles.confirmButton}>
