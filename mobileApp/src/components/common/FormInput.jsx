@@ -14,6 +14,7 @@ import {useTheme} from 'react-native-paper';
  * @param {boolean} [props.secureTextEntry] - Whether to hide input text
  * @param {React.ReactNode} [props.rightIcon] - Icon to display on the right side
  * @param {Object} [props.props] - Additional props to pass to TextInput
+ * @param {string} [props.testID] - Test ID for the input
  * @returns {React.ReactElement} FormInput component
  */
 const FormInput = ({
@@ -23,6 +24,7 @@ const FormInput = ({
   error,
   secureTextEntry,
   rightIcon,
+  testID,
   ...props
 }) => {
   const theme = useTheme();
@@ -47,7 +49,7 @@ const FormInput = ({
   return (
     <View>
       <TextInput
-        testID="form-input"
+        testID={testID}
         style={[styles.input, error && styles.inputError]}
         label={label}
         value={value}
@@ -58,7 +60,11 @@ const FormInput = ({
         autoCapitalize="none"
         {...props}
       />
-      {error && <Text style={styles.errorText}>{error}</Text>}
+      {error && (
+        <Text style={styles.errorText} testID={`${testID}-error`}>
+          {error}
+        </Text>
+      )}
     </View>
   );
 };

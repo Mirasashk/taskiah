@@ -1,6 +1,6 @@
 import React from 'react';
 import {render, fireEvent} from '@testing-library/react-native';
-import FormInput from './FormInput';
+import FormInput from '../FormInput';
 
 // Mock react-native-paper
 jest.mock('react-native-paper', () => ({
@@ -19,6 +19,7 @@ describe('FormInput', () => {
     value: '',
     onChangeText: jest.fn(),
     error: '',
+    testID: 'form-input',
   };
 
   it('renders correctly', () => {

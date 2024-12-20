@@ -1,131 +1,77 @@
 import React, {useState, useEffect} from 'react';
 import {View, StyleSheet} from 'react-native';
-import {Card, Text, Checkbox, IconButton} from 'react-native-paper';
-import {format} from 'date-fns';
-import {useTheme} from 'react-native-paper';
-
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {Text, IconButton} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
-const Stack = createNativeStackNavigator();
 
-const TaskCheckbox = ({checked, onPress}) => (
-	<IconButton
-		icon={
-			checked
-				? 'checkbox-marked-circle-outline'
-				: 'checkbox-blank-circle-outline'
-		}
-		size={20}
-		onPress={onPress}
-		style={styles.checkbox}
-	/>
-);
+import TaskCheckbox from './TaskCheckbox';
 
+/**
+ * Renders an individual task item with completion checkbox and delete button
+ * @component
+ * @param {Object} props
+ * @param {Object} props.task - Task object containing id, title, and status
+ * @param {Function} props.onToggleComplete - Callback when task completion is toggled
+ * @param {Function} props.onDelete - Callback when task is deleted
+ * @returns {React.ReactElement} Task item component
+ */
 const TaskItem = ({task, onToggleComplete, onDelete}) => {
-	const [isChecked, setIsChecked] = useState();
-	const navigation = useNavigation();
-	const theme = useTheme();
-	useEffect(() => {
-		if (task.status === 'completed') {
-			setIsChecked(true);
-		} else {
-			setIsChecked(false);
-		}
-	}, [task]);
+  const [isChecked, setIsChecked] = useState(false);
+  const navigation = useNavigation();
 
-	const formatDueDate = dueDate => {
-		if (!dueDate) return null;
+  useEffect(() => {
+    setIsChecked(task.status === 'completed');
+  }, [task]);
 
-		// Handle Firestore Timestamp
-		if (dueDate.toDate) {
-			return format(dueDate.toDate(), 'MMM d, yyyy');
-		}
+  const handleToggleComplete = () => {
+    setIsChecked(!isChecked);
+    onToggleComplete?.(task.id);
+  };
 
-		// Handle regular Date object
-		if (dueDate instanceof Date) {
-			return format(dueDate, 'MMM d, yyyy');
-		}
+  const handleTaskPress = () => {
+    navigation.navigate('TaskDetail', {task});
+  };
 
-		// Handle timestamp number
-		if (typeof dueDate === 'number') {
-			return format(new Date(dueDate), 'MMM d, yyyy');
-		}
-
-		return null;
-	};
-
-	const handleToggleComplete = () => {
-		console.log('toggle complete');
-		setIsChecked(!isChecked);
-	};
-
-	const handleTaskPress = () => {
-		navigation.navigate('TaskDetail', {task});
-	};
-
-	return (
-		<>
-			<View style={styles.cardContent}>
-				<View style={styles.leftContent}>
-					<TaskCheckbox
-						checked={isChecked}
-						onPress={handleToggleComplete}
-					/>
-					<View style={styles.textContainer}>
-						<Text
-							variant="titleMedium"
-							style={[
-								styles.title,
-								isChecked && styles.completedText,
-							]}
-							onPress={handleTaskPress}>
-							{task.title}
-						</Text>
-					</View>
-				</View>
-				<IconButton
-					icon="delete"
-					size={20}
-					onPress={() => onDelete(task.id)}
-				/>
-			</View>
-		</>
-	);
+  return (
+    <View style={styles.cardContent}>
+      <View style={styles.leftContent}>
+        <TaskCheckbox checked={isChecked} onPress={handleToggleComplete} />
+        <View style={styles.textContainer}>
+          <Text
+            variant="titleMedium"
+            style={[styles.title, isChecked && styles.completedText]}
+            onPress={handleTaskPress}>
+            {task.title}
+          </Text>
+        </View>
+      </View>
+      <IconButton icon="delete" size={20} onPress={() => onDelete(task.id)} />
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
-	card: {
-		marginVertical: 4,
-		marginHorizontal: 8,
-	},
-	cardContent: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'space-between',
-	},
-	leftContent: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		flex: 1,
-	},
-	textContainer: {
-		marginLeft: 8,
-		flex: 1,
-	},
-	title: {
-		width: '100%',
-		marginBottom: 4,
-	},
-	completedText: {
-		textDecorationLine: 'line-through',
-		color: 'gray',
-	},
-	dueDate: {
-		color: 'gray',
-	},
-	checkboxItem: {
-		borderRadius: 100,
-	},
+  cardContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  leftContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  textContainer: {
+    marginLeft: 8,
+    flex: 1,
+  },
+  title: {
+    width: '100%',
+    marginBottom: 4,
+  },
+  completedText: {
+    textDecorationLine: 'line-through',
+    color: 'gray',
+  },
 });
 
 export default TaskItem;

@@ -6,6 +6,26 @@ import {AuthContext} from '../../context/AuthContext';
 import FormInput from '../common/FormInput';
 import {useSignupForm} from '../../hooks/useSignupForm';
 
+/**
+ * @typedef {Object} FormData
+ * @property {string} firstName - User's first name
+ * @property {string} lastName - User's last name
+ * @property {string} email - User's email address
+ * @property {string} username - User's chosen username
+ * @property {string} password - User's password
+ * @property {string} confirmPassword - Password confirmation
+ */
+
+/**
+ * SignupForm component for user registration
+ * @component
+ * @returns {JSX.Element} A form component with input fields for user registration
+ *
+ * @example
+ * return (
+ *   <SignupForm />
+ * )
+ */
 const SignupForm = () => {
   const {signUp} = useContext(AuthContext);
   const [showPassword, setShowPassword] = useState(false);
@@ -29,6 +49,7 @@ const SignupForm = () => {
     <View>
       <FormInput
         label="First Name"
+        testID="first-name-input"
         value={formData.firstName}
         onChangeText={value => handleChange('firstName', value)}
         error={errors.firstName}
@@ -36,6 +57,7 @@ const SignupForm = () => {
 
       <FormInput
         label="Last Name"
+        testID="last-name-input"
         value={formData.lastName}
         onChangeText={value => handleChange('lastName', value)}
         error={errors.lastName}
@@ -43,6 +65,7 @@ const SignupForm = () => {
 
       <FormInput
         label="Email"
+        testID="email-input"
         value={formData.email}
         onChangeText={value => handleChange('email', value)}
         error={errors.email}
@@ -50,6 +73,7 @@ const SignupForm = () => {
 
       <FormInput
         label="Username"
+        testID="username-input"
         value={formData.username}
         onChangeText={value => handleChange('username', value)}
         error={errors.username}
@@ -57,6 +81,7 @@ const SignupForm = () => {
 
       <FormInput
         label="Password"
+        testID="password-input"
         value={formData.password}
         onChangeText={value => handleChange('password', value)}
         error={errors.password}
@@ -71,6 +96,7 @@ const SignupForm = () => {
 
       <FormInput
         label="Confirm Password"
+        testID="confirm-password-input"
         value={formData.confirmPassword}
         onChangeText={value => handleChange('confirmPassword', value)}
         error={errors.confirmPassword}
@@ -83,7 +109,10 @@ const SignupForm = () => {
         }
       />
 
-      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={handleSubmit}
+        testID="signup-button">
         <Text style={styles.buttonText}>Sign Up</Text>
       </TouchableOpacity>
     </View>

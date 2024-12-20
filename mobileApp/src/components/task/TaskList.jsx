@@ -1,227 +1,96 @@
-import React, {useState, useEffect} from 'react';
-import {StyleSheet, View, ScrollView} from 'react-native';
-import {Text, Card, Icon, IconButton, Portal, List} from 'react-native-paper';
-import PropTypes from 'prop-types';
-import TaskItem from './TaskItem';
+import React, {useState, useCallback} from 'react';
+import {View} from 'react-native';
+import {Text} from 'react-native-paper';
 import {useTheme} from 'react-native-paper';
 import {useTaskContext} from '../../context/TaskContext';
 import TaskFilterModal from './TaskFilterModal';
 import ScrollableRefresh from '../PullToRefresh';
+import ListActions from './ListActions';
+import TaskSection from './TaskSection';
+import {createTaskStyles} from '../../theme/taskStyles';
 
-const createStyles = theme =>
-	StyleSheet.create({
-		actionButtons: {
-			flexDirection: 'row',
-			paddingRight: 20,
-		},
-		actionButton: {
-			marginHorizontal: 0,
-			paddingHorizontal: 0,
-		},
-		listContainer: {
-			paddingVertical: 8,
-			flex: 1,
-			paddingHorizontal: 20,
-			backgroundColor: theme.colors.surfaceContainerHigh,
-		},
-		card: {
-			marginBottom: 10,
-			borderRadius: 10,
-
-			backgroundColor: theme.colors.surfaceContainerLow,
-		},
-		emptyContainer: {
-			flex: 1,
-			justifyContent: 'center',
-			alignItems: 'center',
-			backgroundColor: theme.colors.surfaceContainerHigh,
-		},
-	});
-
-const ListActions = ({onFilterPress, onSortPress, styles}) => (
-	<View style={styles.actionButtons}>
-		<IconButton
-			icon="sort"
-			onPress={onSortPress}
-			style={styles.actionButton}
-		/>
-		<IconButton
-			icon="filter"
-			onPress={onFilterPress}
-			style={styles.actionButton}
-		/>
-	</View>
-);
-
-ListActions.propTypes = {
-	onFilterPress: PropTypes.func.isRequired,
-	onSortPress: PropTypes.func.isRequired,
-};
-
-const EmptyState = () => (
-	<View style={styles.emptyContainer}>
-		<Text variant="titleMedium">No tasks found</Text>
-	</View>
-);
-
+/**
+ * Renders the main task list with active and completed task sections
+ * @component
+ * @returns {React.ReactElement} Task list component
+ */
 const TaskList = () => {
-	const theme = useTheme();
-	const {tasks, filteredTasks, filter, getTasks} = useTaskContext();
-	const [showFilterModal, setShowFilterModal] = useState(false);
-	const [expandTasksList, setExpandTasksList] = useState(true);
-	const [expandCompletedList, setExpandCompletedList] = useState(false);
-	const [completedTasksCount, setCompletedTasksCount] = useState(
-		tasks.filter(task => task.status === 'completed').length,
-	);
-	const styles = createStyles(theme);
+  const theme = useTheme();
+  const {tasks, filteredTasks, filter, getTasks} = useTaskContext();
+  const [showFilterModal, setShowFilterModal] = useState(false);
+  const [expandCompletedList, setExpandCompletedList] = useState(false);
 
-	const handleRefresh = async () => {
-		await getTasks();
-		await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
-	};
+  const styles = createTaskStyles(theme);
+  const completedTasksCount = tasks.filter(
+    task => task.status === 'completed',
+  ).length;
 
-	useEffect(() => {
-		console.log('expandCompletedList', expandCompletedList);
-	}, [expandCompletedList]);
+  const handleRefresh = useCallback(async () => {
+    await getTasks();
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }, [getTasks]);
 
-	const handleToggleComplete = taskId => {
-		console.log('taskId', taskId);
-	};
+  const handleToggleComplete = useCallback(taskId => {
+    console.log('taskId', taskId);
+  }, []);
 
-	const handleDelete = taskId => {
-		console.log('taskId', taskId);
-	};
+  const handleDelete = useCallback(taskId => {
+    console.log('taskId', taskId);
+  }, []);
 
-	const renderFilterModal = () => {
-		console.log('renderFilterModal');
-		setShowFilterModal(true);
-	};
+  if (!tasks?.length) {
+    return (
+      <View style={styles.emptyContainer}>
+        <Text variant="titleMedium">No tasks found</Text>
+      </View>
+    );
+  }
 
-	const renderSortModal = () => {
-		console.log('renderSortModal');
-	};
+  const activeTasks = tasks.filter(task => task.status === 'active');
+  const completedTasks = tasks.filter(task => task.status === 'completed');
 
-	if (!tasks?.length) {
-		return (
-			<View style={styles.emptyContainer}>
-				<Text variant="titleMedium">No tasks found</Text>
-			</View>
-		);
-	}
+  return (
+    <ScrollableRefresh onRefresh={handleRefresh}>
+      <View style={styles.listContainer}>
+        <TaskSection
+          title="Tasks"
+          tasks={activeTasks}
+          filteredTasks={filteredTasks}
+          filter={filter}
+          onToggleComplete={handleToggleComplete}
+          onDelete={handleDelete}
+          styles={styles}
+          titleStyle={styles.cardTitle}
+          rightComponent={() => (
+            <ListActions
+              onFilterPress={() => setShowFilterModal(true)}
+              onSortPress={() => console.log('sort')}
+            />
+          )}
+        />
 
-	return (
-		<ScrollableRefresh onRefresh={handleRefresh}>
-			<View style={styles.listContainer}>
-				<Card style={styles.card}>
-					<Card.Title
-						title="Tasks"
-						titleStyle={{
-							paddingLeft: 10,
-							paddingTop: 5,
-							alignItems: 'center',
-							justifyContent: 'center',
-							fontSize: 20,
-						}}
-						right={() => (
-							<ListActions
-								onFilterPress={renderFilterModal}
-								onSortPress={renderSortModal}
-								styles={styles}
-							/>
-						)}
-					/>
-					<Card.Content>
-						{filteredTasks.length > 0 ? (
-							<View>
-								<Text variant="titleMedium">{filter}</Text>
-								{filteredTasks.map(task => (
-									<TaskItem
-										key={task.id}
-										task={task}
-										onToggleComplete={handleToggleComplete}
-										onDelete={handleDelete}
-									/>
-								))}
-							</View>
-						) : (
-							tasks.map(
-								task =>
-									task.status === 'active' && (
-										<TaskItem
-											key={task.id}
-											task={task}
-											onToggleComplete={
-												handleToggleComplete
-											}
-											onDelete={handleDelete}
-										/>
-									),
-							)
-						)}
-					</Card.Content>
-				</Card>
-				<Card
-					style={styles.card}
-					onPress={() =>
-						setExpandCompletedList(!expandCompletedList)
-					}>
-					<Card.Title
-						title={`Completed Tasks (${completedTasksCount}) `}
-						titleStyle={{
-							paddingLeft: 10,
-							paddingTop: 5,
-							alignItems: 'center',
-							justifyContent: 'center',
-							fontSize: 20,
-						}}
-						onPress={() =>
-							setExpandCompletedList(!expandCompletedList)
-						}
-					/>
-					{expandCompletedList && (
-						<Card.Content>
-							{filteredTasks.length > 0 ? (
-								<View>
-									<Text variant="titleMedium">{filter}</Text>
-									{filteredTasks.map(
-										task =>
-											task.status === 'completed' && (
-												<TaskItem
-													key={task.id}
-													task={task}
-													onToggleComplete={
-														handleToggleComplete
-													}
-													onDelete={handleDelete}
-												/>
-											),
-									)}
-								</View>
-							) : (
-								tasks.map(
-									task =>
-										task.status === 'completed' && (
-											<TaskItem
-												key={task.id}
-												task={task}
-												onToggleComplete={
-													handleToggleComplete
-												}
-												onDelete={handleDelete}
-											/>
-										),
-								)
-							)}
-						</Card.Content>
-					)}
-				</Card>
-				<TaskFilterModal
-					visible={showFilterModal}
-					onDismiss={() => setShowFilterModal(false)}
-				/>
-			</View>
-		</ScrollableRefresh>
-	);
+        <TaskSection
+          title={`Completed Tasks (${completedTasksCount})`}
+          tasks={completedTasks}
+          filteredTasks={filteredTasks.filter(
+            task => task.status === 'completed',
+          )}
+          filter={filter}
+          onToggleComplete={handleToggleComplete}
+          onDelete={handleDelete}
+          styles={styles}
+          titleStyle={styles.cardTitle}
+          onPress={() => setExpandCompletedList(!expandCompletedList)}
+          expanded={expandCompletedList}
+        />
+
+        <TaskFilterModal
+          visible={showFilterModal}
+          onDismiss={() => setShowFilterModal(false)}
+        />
+      </View>
+    </ScrollableRefresh>
+  );
 };
 
 export default TaskList;
