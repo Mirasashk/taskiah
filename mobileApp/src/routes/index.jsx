@@ -50,9 +50,17 @@ export const PublicStack = () => {
   const theme = useTheme();
   const screenOptions = getDefaultScreenOptions(theme);
 
+  // Add default screens if publicScreens is undefined
+  const screens = publicScreens || [
+    {
+      name: 'Landing',
+      component: LandingScreen,
+    },
+  ];
+
   return (
     <Stack.Navigator screenOptions={screenOptions}>
-      {publicScreens.map(({name, component}) => (
+      {screens.map(({name, component}) => (
         <Stack.Screen key={name} name={name} component={component} />
       ))}
     </Stack.Navigator>

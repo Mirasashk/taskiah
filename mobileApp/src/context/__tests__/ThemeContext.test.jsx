@@ -1,6 +1,6 @@
 import React, {useContext} from 'react';
 import {render, screen, fireEvent} from '@testing-library/react';
-import {ThemeContext} from './ThemeContext';
+import {ThemeContext} from '../ThemeContext';
 
 describe('ThemeContext', () => {
   // Test component that uses the ThemeContext

@@ -3,7 +3,11 @@ import {View, StyleSheet} from 'react-native';
 import {Text} from 'react-native-paper';
 import SignupForm from '../components/signup/SignupForm';
 
-export default function SignupScreen() {
+/**
+ * SignupScreen component that handles user registration
+ * @returns {React.ReactElement} SignupScreen component
+ */
+export const SignupScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Sign Up</Text>
@@ -11,11 +15,10 @@ export default function SignupScreen() {
       <SignupForm />
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     justifyContent: 'start',
     paddingHorizontal: 40,
     paddingTop: 100,
@@ -32,3 +35,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
+
+export default SignupScreen;

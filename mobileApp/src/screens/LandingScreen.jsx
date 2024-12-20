@@ -1,8 +1,11 @@
 // src/screens/LandingScreen.jsx
-import React, {useContext, useEffect} from 'react';
-import {View, Text, Image, ScrollView, StyleSheet} from 'react-native';
-import {Button, IconButton, useTheme} from 'react-native-paper';
+import React, {useContext} from 'react';
+import {View, ScrollView, StyleSheet} from 'react-native';
+import {Button, useTheme} from 'react-native-paper';
 import {ThemeContext} from '../context/ThemeContext';
+import ThemeToggle from '../components/ui/ThemeToggle';
+import Logo from '../components/ui/Logo';
+import HeroSection from '../components/landing/HeroSection';
 
 const LandingScreen = ({navigation}) => {
   const theme = useTheme();
@@ -10,55 +13,15 @@ const LandingScreen = ({navigation}) => {
 
   return (
     <ScrollView
-      style={[styles.container]}
+      style={styles.container}
       contentContainerStyle={styles.contentContainer}>
-      {/* Header with Logo and Theme Toggle */}
       <View style={styles.header}>
-        <View style={styles.themeToggleContainer}>
-          <IconButton
-            icon={theme.dark ? 'weather-sunny' : 'weather-night'}
-            iconColor={theme.colors.background}
-            size={24}
-            onPress={toggleTheme}
-            style={[
-              styles.themeToggle,
-              {backgroundColor: theme.colors.onBackground},
-            ]}
-          />
-        </View>
-        {/* Placeholder for your app logo */}
-        <View style={styles.logoContainer}>
-          <Image
-            source={
-              theme.dark
-                ? require('../assets/images/Logo_white.png')
-                : require('../assets/images/Logo_black.png')
-            }
-            style={styles.logoImage}
-          />
-        </View>
+        <ThemeToggle isDark={isThemeDark} onToggle={toggleTheme} />
+        <Logo isDark={isThemeDark} />
       </View>
 
-      {/* Hero Section */}
-      <View style={styles.heroSection}>
-        {/* Placeholder for hero graphic */}
-        <View style={styles.heroGraphicPlaceholder}>
-          <Image
-            source={require('../assets/images/heroImg.png')}
-            style={styles.heroGraphic}
-          />
-        </View>
+      <HeroSection theme={theme} />
 
-        {/* Hero Text */}
-        <Text style={[styles.heroTitle, {color: theme.colors.onBackground}]}>
-          Organize Your Tasks
-        </Text>
-        <Text style={[styles.heroSubtitle, {color: theme.colors.onBackground}]}>
-          Stay productive and manage your tasks efficiently with Taskiah
-        </Text>
-      </View>
-
-      {/* Action Buttons */}
       <View style={styles.actionButtons}>
         <Button
           mode="contained"
@@ -91,58 +54,6 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     paddingVertical: 0,
-  },
-  themeToggleContainer: {
-    alignSelf: 'flex-end',
-    padding: 0,
-    margin: 0,
-  },
-  logoContainer: {
-    flex: 0,
-    paddingBottom: 20,
-  },
-  logoImage: {
-    width: 300,
-    height: 100,
-    resizeMode: 'contain',
-  },
-  logoText: {
-    fontSize: 28,
-    fontWeight: 'bold',
-  },
-  themeToggle: {
-    marginLeft: 'auto',
-  },
-  heroSection: {
-    flex: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 0,
-    paddingHorizontal: 20,
-  },
-  heroGraphicPlaceholder: {
-    width: '100%',
-    height: 200,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 10,
-    marginBottom: 30,
-  },
-  heroGraphic: {
-    width: '100%',
-    height: '100%',
-  },
-  heroTitle: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 16,
-  },
-  heroSubtitle: {
-    fontSize: 18,
-    textAlign: 'center',
-    marginBottom: 30,
-    paddingHorizontal: 20,
   },
   actionButtons: {
     gap: 16,
