@@ -4,9 +4,9 @@ import {useTheme} from 'react-native-paper';
 import DashboardScreen from '../screens/DashboardScreen';
 import TasksScreen from '../screens/TasksScreen';
 import {getHeaderTitle} from '@react-navigation/elements';
-import Header from '../components/Header';
+import Header from '../components/header/Header';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import DrawerMain from '../components/DrawerMain';
+import DrawerMain from '../components/drawer/DrawerMain';
 import TaskNavigator from '../routes/TaskNavigator';
 
 const Drawer = createDrawerNavigator();
@@ -16,7 +16,7 @@ const PrivateStack = () => {
 
   return (
     <Drawer.Navigator
-      drawerContent={DrawerMain}
+      drawerContent={props => <DrawerMain {...props} />}
       drawerStyle={{
         backgroundColor: theme.colors.surfaceContainerHigh,
       }}
@@ -49,11 +49,9 @@ const PrivateStack = () => {
           width: '60%',
         },
         drawerActiveTintColor: theme.colors.primary,
+        drawerInactiveTintColor: theme.colors.onSurface,
         drawerItemStyle: {
-          backgroundColor: theme.colors.surfaceContainerHigh,
-          icon: {
-            color: theme.colors.primary,
-          },
+          backgroundColor: 'transparent',
         },
       }}>
       <Drawer.Screen
@@ -61,7 +59,7 @@ const PrivateStack = () => {
         options={{
           drawerLabel: 'Dashboard',
           drawerIcon: ({color, size}) => (
-            <Icon name="home" color={theme.colors.onSurface} size={size} />
+            <Icon name="home" color={color} size={size} />
           ),
         }}
         component={DashboardScreen}
@@ -71,11 +69,7 @@ const PrivateStack = () => {
         options={{
           drawerLabel: 'Tasks',
           drawerIcon: ({color, size}) => (
-            <Icon
-              name="clipboard-edit-outline"
-              color={theme.colors.onSurface}
-              size={size}
-            />
+            <Icon name="clipboard-edit-outline" color={color} size={size} />
           ),
         }}
         component={TaskNavigator}

@@ -122,13 +122,11 @@ const TaskDetailScreen = () => {
   };
 
   const handleCategoryChange = value => {
-    console.log(value);
     setTaskState({...taskState, category: value});
     setShowCategory(false);
   };
 
   const handleTagChange = value => {
-    console.log(value);
     setTaskState({...taskState, tags: value});
     setShowTag(false);
   };

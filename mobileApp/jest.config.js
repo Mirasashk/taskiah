@@ -3,7 +3,7 @@ module.exports = {
   transformIgnorePatterns: [
     'node_modules/(?!(jest-)?react-native|@react-native(-community)?)|react-native-paper|@react-native-community/cli-platform-android|@react-native-community/cli-platform-ios',
   ],
-  setupFilesAfterEnv: ['./jest-setup.ts'],
+  setupFilesAfterEnv: ['./jest-setup.js'],
   coveragePathIgnorePatterns: [
     '/node_modules/',
     '/jest/',

@@ -4,7 +4,7 @@ import {Text} from 'react-native-paper';
 import {useTheme} from 'react-native-paper';
 import {useTaskContext} from '../../context/TaskContext';
 import TaskFilterModal from './TaskFilterModal';
-import ScrollableRefresh from '../PullToRefresh';
+import PullToRefresh from '../PullToRefresh/PullToRefresh';
 import ListActions from './ListActions';
 import TaskSection from './TaskSection';
 import {createTaskStyles} from '../../theme/taskStyles';
@@ -50,7 +50,7 @@ const TaskList = () => {
   const completedTasks = tasks.filter(task => task.status === 'completed');
 
   return (
-    <ScrollableRefresh onRefresh={handleRefresh}>
+    <PullToRefresh onRefresh={handleRefresh}>
       <View style={styles.listContainer}>
         <TaskSection
           title="Tasks"
@@ -89,7 +89,7 @@ const TaskList = () => {
           onDismiss={() => setShowFilterModal(false)}
         />
       </View>
-    </ScrollableRefresh>
+    </PullToRefresh>
   );
 };
 

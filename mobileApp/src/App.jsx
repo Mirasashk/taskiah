@@ -1,27 +1,26 @@
 'use strict';
 
 import 'react-native-gesture-handler';
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {PaperProvider} from 'react-native-paper';
-import {NavigationContainer} from '@react-navigation/native';
 import {StyleSheet} from 'react-native';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
-
+import {useColorScheme} from 'react-native';
 // Config
 import './config/firebase';
 
 // Context
-import {ThemeProvider, ThemeContext} from './context/ThemeContext';
 import {AuthProvider, useAuth} from './context/AuthContext';
 import {TaskProvider} from './context/TaskContext';
+import {ThemeContext} from './context/ThemeContext';
+import {CustomLightTheme, CustomDarkTheme} from './theme';
+
+import {AppContent} from './routes';
 
 // Routes
-import {PublicStack, PrivateRoutes} from './routes';
 
 // Components
-import {LoadingView} from './components/common/LoadingView';
-import {StatusBarWrapper} from './components/layout/StatusBarWrapper';
 
 // Styles defined at the top level
 const styles = StyleSheet.create({
@@ -30,44 +29,43 @@ const styles = StyleSheet.create({
   },
 });
 
-// Component definitions
-const AppContent = () => {
-  const {user, loading} = useAuth();
-  const {theme} = React.useContext(ThemeContext);
+const App = () => {
+  const [isThemeDark, setIsThemeDark] = useState(false);
+  const colorScheme = useColorScheme();
 
-  if (loading) {
-    return <LoadingView theme={theme} />;
-  }
+  useEffect(() => {
+    setIsThemeDark(colorScheme === 'dark' ? true : false);
+  }, [colorScheme]);
+
+  const toggleTheme = React.useCallback(() => {
+    return setIsThemeDark(!isThemeDark);
+  }, [isThemeDark]);
+
+  const preferences = React.useMemo(
+    () => ({
+      toggleTheme,
+      isThemeDark,
+    }),
+    [toggleTheme, isThemeDark],
+  );
+  let theme = isThemeDark ? CustomDarkTheme : CustomLightTheme;
 
   return (
-    <>
-      <StatusBarWrapper theme={theme} />
-      <NavigationContainer theme={theme}>
-        {user ? <PrivateRoutes /> : <PublicStack />}
-      </NavigationContainer>
-    </>
-  );
-};
-
-const App = () => (
-  <GestureHandlerRootView style={styles.root}>
-    <SafeAreaProvider>
-      <ThemeProvider>
+    <GestureHandlerRootView style={styles.root}>
+      <SafeAreaProvider>
         <AuthProvider>
           <TaskProvider>
-            <ThemeContext.Consumer>
-              {({theme}) => (
-                <PaperProvider theme={theme}>
-                  <AppContent />
-                </PaperProvider>
-              )}
-            </ThemeContext.Consumer>
+            <ThemeContext.Provider value={preferences}>
+              <PaperProvider theme={theme}>
+                <AppContent />
+              </PaperProvider>
+            </ThemeContext.Provider>
           </TaskProvider>
         </AuthProvider>
-      </ThemeProvider>
-    </SafeAreaProvider>
-  </GestureHandlerRootView>
-);
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
+  );
+};
 
 // Export at the top level
 export default App;
