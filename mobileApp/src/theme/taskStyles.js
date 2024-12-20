@@ -1,29 +1,40 @@
 import {StyleSheet} from 'react-native';
 
+/**
+ * Creates styles for task-related components
+ * @param {Object} theme - Theme object from react-native-paper
+ * @returns {Object} StyleSheet object
+ */
 export const createTaskStyles = theme =>
   StyleSheet.create({
-    listContainer: {
-      paddingVertical: 8,
+    container: {
       flex: 1,
-      paddingHorizontal: 20,
-      backgroundColor: theme.colors.surfaceContainerHigh,
+      backgroundColor: theme.colors.background,
     },
-    card: {
-      marginBottom: 10,
-      borderRadius: 10,
-      backgroundColor: theme.colors.surfaceContainerLow,
+    listContainer: {
+      flex: 1,
+      padding: 16,
+    },
+    sectionHeader: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      marginBottom: 8,
+      color: theme.colors.onBackground,
     },
     emptyContainer: {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: theme.colors.surfaceContainerHigh,
+      padding: 16,
     },
-    cardTitle: {
-      paddingLeft: 10,
-      paddingTop: 5,
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontSize: 20,
+    emptyText: {
+      fontSize: 16,
+      color: theme.colors.onSurfaceVariant,
+      textAlign: 'center',
+    },
+    taskItem: {
+      marginBottom: 8,
+      borderRadius: 8,
+      backgroundColor: theme.colors.surface,
     },
   });

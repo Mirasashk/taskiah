@@ -1,11 +1,5 @@
 import React, {useState, useCallback} from 'react';
-import {
-  RefreshControl,
-  ScrollView,
-  View,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
-} from 'react-native';
+import {RefreshControl, View, ScrollView, FlatList} from 'react-native';
 import {pullToRefreshStyles as styles} from '../../theme/components/pullToRefresh';
 import {isScrollAtTop} from '../../utils/scroll';
 import PropTypes from 'prop-types';
@@ -18,9 +12,16 @@ import PropTypes from 'prop-types';
  * @param {Function} props.onRefresh - Callback function to execute on pull to refresh
  * @param {boolean} [props.isEnabled=true] - Whether pull to refresh is enabled
  * @param {Object} [props.style] - Additional styles for the container
+ * @param {boolean} [props.isFlatList=false] - Whether the child is a FlatList
  * @returns {React.ReactElement} Rendered component
  */
-const PullToRefresh = ({children, onRefresh, isEnabled = true, style}) => {
+const PullToRefresh = ({
+  children,
+  onRefresh,
+  isEnabled = true,
+  style,
+  isFlatList = false,
+}) => {
   const [refreshing, setRefreshing] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
 
@@ -41,23 +42,36 @@ const PullToRefresh = ({children, onRefresh, isEnabled = true, style}) => {
     }
   }, [scrollPosition, onRefresh]);
 
+  const refreshControl = (
+    <RefreshControl
+      refreshing={refreshing}
+      onRefresh={handleRefresh}
+      enabled={isEnabled && isScrollAtTop(scrollPosition)}
+    />
+  );
+
   if (!isEnabled) {
     return <View style={[styles.container, style]}>{children}</View>;
   }
 
+  // If the child is a FlatList, we'll clone it and add the refresh control
+  if (isFlatList) {
+    return React.cloneElement(children, {
+      refreshControl: refreshControl,
+      onScroll: handleScroll,
+      scrollEventThrottle: 16,
+      style: [styles.container, style],
+    });
+  }
+
+  // Otherwise, wrap the children in a ScrollView
   return (
     <ScrollView
       style={[styles.container, style]}
       contentContainerStyle={styles.contentContainer}
       onScroll={handleScroll}
       scrollEventThrottle={16}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={handleRefresh}
-          enabled={isScrollAtTop(scrollPosition)}
-        />
-      }>
+      refreshControl={refreshControl}>
       {children}
     </ScrollView>
   );
@@ -68,6 +82,7 @@ PullToRefresh.propTypes = {
   onRefresh: PropTypes.func.isRequired,
   isEnabled: PropTypes.bool,
   style: PropTypes.object,
+  isFlatList: PropTypes.bool,
 };
 
 export default PullToRefresh;
