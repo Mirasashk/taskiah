@@ -48,6 +48,7 @@ const TasksScreen = () => {
 
   return (
     <Tab.Navigator
+      testID="tasks-screen"
       initialRouteName="Active"
       screenOptions={{
         tabBarActiveTintColor: theme.colors.primary,

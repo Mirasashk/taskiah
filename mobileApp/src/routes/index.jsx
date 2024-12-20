@@ -1,25 +1,29 @@
-import React, {useEffect, useContext} from 'react';
+import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {NavigationContainer} from '@react-navigation/native';
-
-import {AuthProvider, useAuth} from '../context/AuthContext';
 import {useTheme} from 'react-native-paper';
-
-import {View} from 'react-native';
 
 // Components
 import {LoadingView} from '../components/common/LoadingView';
 import {StatusBarWrapper} from '../components/layout/StatusBarWrapper';
 
-// Import your screens
-import LoginScreen from '../screens/LoginScreen';
-import SignupScreen from '../screens/SignupScreen';
+// Configs
+import {publicScreens} from '../config/navigationConfig';
+import {getDefaultScreenOptions} from '../theme/navigationTheme';
+
+// Hooks
+import {useAuth} from '../context/AuthContext';
+
+// Routes
 import PrivateStack from './PrivateStack';
-import LandingScreen from '../screens/LandingScreen';
 
 const Stack = createNativeStackNavigator();
 
-// Component definitions
+/**
+ * Main application content component that handles authentication state
+ * and renders appropriate navigation stack
+ * @returns {React.ReactElement}
+ */
 export const AppContent = () => {
   const theme = useTheme();
   const {user, loading} = useAuth();
@@ -38,24 +42,25 @@ export const AppContent = () => {
   );
 };
 
+/**
+ * Public navigation stack for unauthenticated users
+ * @returns {React.ReactElement}
+ */
 export const PublicStack = () => {
   const theme = useTheme();
+  const screenOptions = getDefaultScreenOptions(theme);
 
   return (
-    <Stack.Navigator
-      screenOptions={{
-        headerShown: false,
-        contentStyle: {
-          backgroundColor: theme.colors.surfaceContainerHigh,
-        },
-      }}>
-      <Stack.Screen name="Landing" component={LandingScreen} />
-      <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen name="Signup" component={SignupScreen} />
+    <Stack.Navigator screenOptions={screenOptions}>
+      {publicScreens.map(({name, component}) => (
+        <Stack.Screen key={name} name={name} component={component} />
+      ))}
     </Stack.Navigator>
   );
 };
 
-export const PrivateRoutes = () => {
-  return <PrivateStack />;
-};
+/**
+ * Private navigation stack for authenticated users
+ * @returns {React.ReactElement}
+ */
+export const PrivateRoutes = () => <PrivateStack />;

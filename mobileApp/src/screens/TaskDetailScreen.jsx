@@ -137,7 +137,7 @@ const TaskDetailScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View testID="task-detail-screen" style={styles.container}>
       <Card style={styles.card}>
         <Card.Content>
           <TextInput

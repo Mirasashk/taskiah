@@ -4,21 +4,22 @@ import {useTheme} from 'react-native-paper';
 import TasksScreen from '../screens/TasksScreen';
 import TaskDetailScreen from '../screens/TaskDetailScreen';
 import {SCREEN_NAMES, SCREEN_OPTIONS} from '../config/navigation';
+import {getDefaultScreenOptions} from '../config/navigator.config';
 
 const Stack = createNativeStackNavigator();
 
+/**
+ * TaskNavigator Component
+ * Handles the navigation stack for task-related screens
+ *
+ * @component
+ * @returns {React.ReactElement} A stack navigator for task-related screens
+ */
 const TaskNavigator = () => {
   const theme = useTheme();
 
-  const defaultScreenOptions = {
-    headerShown: false,
-    contentStyle: {
-      backgroundColor: theme.colors.surfaceContainerHigh,
-    },
-  };
-
   return (
-    <Stack.Navigator screenOptions={defaultScreenOptions}>
+    <Stack.Navigator screenOptions={getDefaultScreenOptions(theme)}>
       <Stack.Screen
         name={SCREEN_NAMES.TASKS_HOME}
         component={TasksScreen}
