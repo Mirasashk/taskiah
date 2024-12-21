@@ -14,7 +14,7 @@ import {Calendar} from 'react-native-calendars';
 import {TimePickerModal} from 'react-native-paper-dates';
 import useCalendarTheme from '../../theme/calendarTheme';
 import TimePickerButton from './TimePickerButton';
-import {createStyles} from './styles/dateTimePicker.styles';
+import {dateTimePickerStyles} from './styles/dateTimePickerStyles';
 
 /**
  * A modal component that allows users to select both date and time
@@ -33,7 +33,7 @@ const DateTimePicker = ({
 }) => {
   const theme = useTheme();
   const calendarTheme = useCalendarTheme();
-  const styles = createStyles(theme);
+  const styles = dateTimePickerStyles(theme);
 
   const [selectedDate, setSelectedDate] = useState(date);
   const [time, setTime] = useState();

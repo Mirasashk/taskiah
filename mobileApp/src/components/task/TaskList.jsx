@@ -6,7 +6,7 @@ import TaskFilterModal from './TaskFilterModal';
 import PullToRefresh from '../PullToRefresh/PullToRefresh';
 import ListActions from './ListActions';
 import TaskItem from './TaskItem';
-import {createTaskStyles} from '../../theme/taskStyles';
+import {TaskListStyles} from './styles/TaskListStyles';
 
 /**
  * Renders the main task list with filtering and refresh capabilities
@@ -15,7 +15,6 @@ import {createTaskStyles} from '../../theme/taskStyles';
  */
 const TaskList = () => {
   const theme = useTheme();
-  const styles = createTaskStyles(theme);
   const {tasks, getTasks} = useTaskContext();
   const [filterModalVisible, setFilterModalVisible] = useState(false);
 
@@ -24,15 +23,19 @@ const TaskList = () => {
   }, [getTasks]);
 
   const renderEmptyList = () => (
-    <View style={styles.emptyContainer}>
-      <Text style={styles.emptyText}>No tasks found</Text>
+    <View
+      style={[
+        TaskListStyles.emptyContainer,
+        {backgroundColor: theme.colors.surfaceContainerHigh},
+      ]}>
+      <Text style={TaskListStyles.emptyText}>No tasks found</Text>
     </View>
   );
 
   const renderItem = ({item}) => <TaskItem task={item} />;
 
   return (
-    <View style={styles.container} testID="task-list">
+    <View style={TaskListStyles.container} testID="task-list">
       <ListActions
         onFilterPress={() => setFilterModalVisible(true)}
         onSortPress={() => {}}
@@ -42,7 +45,7 @@ const TaskList = () => {
           data={tasks}
           renderItem={renderItem}
           keyExtractor={item => item.id}
-          contentContainerStyle={styles.listContainer}
+          contentContainerStyle={TaskListStyles.listContainer}
           ListEmptyComponent={renderEmptyList}
         />
       </PullToRefresh>

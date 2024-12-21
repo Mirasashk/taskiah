@@ -3,6 +3,6 @@
  * @constant {Object}
  */
 export const COLORS = {
-  PRIMARY: '#FFFFFF',
+  PRIMARY: '#2F628C',
   // Add more colors as needed
 };

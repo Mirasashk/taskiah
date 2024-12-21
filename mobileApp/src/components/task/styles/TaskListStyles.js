@@ -1,10 +1,11 @@
 import {StyleSheet} from 'react-native';
 
-export const pullToRefreshStyles = StyleSheet.create({
+export const TaskListStyles = StyleSheet.create({
+  emptyContainer: {},
   container: {
     flex: 1,
   },
-  contentContainer: {
+  listContainer: {
     flexGrow: 1,
   },
 });

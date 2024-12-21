@@ -1,6 +1,6 @@
 import {StyleSheet} from 'react-native';
 
-export const addListStyles = StyleSheet.create({
+export const AddListTabStyles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',

@@ -1,7 +1,7 @@
 import React from 'react';
 import {View} from 'react-native';
 import {Text, useTheme} from 'react-native-paper';
-import {addListStyles} from '../../theme/components/addList.styles';
+import {AddListTabStyles} from './styles/AddListTabStyles';
 
 /**
  * AddListTab component that displays the add list interface
@@ -14,7 +14,7 @@ const AddListTab = () => {
   return (
     <View
       style={[
-        addListStyles.container,
+        AddListTabStyles.container,
         {backgroundColor: theme.colors.surfaceContainerHigh},
       ]}>
       <Text>Add new list here</Text>

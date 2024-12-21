@@ -1,15 +1,14 @@
 import React from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
 } from 'react-native';
-import {useTheme} from 'react-native-paper';
+import {useTheme, Button, Text} from 'react-native-paper';
 import {FormInput} from '../components/forms/FormInput';
-import {Button} from '../components/common/Button';
+
 import {useLogin} from '../hooks/useLogin';
 
 /**
@@ -51,7 +50,14 @@ export default function LoginScreen({navigation}) {
           secureTextEntry
         />
 
-        <Button title="Login" onPress={handleLogin} loading={loading} />
+        <Button
+          mode="contained-tonal"
+          onPress={handleLogin}
+          loading={loading}
+          style={[styles.button, {backgroundColor: theme.colors.primary}]}
+          labelStyle={{color: theme.colors.onPrimary}}>
+          Login
+        </Button>
 
         <TouchableOpacity
           onPress={() => navigation.navigate('Signup')}
@@ -91,5 +97,10 @@ const styles = StyleSheet.create({
     color: '#ff3333',
     marginBottom: 16,
     textAlign: 'center',
+  },
+  button: {
+    width: '50%',
+    marginHorizontal: 'auto',
+    paddingVertical: 6,
   },
 });

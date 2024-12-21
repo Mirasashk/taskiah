@@ -6,7 +6,7 @@ import {
   DrawerItemList,
 } from '@react-navigation/drawer';
 import {useTheme} from 'react-native-paper';
-import {drawerStyles} from './styles';
+import createDrawerMainStyles from './styles/drawerMainStyles';
 
 /**
  * Main drawer navigation component
@@ -15,6 +15,7 @@ import {drawerStyles} from './styles';
  */
 const DrawerMain = props => {
   const theme = useTheme();
+  const drawerMainStyles = createDrawerMainStyles(theme);
   const {navigation, state} = props;
 
   if (!navigation || !state) {
@@ -29,12 +30,15 @@ const DrawerMain = props => {
     <DrawerContentScrollView
       {...props}
       style={[
-        drawerStyles.container,
+        drawerMainStyles.container,
         {backgroundColor: theme.colors.background},
       ]}>
       <View
-        style={[drawerStyles.header, {borderBottomColor: theme.colors.border}]}>
-        <Text style={[drawerStyles.headerText, {color: theme.colors.text}]}>
+        style={[
+          drawerMainStyles.header,
+          {borderBottomColor: theme.colors.border},
+        ]}>
+        <Text style={[drawerMainStyles.headerText, {color: theme.colors.text}]}>
           App Name
         </Text>
       </View>

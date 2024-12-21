@@ -5,7 +5,7 @@ import StatsSection from '../components/dashboard/StatsSection';
 import NotificationsSection from '../components/dashboard/NotificationsSection';
 import {useTaskContext} from '../context/TaskContext';
 import {useAuth} from '../context/AuthContext';
-import {dashboardStyles} from '../theme/dashboard';
+import {DashboardStyles} from '../components/dashboard/styles/DashboardStyles';
 
 /**
  * Dashboard screen component that displays task statistics and notifications
@@ -58,7 +58,7 @@ const DashboardScreen = () => {
   };
 
   return (
-    <View style={dashboardStyles.container}>
+    <View style={DashboardStyles.container}>
       <StatsSection stats={stats} onTaskPress={handleTaskPress} />
       <NotificationsSection />
     </View>

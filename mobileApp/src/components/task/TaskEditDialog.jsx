@@ -1,7 +1,7 @@
 import React from 'react';
 import {Dialog, RadioButton, useTheme} from 'react-native-paper';
 import PropTypes from 'prop-types';
-import {styles} from './styles';
+import {TaskEditDialogStyles} from './styles/TaskEditDialogStyles';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 
 /**
@@ -29,7 +29,7 @@ const TaskEditDialog = ({
       visible={visible}
       testID="task-edit-dialog"
       onDismiss={onDismiss}
-      style={styles.dialog(theme)}>
+      style={{backgroundColor: theme.colors.surfaceContainerHigh}}>
       <Dialog.Title>{title}</Dialog.Title>
       <Dialog.Content>
         <RadioButton.Group onValueChange={onValueChange} value={value}>

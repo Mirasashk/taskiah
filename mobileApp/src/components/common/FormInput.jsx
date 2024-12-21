@@ -1,64 +1,47 @@
 import React from 'react';
-import {View} from 'react-native';
-import {TextInput, Text} from 'react-native-paper';
-import {useTheme} from 'react-native-paper';
+import {View, StyleSheet} from 'react-native';
+import {Text, TextInput, useTheme} from 'react-native-paper';
+import PropTypes from 'prop-types';
 
 /**
- * A reusable form input component with error handling and styling
- *
+ * A reusable form input component with error handling and consistent styling
  * @param {Object} props - Component props
- * @param {string} props.label - Input label text
- * @param {string} props.value - Input value
- * @param {Function} props.onChangeText - Handler for text change events
- * @param {string} [props.error] - Error message to display
- * @param {boolean} [props.secureTextEntry] - Whether to hide input text
- * @param {React.ReactNode} [props.rightIcon] - Icon to display on the right side
- * @param {Object} [props.props] - Additional props to pass to TextInput
- * @param {string} [props.testID] - Test ID for the input
- * @returns {React.ReactElement} FormInput component
  */
 const FormInput = ({
-  label,
+  label = '',
   value,
   onChangeText,
-  error,
-  secureTextEntry,
-  rightIcon,
-  testID,
-  ...props
+  placeholder = '',
+  error = '',
+  secureTextEntry = false,
+  rightIcon = null,
+  testID = 'form-input',
+  ...inputProps
 }) => {
   const theme = useTheme();
-
-  const styles = {
-    input: {
-      borderWidth: 1,
-      padding: 0,
-      borderRadius: 5,
-      marginBottom: 10,
-    },
-    inputError: {
-      borderColor: theme.colors.error,
-    },
-    errorText: {
-      color: theme.colors.error,
-      fontSize: 12,
-      marginBottom: 5,
-    },
-  };
 
   return (
     <View>
       <TextInput
         testID={testID}
-        style={[styles.input, error && styles.inputError]}
+        style={[
+          styles.input,
+          error && styles.inputError,
+          {
+            backgroundColor: theme.colors.surfaceContainerHigh,
+          },
+        ]}
         label={label}
+        placeholder={placeholder}
+        placeholderTextColor={theme.colors.placeholder}
         value={value}
         onChangeText={onChangeText}
         error={!!error}
         secureTextEntry={secureTextEntry}
         right={rightIcon}
         autoCapitalize="none"
-        {...props}
+        mode="outlined"
+        {...inputProps}
       />
       {error && (
         <Text style={styles.errorText} testID={`${testID}-error`}>
@@ -67,6 +50,33 @@ const FormInput = ({
       )}
     </View>
   );
+};
+
+const styles = StyleSheet.create({
+  input: {
+    borderRadius: 16,
+    marginBottom: 8,
+    fontSize: 16,
+  },
+  inputError: {
+    borderColor: 'error',
+  },
+  errorText: {
+    color: 'error',
+    fontSize: 12,
+    marginBottom: 8,
+  },
+});
+
+FormInput.propTypes = {
+  value: PropTypes.string.isRequired,
+  onChangeText: PropTypes.func.isRequired,
+  placeholder: PropTypes.string,
+  label: PropTypes.string,
+  error: PropTypes.string,
+  secureTextEntry: PropTypes.bool,
+  rightIcon: PropTypes.node,
+  testID: PropTypes.string,
 };
 
 export default FormInput;

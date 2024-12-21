@@ -2,7 +2,7 @@ import React from 'react';
 import {View} from 'react-native';
 import {Text} from 'react-native-paper';
 import StatsCard from './StatsCard';
-import {dashboardStyles} from '../../theme/dashboard';
+import {DashboardStyles} from './styles/DashboardStyles';
 
 /**
  * @typedef {Object} StatsSectionProps
@@ -19,7 +19,7 @@ import {dashboardStyles} from '../../theme/dashboard';
  * @returns {React.ReactElement} Stats section component
  */
 const StatsSection = ({onTaskPress, stats}) => (
-  <View style={dashboardStyles.statsContainer}>
+  <View style={DashboardStyles.statsContainer}>
     <Text variant="titleLarge">Tasks</Text>
     <StatsCard
       title="Active tasks"

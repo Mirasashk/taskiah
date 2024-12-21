@@ -16,9 +16,8 @@ import {TaskProvider} from './context/TaskContext';
 import {ThemeContext} from './context/ThemeContext';
 import {CustomLightTheme, CustomDarkTheme} from './theme';
 
-import {AppContent} from './routes';
-
 // Routes
+import {AppContent} from './routes';
 
 // Components
 
