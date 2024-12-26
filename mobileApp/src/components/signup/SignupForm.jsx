@@ -1,10 +1,10 @@
 import React, {useState, useContext} from 'react';
-import {View, TouchableOpacity, StyleSheet} from 'react-native';
-import {Text, TextInput} from 'react-native-paper';
-import {useTheme} from 'react-native-paper';
+import {View, TouchableOpacity} from 'react-native';
+import {Text, TextInput, Button, useTheme} from 'react-native-paper';
 import {AuthContext} from '../../context/AuthContext';
 import FormInput from '../common/FormInput';
 import {useSignupForm} from '../../hooks/useSignupForm';
+import {SignUpFormStyles} from './styles/SignUpFormStyles';
 
 /**
  * @typedef {Object} FormData
@@ -30,20 +30,12 @@ const SignupForm = () => {
   const {signUp} = useContext(AuthContext);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const theme = useTheme();
 
   const {formData, errors, handleChange, handleSubmit} = useSignupForm(signUp);
 
-  const styles = StyleSheet.create({
-    button: {
-      padding: 15,
-      borderRadius: 5,
-      alignItems: 'center',
-    },
-    buttonText: {
-      fontWeight: 'bold',
-    },
-  });
+  const styles = SignUpFormStyles(theme);
 
   return (
     <View>
@@ -109,12 +101,13 @@ const SignupForm = () => {
         }
       />
 
-      <TouchableOpacity
+      <Button
+        mode="contained"
         style={styles.button}
         onPress={handleSubmit}
         testID="signup-button">
-        <Text style={styles.buttonText}>Sign Up</Text>
-      </TouchableOpacity>
+        Sign Up
+      </Button>
     </View>
   );
 };

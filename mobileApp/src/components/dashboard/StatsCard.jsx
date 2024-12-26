@@ -2,7 +2,6 @@ import React from 'react';
 import {View} from 'react-native';
 import {Card, Avatar, IconButton} from 'react-native-paper';
 import {useTheme} from 'react-native-paper';
-import {createStyles} from '../../theme/components/StatsCard.styles';
 
 /**
  * StatsCard Component
@@ -14,10 +13,9 @@ import {createStyles} from '../../theme/components/StatsCard.styles';
  */
 const StatsCard = ({title, subtitle, icon, onPress}) => {
   const theme = useTheme();
-  const styles = createStyles(theme);
 
   const renderAvatar = props => (
-    <Avatar.Icon {...props} size={48} icon={icon} style={styles.avatar} />
+    <Avatar.Icon {...props} size={48} icon={icon} />
   );
 
   const renderChevron = props => (
@@ -31,12 +29,8 @@ const StatsCard = ({title, subtitle, icon, onPress}) => {
   );
 
   return (
-    <View style={styles.container}>
-      <Card
-        mode="contained"
-        elevation={1}
-        style={styles.card}
-        onPress={onPress}>
+    <View>
+      <Card mode="contained" elevation={1} onPress={onPress}>
         <Card.Title
           title={title}
           subtitle={subtitle}

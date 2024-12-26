@@ -61,6 +61,7 @@ const PrivateStack = () => {
         name={DRAWER_SCREENS.DASHBOARD.name}
         options={{
           drawerLabel: DRAWER_SCREENS.DASHBOARD.name,
+          drawerLabelStyle: {focused: {color: ''}},
           drawerIcon: ({color, size}) =>
             renderDrawerIcon(DRAWER_SCREENS.DASHBOARD.icon, color, size),
         }}
@@ -70,6 +71,7 @@ const PrivateStack = () => {
         name={DRAWER_SCREENS.TASKS.name}
         options={{
           drawerLabel: DRAWER_SCREENS.TASKS.name,
+          drawerLabelStyle: {focused: {color: ''}},
           drawerIcon: ({color, size}) =>
             renderDrawerIcon(DRAWER_SCREENS.TASKS.icon, color, size),
         }}

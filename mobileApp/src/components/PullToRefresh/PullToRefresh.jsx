@@ -1,6 +1,6 @@
 import React, {useState, useCallback} from 'react';
 import {RefreshControl, View, ScrollView, FlatList} from 'react-native';
-import {pullToRefreshStyles as styles} from '../../theme/components/pullToRefresh';
+
 import {isScrollAtTop} from '../../utils/scroll';
 import PropTypes from 'prop-types';
 
@@ -51,7 +51,7 @@ const PullToRefresh = ({
   );
 
   if (!isEnabled) {
-    return <View style={[styles.container, style]}>{children}</View>;
+    return <View>{children}</View>;
   }
 
   // If the child is a FlatList, we'll clone it and add the refresh control
@@ -60,15 +60,12 @@ const PullToRefresh = ({
       refreshControl: refreshControl,
       onScroll: handleScroll,
       scrollEventThrottle: 16,
-      style: [styles.container, style],
     });
   }
 
   // Otherwise, wrap the children in a ScrollView
   return (
     <ScrollView
-      style={[styles.container, style]}
-      contentContainerStyle={styles.contentContainer}
       onScroll={handleScroll}
       scrollEventThrottle={16}
       refreshControl={refreshControl}>

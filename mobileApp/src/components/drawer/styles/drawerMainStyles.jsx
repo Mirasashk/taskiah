@@ -7,9 +7,13 @@ const createDrawerMainStyles = theme =>
     },
     header: {
       backgroundColor: theme.colors.surfaceContainerHigh,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingVertical: 10,
+      marginHorizontal: 'auto',
     },
     headerText: {
-      color: theme.colors.text,
+      textAlign: 'center',
     },
   });
 

@@ -20,6 +20,22 @@ const FormInput = ({
 }) => {
   const theme = useTheme();
 
+  const styles = StyleSheet.create({
+    input: {
+      borderRadius: 16,
+      marginBottom: 8,
+      fontSize: 16,
+    },
+    inputError: {
+      borderColor: 'error',
+    },
+    errorText: {
+      color: theme.colors.error,
+      fontSize: 12,
+      marginBottom: 8,
+    },
+  });
+
   return (
     <View>
       <TextInput
@@ -51,22 +67,6 @@ const FormInput = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  input: {
-    borderRadius: 16,
-    marginBottom: 8,
-    fontSize: 16,
-  },
-  inputError: {
-    borderColor: 'error',
-  },
-  errorText: {
-    color: 'error',
-    fontSize: 12,
-    marginBottom: 8,
-  },
-});
 
 FormInput.propTypes = {
   value: PropTypes.string.isRequired,

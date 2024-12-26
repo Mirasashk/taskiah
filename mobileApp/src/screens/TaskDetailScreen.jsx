@@ -16,7 +16,7 @@ import {AuthContext} from '../context/AuthContext';
 import DateTimePicker from '../components/common/DateTimePicker';
 import TaskDetailField from '../components/task/TaskDetailField';
 import {STATUS_OPTIONS, PRIORITY_OPTIONS} from '../config/taskConstants';
-import {createTaskDetailStyles} from '../theme/components/taskDetailStyles';
+
 import {useContext} from 'react';
 
 /**
@@ -41,8 +41,6 @@ const TaskDetailScreen = () => {
   const [dueDate, setDueDate] = useState(
     task.dueDate ? new Date(task.dueDate) : null,
   );
-
-  const styles = createTaskDetailStyles(theme);
 
   useEffect(() => {
     setTaskState(task);
@@ -96,8 +94,8 @@ const TaskDetailScreen = () => {
   );
 
   return (
-    <View testID="task-detail-screen" style={styles.container}>
-      <Card style={styles.card}>
+    <View testID="task-detail-screen">
+      <Card>
         <Card.Content>
           <TextInput
             mode="contained"
@@ -106,7 +104,6 @@ const TaskDetailScreen = () => {
             underlineColor={theme.colors.surface}
             contentStyle={{padding: 0, margin: 0}}
             onChangeText={text => handleFieldChange('title', text)}
-            style={[styles.input, styles.titleInput]}
           />
 
           <TextInput
@@ -122,10 +119,8 @@ const TaskDetailScreen = () => {
                 icon="text"
                 size={16}
                 color={theme.colors.onSurface}
-                style={styles.descriptionIcon}
               />
             }
-            style={styles.input}
           />
 
           <TaskDetailField
@@ -175,16 +170,13 @@ const TaskDetailScreen = () => {
             }}
           />
 
-          <Button
-            mode="contained"
-            onPress={handleUpdate}
-            style={styles.updateButton}>
+          <Button mode="contained" onPress={handleUpdate}>
             Update
           </Button>
         </Card.Content>
       </Card>
 
-      <FAB icon="check" size="small" label="Mark Complete" style={styles.fab} />
+      <FAB icon="check" size="small" label="Mark Complete" />
 
       {showDueDate && (
         <DateTimePicker

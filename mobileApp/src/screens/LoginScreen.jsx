@@ -77,8 +77,8 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     flex: 1,
-    justifyContent: 'center',
-    padding: 20,
+    marginTop: 200,
+    paddingHorizontal: 40,
   },
   title: {
     fontSize: 32,
@@ -101,6 +101,7 @@ const styles = StyleSheet.create({
   button: {
     width: '50%',
     marginHorizontal: 'auto',
-    paddingVertical: 6,
+    borderRadius: 25,
+    paddingVertical: 3,
   },
 });

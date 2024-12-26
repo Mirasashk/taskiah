@@ -1,6 +1,6 @@
 import React from 'react';
 import {View, StyleSheet} from 'react-native';
-import {Text} from 'react-native-paper';
+import {Text, useTheme} from 'react-native-paper';
 import SignupForm from '../components/signup/SignupForm';
 
 /**
@@ -8,10 +8,18 @@ import SignupForm from '../components/signup/SignupForm';
  * @returns {React.ReactElement} SignupScreen component
  */
 export const SignupScreen = () => {
+  const theme = useTheme();
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Sign Up</Text>
-      <Text style={styles.subtitle}>Create an account to get started</Text>
+      <Text
+        style={[styles.title, {color: theme.colors.primary}]}
+        variant="displaySmall">
+        Sign Up
+      </Text>
+      <Text style={styles.subtitle} variant="bodyLarge">
+        Create an account to get started
+      </Text>
       <SignupForm />
     </View>
   );

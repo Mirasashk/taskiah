@@ -2,7 +2,7 @@ import React from 'react';
 import {View} from 'react-native';
 import {Text} from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {tabStyles} from '../../theme/components/tab.styles';
+
 import PropTypes from 'prop-types';
 
 /**
@@ -16,7 +16,7 @@ import PropTypes from 'prop-types';
  * @returns {React.ReactElement} Tab label component
  */
 const TabLabel = ({focused, label, theme, showIcon = false}) => (
-  <View style={tabStyles.labelContainer}>
+  <View>
     <Text
       style={{
         color: focused ? theme.colors.primary : theme.colors.onSurface,

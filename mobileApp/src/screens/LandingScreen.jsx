@@ -12,23 +12,20 @@ const LandingScreen = ({navigation}) => {
   const {isThemeDark, toggleTheme} = useContext(ThemeContext);
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.contentContainer}>
+    <View style={styles.container}>
       <View style={styles.header}>
-        <ThemeToggle isDark={isThemeDark} onToggle={toggleTheme} />
         <Logo isDark={isThemeDark} />
       </View>
-
       <HeroSection theme={theme} />
 
       <View style={styles.actionButtons}>
         <Button
           mode="contained"
-          style={[styles.button, {backgroundColor: theme.colors.primary}]}
-          labelStyle={styles.buttonLabel}
+          style={styles.button}
+          buttonColor={theme.colors.primary}
+          labelStyle={{color: theme.colors.onPrimary}}
           onPress={() => navigation.navigate('Login')}>
-          Login
+          Log in
         </Button>
         <Button
           mode="outlined"
@@ -38,19 +35,17 @@ const LandingScreen = ({navigation}) => {
           Sign Up
         </Button>
       </View>
-    </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  contentContainer: {
-    flexGrow: 1,
-    paddingHorizontal: 10,
+    paddingHorizontal: 20,
   },
   header: {
+    marginTop: 20,
     flexDirection: 'column',
     alignItems: 'center',
     paddingVertical: 0,
@@ -61,13 +56,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   button: {
-    borderRadius: 8,
+    borderRadius: 25,
+    width: '85%',
+    marginHorizontal: 'auto',
     paddingVertical: 8,
-  },
-  buttonLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    paddingVertical: 4,
   },
 });
 

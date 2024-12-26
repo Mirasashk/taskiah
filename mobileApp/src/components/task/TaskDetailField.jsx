@@ -2,7 +2,6 @@ import React from 'react';
 import {View, TouchableOpacity} from 'react-native';
 import {Text, Icon, useTheme} from 'react-native-paper';
 import PropTypes from 'prop-types';
-import {createTaskFieldStyles} from '../../theme/components/taskFieldStyles';
 
 /**
  * A reusable field component for task details
@@ -17,23 +16,15 @@ import {createTaskFieldStyles} from '../../theme/components/taskFieldStyles';
  */
 const TaskDetailField = ({label, value, onPress, isPrimary = false, icon}) => {
   const theme = useTheme();
-  const styles = createTaskFieldStyles(theme);
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity onPress={onPress} style={styles.touchable}>
-        <View style={styles.fieldContainer}>
-          <Text style={styles.label}>{label}</Text>
-          <Text style={[styles.value, !isPrimary && styles.regularValue]}>
-            {value}
-          </Text>
+    <View>
+      <TouchableOpacity onPress={onPress}>
+        <View>
+          <Text>{label}</Text>
+          <Text>{value}</Text>
           {icon && (
-            <Icon
-              source={icon.source}
-              size={icon.size}
-              color={icon.color}
-              style={styles.icon}
-            />
+            <Icon source={icon.source} size={icon.size} color={icon.color} />
           )}
         </View>
       </TouchableOpacity>

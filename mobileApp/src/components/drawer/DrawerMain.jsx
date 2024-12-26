@@ -1,5 +1,6 @@
 import React from 'react';
-import {View, Text} from 'react-native';
+import {View} from 'react-native';
+import {Text} from 'react-native-paper';
 import {
   DrawerContentScrollView,
   DrawerItem,
@@ -31,26 +32,26 @@ const DrawerMain = props => {
       {...props}
       style={[
         drawerMainStyles.container,
-        {backgroundColor: theme.colors.background},
+        {backgroundColor: theme.colors.surfaceContainerHigh},
       ]}>
       <View
         style={[
           drawerMainStyles.header,
           {borderBottomColor: theme.colors.border},
         ]}>
-        <Text style={[drawerMainStyles.headerText, {color: theme.colors.text}]}>
-          App Name
+        <Text variant="titleLarge" style={drawerMainStyles.headerText}>
+          Taskiah
         </Text>
       </View>
 
       <DrawerItemList {...props} />
 
-      <DrawerItem
+      {/* <DrawerItem
         label="Custom Action"
         onPress={handleCustomAction}
         activeTintColor={theme.colors.primary}
         inactiveTintColor={theme.colors.onSurface}
-      />
+      /> */}
     </DrawerContentScrollView>
   );
 };
