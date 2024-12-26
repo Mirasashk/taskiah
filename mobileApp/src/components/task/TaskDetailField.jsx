@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, TouchableOpacity} from 'react-native';
+import {View, TouchableOpacity, StyleSheet} from 'react-native';
 import {Text, Icon, useTheme} from 'react-native-paper';
 import PropTypes from 'prop-types';
 
@@ -18,11 +18,13 @@ const TaskDetailField = ({label, value, onPress, isPrimary = false, icon}) => {
   const theme = useTheme();
 
   return (
-    <View>
+    <View style={styles.container}>
       <TouchableOpacity onPress={onPress}>
-        <View>
-          <Text>{label}</Text>
-          <Text>{value}</Text>
+        <View style={styles.content}>
+          <Text variant="labelMedium">{label}</Text>
+          <Text variant="bodyMedium" style={{color: theme.colors.primary}}>
+            {value}
+          </Text>
           {icon && (
             <Icon source={icon.source} size={icon.size} color={icon.color} />
           )}
@@ -31,6 +33,18 @@ const TaskDetailField = ({label, value, onPress, isPrimary = false, icon}) => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    marginLeft: 20,
+  },
+  content: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    gap: 8,
+  },
+});
 
 TaskDetailField.propTypes = {
   label: PropTypes.string.isRequired,

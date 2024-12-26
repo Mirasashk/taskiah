@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 const styles = StyleSheet.create({
   actionButtons: {
     flexDirection: 'row',
-    paddingRight: 20,
+    paddingRight: 10,
   },
   actionButton: {
     marginHorizontal: 0,

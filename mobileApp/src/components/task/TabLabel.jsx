@@ -16,7 +16,7 @@ import PropTypes from 'prop-types';
  * @returns {React.ReactElement} Tab label component
  */
 const TabLabel = ({focused, label, theme, showIcon = false}) => (
-  <View>
+  <View style={{flexDirection: 'row', alignItems: 'center'}}>
     <Text
       style={{
         color: focused ? theme.colors.primary : theme.colors.onSurface,
@@ -30,6 +30,7 @@ const TabLabel = ({focused, label, theme, showIcon = false}) => (
         testID="plus-icon"
         style={{
           color: focused ? theme.colors.primary : theme.colors.onSurface,
+          marginLeft: 4,
         }}
       />
     )}

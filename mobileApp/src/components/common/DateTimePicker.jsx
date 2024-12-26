@@ -87,14 +87,14 @@ const DateTimePicker = ({
                 hours={12}
                 minutes={30}
                 style={styles.timePicker}
+                theme={theme}
               />
               <View style={styles.buttonContainer}>
                 <Button
                   onPress={handleSubmit}
                   icon="check"
                   testID="confirm-button"
-                  mode="text"
-                  textColor={theme.colors.onPrimary}
+                  mode="contained"
                   style={styles.confirmButton}>
                   Confirm
                 </Button>

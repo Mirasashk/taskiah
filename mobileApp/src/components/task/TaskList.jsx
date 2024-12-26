@@ -15,7 +15,7 @@ import {TaskListStyles} from './styles/TaskListStyles';
  */
 const TaskList = () => {
   const theme = useTheme();
-  const {tasks, getTasks} = useTaskContext();
+  const {tasks, getTasks, filter} = useTaskContext();
   const [filterModalVisible, setFilterModalVisible] = useState(false);
 
   const handleRefresh = useCallback(async () => {
@@ -35,11 +35,19 @@ const TaskList = () => {
   const renderItem = ({item}) => <TaskItem task={item} />;
 
   return (
-    <View style={TaskListStyles.container} testID="task-list">
-      <ListActions
-        onFilterPress={() => setFilterModalVisible(true)}
-        onSortPress={() => {}}
-      />
+    <View
+      style={[
+        TaskListStyles.container,
+        {backgroundColor: theme.colors.surfaceContainerHigh},
+      ]}
+      testID="task-list">
+      <View style={TaskListStyles.listHeader}>
+        <Text variant="titleLarge">{filter}</Text>
+        <ListActions
+          onFilterPress={() => setFilterModalVisible(true)}
+          onSortPress={() => {}}
+        />
+      </View>
       <PullToRefresh onRefresh={handleRefresh} isFlatList={true}>
         <FlatList
           data={tasks}

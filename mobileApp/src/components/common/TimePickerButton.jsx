@@ -24,12 +24,17 @@ const TimePickerButton = ({onPress, time}) => {
       borderRadius: 5,
       padding: 5,
     },
+    button: {
+      width: '50%',
+      alignSelf: 'center',
+    },
   });
 
   return (
     <Button
       onPress={onPress}
       textColor={theme.colors.onSurface}
+      style={styles.button}
       testID="time-picker-button"
       mode="text"
       icon="clock-outline">
@@ -38,7 +43,7 @@ const TimePickerButton = ({onPress, time}) => {
           {formatTime(time.hours, time.minutes)}
         </Text>
       ) : (
-        'Pick time'
+        'Pick a time'
       )}
     </Button>
   );
