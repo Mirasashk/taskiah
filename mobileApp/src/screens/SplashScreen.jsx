@@ -1,25 +1,20 @@
-import React, {useEffect} from 'react';
-import {View, StyleSheet} from 'react-native';
+import React from 'react';
+import {View} from 'react-native';
+import {useSplashNavigation} from '../hooks/useSplashNavigation';
+import {styles} from './styles/SplashScreen.styles';
 
+/**
+ * SplashScreen component that displays during app initialization
+ * @component
+ * @param {Object} props - Component props
+ * @param {Object} props.navigation - Navigation object provided by React Navigation
+ * @returns {React.ReactElement} Rendered component
+ */
 const SplashScreen = ({navigation}) => {
-  useEffect(() => {
-    // Add your initialization logic here
-    const timer = setTimeout(() => {
-      navigation.replace('Landing');
-    }, 2000); // Navigate to Landing after 2 seconds
+  // Custom hook to handle navigation logic
+  useSplashNavigation(navigation);
 
-    return () => clearTimeout(timer);
-  }, [navigation]);
-
-  return <View style={styles.container} />;
+  return <View style={styles.container} testID="splash-screen" />;
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-    // Add your splash screen styling here
-  },
-});
 
 export default SplashScreen;

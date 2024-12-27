@@ -86,3 +86,9 @@ yarn-error.log
 debug.keystore
 /android/app/google-services.json
 /ios/mobileApp/GoogleService-Info.plist
+
+# VSCode
+.vscode
+
+# Jest
+coverage/

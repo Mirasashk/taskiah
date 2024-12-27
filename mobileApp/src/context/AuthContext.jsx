@@ -1,111 +1,138 @@
 import React, {createContext, useState, useContext, useEffect} from 'react';
 import {auth} from '../config/firebase';
 import {getUserProfile, createUserProfile} from '../services/userApi';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import Config from 'react-native-config';
 
+import {storeUserData, processUserData} from '../utils/authUtils';
+
+/**
+ * @typedef {Object} AuthContextType
+ * @property {Object|null} user - Current user object
+ * @property {boolean} loading - Loading state
+ * @property {Function} login - Login function
+ * @property {Function} signOut - Sign out function
+ * @property {Function} signUp - Sign up function
+ */
+
+/**
+ * Authentication context
+ * @type {React.Context<AuthContextType>}
+ */
 export const AuthContext = createContext({});
 
+/**
+ * Authentication Provider Component
+ * @param {Object} props - Component props
+ * @param {React.ReactNode} props.children - Child components
+ */
 export const AuthProvider = ({children}) => {
-	const [user, setUser] = useState(null);
-	const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-	useEffect(() => {
-		// Handle user state changes
-		const unsubscribe = auth.onAuthStateChanged(async firebaseUser => {
-			console.log('Unsubscribing...', firebaseUser.uid);
-			try {
-				if (firebaseUser) {
-					// Get additional user info from backend
-					const userProfile = await getUserProfile(firebaseUser.uid);
-					setUser({...firebaseUser, ...userProfile});
-					await AsyncStorage.setItem(
-						'user',
-						JSON.stringify(userProfile),
-					);
-				} else {
-					setUser(null);
-					await AsyncStorage.removeItem('user');
-				}
-			} catch (error) {
-				signOut();
-				console.error('Error handling auth state:', error);
-			} finally {
-				setLoading(false);
-			}
-		});
+  useEffect(() => {
+    const handleAuthStateChange = async firebaseUser => {
+      try {
+        if (firebaseUser) {
+          const userProfile = await getUserProfile(firebaseUser.uid);
+          const processedUser = processUserData(firebaseUser, userProfile);
+          setUser(processedUser);
+          await storeUserData(userProfile);
+        } else {
+          setUser(null);
+          await storeUserData(null);
+        }
+      } catch (error) {
+        console.error('Auth state handling error:', error);
+        await signOut();
+      } finally {
+        setLoading(false);
+      }
+    };
 
-		return unsubscribe;
-	}, []);
+    const unsubscribe = auth.onAuthStateChanged(handleAuthStateChange);
+    return unsubscribe;
+  }, []);
 
-	const login = async (email, password) => {
-		try {
-			const {user: firebaseUser} = await auth.signInWithEmailAndPassword(
-				email,
-				password,
-			);
-			console.log('API_URL:', Config.API_URL);
-			console.log('Making login request...');
-			return firebaseUser;
-		} catch (error) {
-			console.error('Login error details:', {
-				message: error.message,
-				config: error.config,
-				response: error.response,
-			});
-			throw error;
-		}
-	};
+  /**
+   * Handles user login
+   * @param {string} email - User email
+   * @param {string} password - User password
+   * @returns {Promise<Object>} Firebase user object
+   */
+  const login = async (email, password) => {
+    try {
+      const {user: firebaseUser} = await auth.signInWithEmailAndPassword(
+        email,
+        password,
+      );
+      return firebaseUser;
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    }
+  };
 
-	const signOut = async () => {
-		try {
-			console.log('Signing out...');
-			await auth.signOut();
-			setUser(null);
-		} catch (error) {
-			console.error('Error signing out:', error);
-		}
-	};
+  /**
+   * Handles user sign out
+   * @returns {Promise<void>}
+   */
+  const signOut = async () => {
+    try {
+      await auth.signOut();
+      setUser(null);
+    } catch (error) {
+      console.error('Sign out error:', error);
+      throw error;
+    }
+  };
 
-	const signUp = async userData => {
-		console.log('signup', userData);
-		try {
-			const {user: firebaseUser} = await auth
-				.createUserWithEmailAndPassword(
-					userData.email,
-					userData.password,
-				)
-				.then(async response => {
-					try {
-						userData.id = response.user.uid;
-						userData.isActive = true;
-						const userProfile = await createUserProfile(userData);
-						await AsyncStorage.setItem(
-							'user',
-							JSON.stringify(userProfile),
-						);
-						return userProfile;
-					} catch (error) {
-						console.error('Error creating user profile:', error);
-					}
-				});
-			return firebaseUser;
-		} catch (error) {
-			console.error('Error signing up:', error);
-		}
-	};
+  /**
+   * Handles user registration
+   * @param {Object} userData - User registration data
+   * @returns {Promise<Object>} Created user object
+   */
+  const signUp = async userData => {
+    try {
+      const {user: firebaseUser} = await auth.createUserWithEmailAndPassword(
+        userData.email,
+        userData.password,
+      );
 
-	const value = {
-		user,
-		loading,
-		login,
-		signOut,
-		signUp,
-	};
+      const userProfile = await createUserProfile({
+        ...userData,
+        id: firebaseUser.uid,
+        isActive: true,
+      });
 
-	return (
-		<AuthContext.Provider value={value}>{children}</AuthContext.Provider>
-	);
+      await storeUserData(userProfile);
+      return firebaseUser;
+    } catch (error) {
+      console.error('Sign up error:', error);
+      throw error;
+    }
+  };
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        login,
+        signOut,
+        signUp,
+      }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
-export const useAuth = () => useContext(AuthContext);
+/**
+ * Custom hook to use auth context
+ * @returns {AuthContextType} Auth context value
+ */
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};

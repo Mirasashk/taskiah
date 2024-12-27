@@ -1,91 +1,84 @@
-import React, {useEffect} from 'react';
+/**
+ * Private navigation stack component
+ * @module PrivateStack
+ */
+
+import React from 'react';
 import {createDrawerNavigator} from '@react-navigation/drawer';
-import {useTheme} from 'react-native-paper';
-import DashboardScreen from '../screens/DashboardScreen';
-import TasksScreen from '../screens/TasksScreen';
 import {getHeaderTitle} from '@react-navigation/elements';
-import Header from '../components/Header';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import DrawerMain from '../components/DrawerMain';
-import TaskNavigator from '../components/task/TaskNavigator';
+
+// Components
+import Header from '../components/header/Header';
+import DrawerMain from '../components/drawer/DrawerMain';
+
+// Screens
+import DashboardScreen from '../screens/DashboardScreen';
+import TaskNavigator from './TaskNavigator';
+
+// Config & Hooks
+import {DRAWER_SCREENS} from '../config/navigationConfig';
+import {useDrawerConfig} from '../hooks/useDrawerConfig';
 
 const Drawer = createDrawerNavigator();
 
+/**
+ * Renders a drawer icon based on name and color
+ * @param {string} name - Icon name
+ * @param {string} color - Icon color
+ * @param {number} size - Icon size
+ * @returns {React.Component} Icon component
+ */
+const renderDrawerIcon = (name, color, size) => (
+  <Icon name={name} color={color} size={size} />
+);
+
+/**
+ * Private Stack Navigator Component
+ * Handles authenticated user navigation
+ * @returns {React.Component} Drawer Navigator
+ */
 const PrivateStack = () => {
-	const theme = useTheme();
+  const drawerConfig = useDrawerConfig();
 
-	return (
-		<Drawer.Navigator
-			drawerContent={DrawerMain}
-			drawerStyle={{
-				backgroundColor: theme.colors.surfaceContainerHigh,
-			}}
-			screenOptions={{
-				header: ({navigation, route, options}) => {
-					const title = getHeaderTitle(options, route.name);
-
-					return (
-						<Header
-							title={title}
-							style={options.headerStyle}
-							openDrawer={navigation.openDrawer}
-						/>
-					);
-				},
-				headerStyle: {
-					backgroundColor: theme.colors.surfaceContainerHigh,
-				},
-				sceneStyle: {
-					backgroundColor: theme.colors.surfaceContainerHigh,
-				},
-				drawerLabelStyle: {
-					color: theme.colors.onSurface,
-					fontSize: 16,
-					fontFamily: 'Georgia',
-				},
-				drawerType: 'slide',
-				drawerStyle: {
-					backgroundColor: theme.colors.surfaceContainerHigh,
-					width: '60%',
-				},
-				drawerActiveTintColor: theme.colors.primary,
-				drawerItemStyle: {
-					backgroundColor: theme.colors.surfaceContainerHigh,
-					icon: {
-						color: theme.colors.primary,
-					},
-				},
-			}}>
-			<Drawer.Screen
-				name="Dashboard"
-				options={{
-					drawerLabel: 'Dashboard',
-					drawerIcon: ({color, size}) => (
-						<Icon
-							name="home"
-							color={theme.colors.onSurface}
-							size={size}
-						/>
-					),
-				}}
-				component={DashboardScreen}
-			/>
-			<Drawer.Screen
-				name="Tasks"
-				options={{
-					drawerLabel: 'Tasks',
-					drawerIcon: ({color, size}) => (
-						<Icon
-							name="clipboard-edit-outline"
-							color={theme.colors.onSurface}
-							size={size}
-						/>
-					),
-				}}
-				component={TaskNavigator}
-			/>
-		</Drawer.Navigator>
-	);
+  return (
+    <Drawer.Navigator
+      drawerContent={props => <DrawerMain {...props} />}
+      screenOptions={{
+        header: ({navigation, route, options}) => {
+          const title = getHeaderTitle(options, route.name);
+          return (
+            <Header
+              title={title}
+              style={options.headerStyle}
+              openDrawer={navigation.openDrawer}
+            />
+          );
+        },
+        ...drawerConfig,
+      }}>
+      <Drawer.Screen
+        name={DRAWER_SCREENS.DASHBOARD.name}
+        options={{
+          drawerLabel: DRAWER_SCREENS.DASHBOARD.name,
+          drawerLabelStyle: {focused: {color: ''}},
+          drawerIcon: ({color, size}) =>
+            renderDrawerIcon(DRAWER_SCREENS.DASHBOARD.icon, color, size),
+        }}
+        component={DashboardScreen}
+      />
+      <Drawer.Screen
+        name={DRAWER_SCREENS.TASKS.name}
+        options={{
+          drawerLabel: DRAWER_SCREENS.TASKS.name,
+          drawerLabelStyle: {focused: {color: ''}},
+          drawerIcon: ({color, size}) =>
+            renderDrawerIcon(DRAWER_SCREENS.TASKS.icon, color, size),
+        }}
+        component={TaskNavigator}
+      />
+    </Drawer.Navigator>
+  );
 };
 
 export default PrivateStack;

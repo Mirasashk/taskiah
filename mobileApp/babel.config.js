@@ -3,11 +3,7 @@ module.exports = {
   plugins: ['react-native-reanimated/plugin'],
   env: {
     production: {
-      plugins: [
-        'react-native-paper/babel',
-        'module:react-native-dotenv',
-        'react-native-reanimated/plugin',
-      ],
+      plugins: ['react-native-paper/babel', 'module:react-native-dotenv'],
     },
   },
 };

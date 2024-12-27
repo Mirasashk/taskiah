@@ -1,60 +1,68 @@
-import React, {useEffect} from 'react';
-import {View, StyleSheet} from 'react-native';
-import {Text} from 'react-native-paper';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import StatsCard from '../components/dashboard/StatsCard';
+import React, {useEffect, useState} from 'react';
+import {View} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
+import StatsSection from '../components/dashboard/StatsSection';
+import NotificationsSection from '../components/dashboard/NotificationsSection';
 import {useTaskContext} from '../context/TaskContext';
 import {useAuth} from '../context/AuthContext';
+import {DashboardStyles} from '../components/dashboard/styles/DashboardStyles';
 
+/**
+ * Dashboard screen component that displays task statistics and notifications
+ * @returns {React.ReactElement} Dashboard screen component
+ */
 const DashboardScreen = () => {
-	const {getTasks} = useTaskContext();
-	const {user} = useAuth();
+  const navigation = useNavigation();
+  const {getTasks, tasks} = useTaskContext();
+  const {user} = useAuth();
+  const [stats, setStats] = useState({
+    active: 0,
+    completed: 0,
+    overdue: 0,
+  });
 
-	useEffect(() => {
-		console.log('DashboardScreen mounted');
-		console.log(AsyncStorage.getAllKeys());
-	}, []);
+  // Load task stats once when component mounts
+  useEffect(() => {
+    let isMounted = true;
 
-	return (
-		<View style={styles.container}>
-			<View style={styles.statsContainer}>
-				<Text variant="titleLarge">Tasks</Text>
-				<StatsCard
-					title="Active tasks"
-					subtitle="100"
-					icon="clipboard-edit-outline"
-					onPress={() => navigation.navigate('TaskScreen')}
-				/>
-				<StatsCard
-					title="Completed tasks"
-					subtitle="100"
-					icon="clipboard-check-outline"
-				/>
-				<StatsCard
-					title="Overdue tasks"
-					subtitle="100"
-					icon="clipboard-alert-outline"
-				/>
-			</View>
-			<View style={styles.notificationsContainer}>
-				<Text variant="titleLarge">Notifications</Text>
-			</View>
-		</View>
-	);
+    const fetchTaskStats = async () => {
+      try {
+        await getTasks();
+
+        // Only update state if component is still mounted
+        if (isMounted && Array.isArray(tasks)) {
+          const now = new Date();
+          setStats({
+            active: tasks.filter(task => task.status === 'active').length,
+            completed: tasks.filter(task => task.status === 'completed').length,
+            overdue: tasks.filter(
+              task => task.status === 'active' && new Date(task.dueDate) < now,
+            ).length,
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching task stats:', error);
+      }
+    };
+
+    fetchTaskStats();
+
+    // Cleanup function to prevent state updates after unmount
+    return () => {
+      isMounted = false;
+    };
+  }, []); // Empty dependency array means this runs once on mount
+
+  const handleTaskPress = () => {
+    navigation.navigate('Tasks');
+  };
+
+  return (
+    <View style={DashboardStyles.container}>
+      <StatsSection stats={stats} onTaskPress={handleTaskPress} />
+      <NotificationsSection />
+    </View>
+  );
 };
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		padding: 16,
-		gap: 8,
-	},
-	statsContainer: {
-		gap: 8,
-	},
-	notificationsContainer: {
-		gap: 8,
-	},
-});
 
 export default DashboardScreen;

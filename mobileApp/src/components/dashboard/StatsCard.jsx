@@ -1,48 +1,45 @@
 import React from 'react';
-import {View, StyleSheet} from 'react-native';
+import {View} from 'react-native';
 import {Card, Avatar, IconButton} from 'react-native-paper';
 import {useTheme} from 'react-native-paper';
 
-const StatsCard = ({title, subtitle, icon}) => {
-	const theme = useTheme();
+/**
+ * StatsCard Component
+ * @param {Object} props - Component props
+ * @param {string} props.title - Card title
+ * @param {string} props.subtitle - Card subtitle
+ * @param {string} props.icon - Icon name for the avatar
+ * @param {Function} [props.onPress] - Optional callback for card press
+ */
+const StatsCard = ({title, subtitle, icon, onPress}) => {
+  const theme = useTheme();
 
-	const styles = StyleSheet.create({
-		container: {},
-		card: {
-			backgroundColor: theme.colors.surfaceContainerLow,
-			borderRadius: 40,
-		},
-	});
+  const renderAvatar = props => (
+    <Avatar.Icon {...props} size={48} icon={icon} />
+  );
 
-	return (
-		<View style={styles.container}>
-			<Card mode="contained" elevation={1} style={styles.card}>
-				<Card.Title
-					title={title}
-					subtitle={subtitle}
-					left={props => (
-						<Avatar.Icon
-							{...props}
-							size={48}
-							icon={icon}
-							style={{
-								backgroundColor:
-									theme.colors.surfaceContainerLow,
-							}}
-						/>
-					)}
-					right={props => (
-						<IconButton
-							{...props}
-							icon="chevron-right"
-							size={24}
-							color={theme.colors.onSurface}
-						/>
-					)}
-				/>
-			</Card>
-		</View>
-	);
+  const renderChevron = props => (
+    <IconButton
+      {...props}
+      icon="chevron-right"
+      size={24}
+      color={theme.colors.onSurface}
+      onPress={onPress}
+    />
+  );
+
+  return (
+    <View>
+      <Card mode="contained" elevation={1} onPress={onPress}>
+        <Card.Title
+          title={title}
+          subtitle={subtitle}
+          left={renderAvatar}
+          right={renderChevron}
+        />
+      </Card>
+    </View>
+  );
 };
 
 export default StatsCard;

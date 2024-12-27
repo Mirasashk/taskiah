@@ -1,154 +1,125 @@
 import React, {useState} from 'react';
-import {StyleSheet, View} from 'react-native';
+import {View} from 'react-native';
+import PropTypes from 'prop-types';
 import {
-	Card,
-	Portal,
-	Modal,
-	useTheme,
-	Button,
-	Text,
-	Dialog,
+  Card,
+  Portal,
+  Modal,
+  useTheme,
+  Button,
+  Text,
+  Dialog,
 } from 'react-native-paper';
 import {Calendar} from 'react-native-calendars';
-import useCalendarTheme from '../../theme/calendarTheme';
 import {TimePickerModal} from 'react-native-paper-dates';
+import useCalendarTheme from '../../theme/calendarTheme';
+import TimePickerButton from './TimePickerButton';
+import {dateTimePickerStyles} from './styles/dateTimePickerStyles';
 
-const DateTimePicker = ({visible, onDismiss, date, onDateChange}) => {
-	const theme = useTheme();
-	const calendarTheme = useCalendarTheme();
-	const [selectedDate, setSelectedDate] = useState(date);
-	const [time, setTime] = useState();
-	const [timePickerVisible, setTimePickerVisible] = useState(false);
-	const [errorDialogVisible, setErrorDialogVisible] = useState(false);
+/**
+ * A modal component that allows users to select both date and time
+ * @component
+ * @param {Object} props
+ * @param {boolean} props.visible - Controls the visibility of the modal
+ * @param {Function} props.onDismiss - Callback function when modal is dismissed
+ * @param {Date} props.date - Initial date value
+ * @param {Function} props.onDateChange - Callback function when date/time is selected
+ */
+const DateTimePicker = ({
+  visible = false,
+  onDismiss = () => {},
+  date = new Date(),
+  onDateChange = () => {},
+}) => {
+  const theme = useTheme();
+  const calendarTheme = useCalendarTheme();
+  const styles = dateTimePickerStyles(theme);
 
-	const handleTimeConfirm = ({hours, minutes}) => {
-		setTime({hours, minutes});
-		setTimePickerVisible(false);
-	};
+  const [selectedDate, setSelectedDate] = useState(date);
+  const [time, setTime] = useState();
+  const [timePickerVisible, setTimePickerVisible] = useState(false);
+  const [errorDialogVisible, setErrorDialogVisible] = useState(false);
 
-	const handleSubmit = () => {
-		if (time && selectedDate) {
-			const date = new Date(
-				`${selectedDate}T${time.hours}:${time.minutes}`,
-			);
-			onDateChange(date);
-			onDismiss();
-		} else {
-			setErrorDialogVisible(true);
-		}
-	};
+  const handleTimeConfirm = ({hours, minutes}) => {
+    setTime({hours, minutes});
+    setTimePickerVisible(false);
+  };
 
-	const renderErrorDialog = () => (
-		<Dialog
-			visible={errorDialogVisible}
-			onDismiss={() => setErrorDialogVisible(false)}>
-			<Dialog.Title>Error</Dialog.Title>
-			<Dialog.Content>
-				<Text>Please select a date and time</Text>
-			</Dialog.Content>
-		</Dialog>
-	);
+  const handleSubmit = () => {
+    if (!time || !selectedDate) {
+      setErrorDialogVisible(true);
+      return;
+    }
 
-	const styles = StyleSheet.create({
-		modal: {
-			alignItems: 'center',
-			justifyContent: 'center',
-		},
-		card: {
-			width: '80%',
-			paddingBottom: 20,
-			backgroundColor: theme.colors.surface,
-			paddingHorizontal: 0,
-			paddingVertical: 0,
-		},
-		cardContent: {
-			paddingHorizontal: 5,
-			paddingVertical: 5,
-		},
-		timePicker: {
-			width: '100%',
-			justifyContent: 'center',
-			alignItems: 'center',
-		},
-		timeText: {
-			color: theme.colors.onSurface,
-			borderWidth: 1,
-			borderColor: theme.colors.onSurface,
-			borderRadius: 5,
-			padding: 5,
-		},
-		confirmButton: {
-			marginTop: 10,
-			backgroundColor: theme.colors.primary,
-			width: 100,
-		},
-	});
+    const dateTime = new Date(`${selectedDate}T${time.hours}:${time.minutes}`);
+    onDateChange(dateTime);
+    onDismiss();
+  };
 
-	return (
-		<Portal>
-			<Modal
-				visible={visible}
-				onDismiss={onDismiss}
-				contentContainerStyle={styles.modal}>
-				<Card style={styles.card}>
-					<Card.Content style={styles.cardContent}>
-						<Calendar
-							onDayPress={day => setSelectedDate(day.dateString)}
-							style={styles.calendar}
-							theme={calendarTheme}
-							markedDates={{
-								[selectedDate]: {selected: true},
-							}}
-						/>
-						<View>
-							<View style={{alignItems: 'flex-start'}}>
-								<Button
-									onPress={() => setTimePickerVisible(true)}
-									textColor={theme.colors.onSurface}
-									mode="text"
-									icon="clock-outline">
-									{time ? (
-										<Text style={styles.timeText}>
-											{`${convertTo12HourFormat(
-												time.hours,
-											)}:${time.minutes} ${
-												time.hours >= 12 ? 'PM' : 'AM'
-											}`}
-										</Text>
-									) : (
-										'Pick time'
-									)}
-								</Button>
-							</View>
-							<TimePickerModal
-								visible={timePickerVisible}
-								onDismiss={() => setTimePickerVisible(false)}
-								onConfirm={handleTimeConfirm}
-								hours={12}
-								minutes={30}
-								style={styles.timePicker}
-							/>
-							<View style={{alignItems: 'center'}}>
-								<Button
-									onPress={handleSubmit}
-									icon="check"
-									mode="text"
-									textColor={theme.colors.onPrimary}
-									style={styles.confirmButton}>
-									Confirm
-								</Button>
-							</View>
-						</View>
-					</Card.Content>
-				</Card>
-			</Modal>
-			{renderErrorDialog()}
-		</Portal>
-	);
+  return (
+    <Portal>
+      <Modal
+        visible={visible}
+        onDismiss={onDismiss}
+        contentContainerStyle={styles.modal}>
+        <Card style={styles.card}>
+          <Card.Content style={styles.cardContent}>
+            <Calendar
+              onDayPress={day => setSelectedDate(day.dateString)}
+              style={styles.calendar}
+              theme={calendarTheme}
+              markedDates={{
+                [selectedDate]: {selected: true},
+              }}
+            />
+            <View>
+              <View style={styles.timePickerContainer}>
+                <TimePickerButton
+                  onPress={() => setTimePickerVisible(true)}
+                  time={time}
+                />
+              </View>
+              <TimePickerModal
+                visible={timePickerVisible}
+                onDismiss={() => setTimePickerVisible(false)}
+                onConfirm={handleTimeConfirm}
+                testID="time-picker-modal"
+                hours={12}
+                minutes={30}
+                style={styles.timePicker}
+                theme={theme}
+              />
+              <View style={styles.buttonContainer}>
+                <Button
+                  onPress={handleSubmit}
+                  icon="check"
+                  testID="confirm-button"
+                  mode="contained"
+                  style={styles.confirmButton}>
+                  Confirm
+                </Button>
+              </View>
+            </View>
+          </Card.Content>
+        </Card>
+      </Modal>
+      <Dialog
+        visible={errorDialogVisible}
+        onDismiss={() => setErrorDialogVisible(false)}>
+        <Dialog.Title>Error</Dialog.Title>
+        <Dialog.Content>
+          <Text>Please select a date and time</Text>
+        </Dialog.Content>
+      </Dialog>
+    </Portal>
+  );
 };
 
-const convertTo12HourFormat = hours => {
-	return hours % 12 || 12;
+DateTimePicker.propTypes = {
+  visible: PropTypes.bool.isRequired,
+  onDismiss: PropTypes.func.isRequired,
+  date: PropTypes.instanceOf(Date),
+  onDateChange: PropTypes.func.isRequired,
 };
 
 export default DateTimePicker;

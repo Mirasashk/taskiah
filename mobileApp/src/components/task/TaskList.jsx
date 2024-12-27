@@ -1,207 +1,105 @@
-import React, {useState, useEffect} from 'react';
-import {StyleSheet, View, ScrollView} from 'react-native';
-import {Text, Card, Icon, IconButton, Portal, List} from 'react-native-paper';
-import TaskItem from './TaskItem';
-import {useTheme} from 'react-native-paper';
+import React, {useState, useCallback} from 'react';
+import {View, FlatList} from 'react-native';
+import {Text, useTheme, IconButton, FAB} from 'react-native-paper';
 import {useTaskContext} from '../../context/TaskContext';
 import TaskFilterModal from './TaskFilterModal';
-import ScrollableRefresh from '../PullToRefresh';
-
+import PullToRefresh from '../PullToRefresh/PullToRefresh';
+import ListActions from './ListActions';
+import {TaskListStyles} from './styles/TaskListStyles';
+import TaskSection from './TaskSection';
+import {useNavigation} from '@react-navigation/native';
+/**
+ * Renders the main task list with filtering and refresh capabilities
+ * @component
+ * @returns {React.ReactElement} Task list component
+ */
 const TaskList = () => {
-	const theme = useTheme();
-	const {tasks, filteredTasks, filter, getTasks} = useTaskContext();
-	const [showFilterModal, setShowFilterModal] = useState(false);
-	const [expandTasksList, setExpandTasksList] = useState(true);
-	const [expandCompletedList, setExpandCompletedList] = useState(false);
-	const [completedTasksCount, setCompletedTasksCount] = useState(
-		tasks.filter(task => task.status === 'completed').length,
-	);
+  const theme = useTheme();
+  const {tasks, getTasks, filter, filteredTasks} = useTaskContext();
+  const [filterModalVisible, setFilterModalVisible] = useState(false);
+  const navigation = useNavigation();
+  const handleRefresh = useCallback(async () => {
+    await getTasks();
+  }, [getTasks]);
 
-	const handleRefresh = async () => {
-		await getTasks();
-		await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
-	};
+  const getTaskList = () => {
+    if (filter === 'All tasks') {
+      return tasks.filter(task => task.status !== 'completed');
+    }
+    return filteredTasks.filter(task => task.status !== 'completed');
+  };
 
-	useEffect(() => {
-		console.log('expandCompletedList', expandCompletedList);
-	}, [expandCompletedList]);
+  const getCompletedTasks = () => {
+    if (filter === 'All tasks') {
+      return tasks.filter(task => task.status === 'completed');
+    }
+    return filteredTasks.filter(task => task.status === 'completed');
+  };
 
-	const handleToggleComplete = taskId => {
-		console.log('taskId', taskId);
-	};
+  const listActions = section => {
+    if (section === 'completed') {
+      return (
+        <View
+          style={{
+            flexDirection: 'row',
+            paddingRight: 10,
+            alignItems: 'center',
+          }}>
+          <Text>{`(Clear All)`}</Text>
+          <IconButton icon="delete" size={24} />
+        </View>
+      );
+    }
+    return (
+      <ListActions
+        onFilterPress={() => setFilterModalVisible(true)}
+        onSortPress={() => {}}
+      />
+    );
+  };
 
-	const handleDelete = taskId => {
-		console.log('taskId', taskId);
-	};
-
-	const renderFilterModal = () => {
-		console.log('renderFilterModal');
-		setShowFilterModal(true);
-	};
-
-	const renderSortModal = () => {
-		console.log('renderSortModal');
-	};
-
-	const styles = StyleSheet.create({
-		listContainer: {
-			paddingVertical: 8,
-			flex: 1,
-			paddingHorizontal: 20,
-			backgroundColor: theme.colors.surfaceContainerHigh,
-		},
-		card: {
-			marginBottom: 10,
-			borderRadius: 10,
-
-			backgroundColor: theme.colors.surfaceContainerLow,
-		},
-		emptyContainer: {
-			flex: 1,
-			justifyContent: 'center',
-			alignItems: 'center',
-			backgroundColor: theme.colors.surfaceContainerHigh,
-		},
-	});
-
-	if (!tasks?.length) {
-		return (
-			<View style={styles.emptyContainer}>
-				<Text variant="titleMedium">No tasks found</Text>
-			</View>
-		);
-	}
-
-	return (
-		<ScrollableRefresh onRefresh={handleRefresh}>
-			<View style={styles.listContainer}>
-				<Card style={styles.card}>
-					<Card.Title
-						title="Tasks"
-						titleStyle={{
-							paddingLeft: 10,
-							paddingTop: 5,
-							alignItems: 'center',
-							justifyContent: 'center',
-							fontSize: 20,
-						}}
-						right={() => (
-							<View
-								style={{
-									flexDirection: 'row',
-									paddingRight: 20,
-								}}>
-								<IconButton
-									icon="sort"
-									onPress={() => renderSortModal()}
-									style={{
-										marginHorizontal: 0,
-										paddingHorizontal: 0,
-									}}
-								/>
-								<IconButton
-									icon="filter"
-									onPress={() => renderFilterModal()}
-									style={{
-										marginHorizontal: 0,
-										paddingHorizontal: 0,
-									}}
-								/>
-							</View>
-						)}
-					/>
-					<Card.Content>
-						{filteredTasks.length > 0 ? (
-							<View>
-								<Text variant="titleMedium">{filter}</Text>
-								{filteredTasks.map(task => (
-									<TaskItem
-										key={task.id}
-										task={task}
-										onToggleComplete={handleToggleComplete}
-										onDelete={handleDelete}
-									/>
-								))}
-							</View>
-						) : (
-							tasks.map(
-								task =>
-									task.status === 'active' && (
-										<TaskItem
-											key={task.id}
-											task={task}
-											onToggleComplete={
-												handleToggleComplete
-											}
-											onDelete={handleDelete}
-										/>
-									),
-							)
-						)}
-					</Card.Content>
-				</Card>
-				<Card
-					style={styles.card}
-					onPress={() =>
-						setExpandCompletedList(!expandCompletedList)
-					}>
-					<Card.Title
-						title={`Completed Tasks (${completedTasksCount}) `}
-						titleStyle={{
-							paddingLeft: 10,
-							paddingTop: 5,
-							alignItems: 'center',
-							justifyContent: 'center',
-							fontSize: 20,
-						}}
-						onPress={() =>
-							setExpandCompletedList(!expandCompletedList)
-						}
-					/>
-					{expandCompletedList && (
-						<Card.Content>
-							{filteredTasks.length > 0 ? (
-								<View>
-									<Text variant="titleMedium">{filter}</Text>
-									{filteredTasks.map(
-										task =>
-											task.status === 'completed' && (
-												<TaskItem
-													key={task.id}
-													task={task}
-													onToggleComplete={
-														handleToggleComplete
-													}
-													onDelete={handleDelete}
-												/>
-											),
-									)}
-								</View>
-							) : (
-								tasks.map(
-									task =>
-										task.status === 'completed' && (
-											<TaskItem
-												key={task.id}
-												task={task}
-												onToggleComplete={
-													handleToggleComplete
-												}
-												onDelete={handleDelete}
-											/>
-										),
-								)
-							)}
-						</Card.Content>
-					)}
-				</Card>
-				<TaskFilterModal
-					visible={showFilterModal}
-					onDismiss={() => setShowFilterModal(false)}
-				/>
-			</View>
-		</ScrollableRefresh>
-	);
+  return (
+    <View
+      style={[
+        TaskListStyles.container,
+        {backgroundColor: theme.colors.surfaceContainerHigh},
+      ]}
+      testID="task-list">
+      <PullToRefresh onRefresh={handleRefresh}>
+        <View>
+          <TaskSection
+            title={`${filter} (${getTaskList().length})`}
+            tasks={getTaskList()}
+            rightComponent={listActions()}
+            expanded={true}
+          />
+          <TaskSection
+            title={`Completed tasks (${getCompletedTasks().length})`}
+            tasks={getCompletedTasks()}
+            rightComponent={listActions('completed')}
+            expanded={false}
+          />
+        </View>
+      </PullToRefresh>
+      <TaskFilterModal
+        visible={filterModalVisible}
+        onDismiss={() => setFilterModalVisible(false)}
+      />
+      <FAB
+        icon="plus"
+        color={theme.colors.onPrimary}
+        style={{
+          position: 'absolute',
+          bottom: 16,
+          right: 16,
+          backgroundColor: theme.colors.primary,
+        }}
+        onPress={() => {
+          navigation.navigate('TaskAddNew');
+        }}
+      />
+    </View>
+  );
 };
 
 export default TaskList;
