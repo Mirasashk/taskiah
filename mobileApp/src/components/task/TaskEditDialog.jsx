@@ -55,7 +55,6 @@ TaskEditDialog.propTypes = {
     }),
   ).isRequired,
   onValueChange: PropTypes.func.isRequired,
-  value: PropTypes.string.isRequired,
   visible: PropTypes.bool.isRequired,
   onDismiss: PropTypes.func.isRequired,
 };

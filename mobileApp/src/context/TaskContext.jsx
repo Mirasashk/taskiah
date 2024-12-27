@@ -60,12 +60,10 @@ export function TaskProvider({children}) {
    * @param {string} filter - Filter criteria
    */
   const filterTasks = (filteredTasks, filter) => {
-    console.log(filter);
     // sort filteredTasks by createdAt date
     const sortedFilteredTasks = filteredTasks.sort(
       (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
     );
-    console.log('sortedFilteredTasks', sortedFilteredTasks);
     setFilter(filter);
     setFilteredTasks(sortedFilteredTasks);
   };

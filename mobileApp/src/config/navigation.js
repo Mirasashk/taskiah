@@ -1,6 +1,7 @@
 export const SCREEN_NAMES = {
   TASKS_HOME: 'TasksHome',
   TASK_DETAIL: 'TaskDetail',
+  TASK_ADD_NEW: 'TaskAddNew',
 };
 
 export const SCREEN_OPTIONS = {
@@ -9,6 +10,9 @@ export const SCREEN_OPTIONS = {
   },
   TASK_DETAIL: {
     title: 'Task Details',
+  },
+  TASK_ADD_NEW: {
+    title: 'Create a new task',
   },
 };
 

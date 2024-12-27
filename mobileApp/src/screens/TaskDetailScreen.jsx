@@ -1,6 +1,7 @@
 // mobileApp/src/screens/TaskDetailScreen.jsx
-import React from 'react';
+import React, {useEffect} from 'react';
 import {View} from 'react-native';
+import {useRoute, useNavigation} from '@react-navigation/native';
 
 import TaskDetailForm from '../components/task/TaskDetailForm';
 

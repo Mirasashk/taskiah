@@ -5,6 +5,7 @@ import TasksScreen from '../screens/TasksScreen';
 import TaskDetailScreen from '../screens/TaskDetailScreen';
 import {SCREEN_NAMES, SCREEN_OPTIONS} from '../config/navigation';
 import {getDefaultScreenOptions} from '../config/navigator.config';
+import TaskAddNewScreen from '../screens/TaskAddNewScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -29,6 +30,11 @@ const TaskNavigator = () => {
         name={SCREEN_NAMES.TASK_DETAIL}
         component={TaskDetailScreen}
         options={SCREEN_OPTIONS.TASK_DETAIL}
+      />
+      <Stack.Screen
+        name={SCREEN_NAMES.TASK_ADD_NEW}
+        component={TaskAddNewScreen}
+        options={SCREEN_OPTIONS.TASK_ADD_NEW}
       />
     </Stack.Navigator>
   );

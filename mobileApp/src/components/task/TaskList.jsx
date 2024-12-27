@@ -1,13 +1,13 @@
 import React, {useState, useCallback} from 'react';
 import {View, FlatList} from 'react-native';
-import {Text, useTheme} from 'react-native-paper';
+import {Text, useTheme, IconButton, FAB} from 'react-native-paper';
 import {useTaskContext} from '../../context/TaskContext';
 import TaskFilterModal from './TaskFilterModal';
 import PullToRefresh from '../PullToRefresh/PullToRefresh';
 import ListActions from './ListActions';
-import TaskItem from './TaskItem';
 import {TaskListStyles} from './styles/TaskListStyles';
-
+import TaskSection from './TaskSection';
+import {useNavigation} from '@react-navigation/native';
 /**
  * Renders the main task list with filtering and refresh capabilities
  * @component
@@ -15,24 +15,48 @@ import {TaskListStyles} from './styles/TaskListStyles';
  */
 const TaskList = () => {
   const theme = useTheme();
-  const {tasks, getTasks, filter} = useTaskContext();
+  const {tasks, getTasks, filter, filteredTasks} = useTaskContext();
   const [filterModalVisible, setFilterModalVisible] = useState(false);
-
+  const navigation = useNavigation();
   const handleRefresh = useCallback(async () => {
     await getTasks();
   }, [getTasks]);
 
-  const renderEmptyList = () => (
-    <View
-      style={[
-        TaskListStyles.emptyContainer,
-        {backgroundColor: theme.colors.surfaceContainerHigh},
-      ]}>
-      <Text style={TaskListStyles.emptyText}>No tasks found</Text>
-    </View>
-  );
+  const getTaskList = () => {
+    if (filter === 'All tasks') {
+      return tasks.filter(task => task.status !== 'completed');
+    }
+    return filteredTasks.filter(task => task.status !== 'completed');
+  };
 
-  const renderItem = ({item}) => <TaskItem task={item} />;
+  const getCompletedTasks = () => {
+    if (filter === 'All tasks') {
+      return tasks.filter(task => task.status === 'completed');
+    }
+    return filteredTasks.filter(task => task.status === 'completed');
+  };
+
+  const listActions = section => {
+    if (section === 'completed') {
+      return (
+        <View
+          style={{
+            flexDirection: 'row',
+            paddingRight: 10,
+            alignItems: 'center',
+          }}>
+          <Text>{`(Clear All)`}</Text>
+          <IconButton icon="delete" size={24} />
+        </View>
+      );
+    }
+    return (
+      <ListActions
+        onFilterPress={() => setFilterModalVisible(true)}
+        onSortPress={() => {}}
+      />
+    );
+  };
 
   return (
     <View
@@ -41,25 +65,38 @@ const TaskList = () => {
         {backgroundColor: theme.colors.surfaceContainerHigh},
       ]}
       testID="task-list">
-      <View style={TaskListStyles.listHeader}>
-        <Text variant="titleLarge">{filter}</Text>
-        <ListActions
-          onFilterPress={() => setFilterModalVisible(true)}
-          onSortPress={() => {}}
-        />
-      </View>
-      <PullToRefresh onRefresh={handleRefresh} isFlatList={true}>
-        <FlatList
-          data={tasks}
-          renderItem={renderItem}
-          keyExtractor={item => item.id}
-          contentContainerStyle={TaskListStyles.listContainer}
-          ListEmptyComponent={renderEmptyList}
-        />
+      <PullToRefresh onRefresh={handleRefresh}>
+        <View>
+          <TaskSection
+            title={`${filter} (${getTaskList().length})`}
+            tasks={getTaskList()}
+            rightComponent={listActions()}
+            expanded={true}
+          />
+          <TaskSection
+            title={`Completed tasks (${getCompletedTasks().length})`}
+            tasks={getCompletedTasks()}
+            rightComponent={listActions('completed')}
+            expanded={false}
+          />
+        </View>
       </PullToRefresh>
       <TaskFilterModal
         visible={filterModalVisible}
         onDismiss={() => setFilterModalVisible(false)}
+      />
+      <FAB
+        icon="plus"
+        color={theme.colors.onPrimary}
+        style={{
+          position: 'absolute',
+          bottom: 16,
+          right: 16,
+          backgroundColor: theme.colors.primary,
+        }}
+        onPress={() => {
+          navigation.navigate('TaskAddNew');
+        }}
       />
     </View>
   );

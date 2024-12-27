@@ -54,7 +54,7 @@ const DashboardScreen = () => {
   }, []); // Empty dependency array means this runs once on mount
 
   const handleTaskPress = () => {
-    navigation.navigate('TaskScreen');
+    navigation.navigate('Tasks');
   };
 
   return (

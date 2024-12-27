@@ -57,27 +57,35 @@ const TaskFilterList = ({onDismiss}) => {
     <View style={styles.container}>
       <List.Section style={styles.section}>
         <TaskFilterItems
-          count={tasks.length}
+          count={tasks.filter(task => task.status !== 'completed').length}
           title="All active tasks"
           icon="inbox-full"
           onPress={() => handleFilter(FILTER_TYPES.ALL)}
         />
         <TaskFilterItems
           count={
-            tasks.filter(task => isSameDay(task.dueDate, new Date())).length
+            tasks
+              .filter(task => isSameDay(task.dueDate, new Date()))
+              .filter(task => task.status !== 'completed').length
           }
           title="Today"
           icon="calendar-month"
           onPress={() => handleFilter(FILTER_TYPES.TODAY)}
         />
         <TaskFilterItems
-          count={tasks.filter(task => task.priority === 'high').length}
+          count={
+            tasks
+              .filter(task => task.priority === 'high')
+              .filter(task => task.status !== 'completed').length
+          }
           title="Important"
           icon="star"
           onPress={() => handleFilter(FILTER_TYPES.IMPORTANT)}
         />
         <TaskFilterItems
-          count={deletedTasks.length}
+          count={
+            deletedTasks.filter(task => task.status !== 'completed').length
+          }
           title="Deleted"
           icon="trash-can"
           onPress={() => handleFilter(FILTER_TYPES.DELETED)}
