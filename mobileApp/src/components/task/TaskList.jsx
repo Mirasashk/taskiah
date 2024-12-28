@@ -15,7 +15,8 @@ import {useNavigation} from '@react-navigation/native';
  */
 const TaskList = () => {
   const theme = useTheme();
-  const {tasks, getTasks, filter, filteredTasks} = useTaskContext();
+  const {tasks, getTasks, filter, filteredTasks, completedTasks} =
+    useTaskContext();
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const navigation = useNavigation();
   const handleRefresh = useCallback(async () => {
@@ -24,16 +25,9 @@ const TaskList = () => {
 
   const getTaskList = () => {
     if (filter === 'All tasks') {
-      return tasks.filter(task => task.status !== 'completed');
+      return tasks;
     }
-    return filteredTasks.filter(task => task.status !== 'completed');
-  };
-
-  const getCompletedTasks = () => {
-    if (filter === 'All tasks') {
-      return tasks.filter(task => task.status === 'completed');
-    }
-    return filteredTasks.filter(task => task.status === 'completed');
+    return filteredTasks;
   };
 
   const listActions = section => {
@@ -74,8 +68,8 @@ const TaskList = () => {
             expanded={true}
           />
           <TaskSection
-            title={`Completed tasks (${getCompletedTasks().length})`}
-            tasks={getCompletedTasks()}
+            title={`Completed tasks (${completedTasks.length})`}
+            tasks={completedTasks}
             rightComponent={listActions('completed')}
             expanded={false}
           />

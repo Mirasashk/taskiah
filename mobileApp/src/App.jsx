@@ -14,6 +14,7 @@ import './config/firebase';
 import {AuthProvider, useAuth} from './context/AuthContext';
 import {TaskProvider} from './context/TaskContext';
 import {ThemeContext} from './context/ThemeContext';
+import {NotificationProvider} from './context/NotificationContext';
 import {CustomLightTheme, CustomDarkTheme} from './theme';
 
 // Routes
@@ -54,11 +55,13 @@ const App = () => {
       <SafeAreaProvider>
         <AuthProvider>
           <TaskProvider>
-            <ThemeContext.Provider value={preferences}>
-              <PaperProvider theme={theme}>
-                <AppContent />
-              </PaperProvider>
-            </ThemeContext.Provider>
+            <NotificationProvider>
+              <ThemeContext.Provider value={preferences}>
+                <PaperProvider theme={theme}>
+                  <AppContent />
+                </PaperProvider>
+              </ThemeContext.Provider>
+            </NotificationProvider>
           </TaskProvider>
         </AuthProvider>
       </SafeAreaProvider>

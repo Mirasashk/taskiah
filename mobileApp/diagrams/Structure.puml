@@ -1,0 +1,60 @@
+@startuml
+
+package "src" {
+    package "components" {
+        package "common" {
+            class ColorDot
+            class DateTimePicker
+            class FormInput
+            class LoadingView
+            class TimePickerButton
+            
+            DateTimePicker --> TimePickerButton
+        }
+        
+        package "dashboard" {
+            class NotificationsSection
+            class StatsCard
+            class StatsSection
+            
+            StatsSection --> StatsCard
+        }
+        
+        package "drawer" {
+            class DrawerMain
+        }
+        
+        package "PullToRefresh" {
+            class PullToRefresh
+        }
+    }
+    
+    package "context" {
+        class AuthContext
+        class TaskContext
+        class ThemeContext
+    }
+    
+    class App
+    class AppContent
+}
+
+' Relationships
+App --> AuthContext
+App --> TaskContext
+App --> ThemeContext
+App --> AppContent
+
+AppContent --> DrawerMain
+
+' Common component relationships
+DateTimePicker ..> "uses" TimePickerButton
+
+' Dashboard component relationships
+StatsSection ..> "contains" StatsCard
+
+' Theme relationships
+App ..> "uses" CustomLightTheme
+App ..> "uses" CustomDarkTheme
+
+@enduml

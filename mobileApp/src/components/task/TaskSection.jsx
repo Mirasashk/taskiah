@@ -55,7 +55,7 @@ const TaskSection = ({
     <Card style={styles.card} onPress={handlePress}>
       <Card.Title
         title={title}
-        titleStyle={titleStyle}
+        titleStyle={[titleStyle, {marginTop: 5}]}
         right={() => rightComponent}
         onPress={onPress}
       />

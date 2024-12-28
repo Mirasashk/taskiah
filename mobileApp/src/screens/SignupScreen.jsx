@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, KeyboardAvoidingView, Platform} from 'react-native';
 import {Text, useTheme} from 'react-native-paper';
 import SignupForm from '../components/signup/SignupForm';
 
@@ -11,17 +11,21 @@ export const SignupScreen = () => {
   const theme = useTheme();
 
   return (
-    <View style={styles.container}>
-      <Text
-        style={[styles.title, {color: theme.colors.primary}]}
-        variant="displaySmall">
-        Sign Up
-      </Text>
-      <Text style={styles.subtitle} variant="bodyLarge">
-        Create an account to get started
-      </Text>
-      <SignupForm />
-    </View>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}>
+      <View style={styles.container}>
+        <Text
+          style={[styles.title, {color: theme.colors.primary}]}
+          variant="displaySmall">
+          Sign Up
+        </Text>
+        <Text style={styles.subtitle} variant="bodyLarge">
+          Create an account to get started
+        </Text>
+        <SignupForm />
+      </View>
+    </KeyboardAvoidingView>
   );
 };
 

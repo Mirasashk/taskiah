@@ -15,7 +15,13 @@ const StatsCard = ({title, subtitle, icon, onPress}) => {
   const theme = useTheme();
 
   const renderAvatar = props => (
-    <Avatar.Icon {...props} size={48} icon={icon} />
+    <Avatar.Icon
+      {...props}
+      size={48}
+      icon={icon}
+      color={theme.colors.onSurface}
+      style={{backgroundColor: theme.colors.surfaceContainerHigh}}
+    />
   );
 
   const renderChevron = props => (

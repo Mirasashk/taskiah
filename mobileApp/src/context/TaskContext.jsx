@@ -12,14 +12,17 @@ const TaskContext = createContext(null);
 /**
  * Provider component for task management
  * @param {Object} props - Component props
+ * @property {boolean} loading - Loading state
  * @param {React.ReactNode} props.children - Child components
  */
 export function TaskProvider({children}) {
   const [tasks, setTasks] = useState([]);
   const [filteredTasks, setFilteredTasks] = useState([]);
+  const [completedTasks, setCompletedTasks] = useState([]);
   const [deletedTasks, setDeletedTasks] = useState([]);
   const [filter, setFilter] = useState('All tasks');
   const [selectedTask, setSelectedTask] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const {user} = useContext(AuthContext);
 
@@ -95,6 +98,8 @@ export function TaskProvider({children}) {
       tasks.map(task => (task.id === taskId ? {...task, ...taskData} : task)),
     );
     await taskService.updateTask(taskId, taskData);
+    await getTasks();
+    setLoading(false);
   };
 
   /**
@@ -111,9 +116,15 @@ export function TaskProvider({children}) {
     );
     setDeletedTasks(deletedTasks);
 
-    const filteredTasks = response.data.filter(
-      task => task.status !== 'deleted',
+    const completedTasks = response.data.filter(
+      task => task.status === 'completed',
     );
+    setCompletedTasks(completedTasks);
+
+    const filteredTasks = response.data.filter(
+      task => task.status !== 'deleted' && task.status !== 'completed',
+    );
+
     const sortedTasks = filteredTasks.sort(
       (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
     );
@@ -135,8 +146,10 @@ export function TaskProvider({children}) {
    * @param {Object} newTaskData - New task data
    */
   const updateTask = async (taskId, newTaskData) => {
+    setLoading(true);
     await taskService.updateTask(taskId, newTaskData);
     await getTasks();
+    setLoading(false);
   };
 
   const value = {
@@ -144,7 +157,9 @@ export function TaskProvider({children}) {
     filter,
     filteredTasks,
     deletedTasks,
+    completedTasks,
     selectedTask,
+    loading,
     setSelectedTask,
     setFilteredTasks,
     setFilter,

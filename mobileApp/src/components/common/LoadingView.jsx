@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, ActivityIndicator} from 'react-native';
+import {View, ActivityIndicator, Dimensions} from 'react-native';
 import PropTypes from 'prop-types';
 import {useTheme} from 'react-native-paper';
 
@@ -12,7 +12,13 @@ export const LoadingView = ({size = 'large'}) => {
   const theme = useTheme();
 
   return (
-    <View>
+    <View
+      style={{
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: Dimensions.get('window').width,
+        height: '90%',
+      }}>
       <ActivityIndicator
         testID="loading-indicator"
         size={size}

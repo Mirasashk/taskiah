@@ -1,6 +1,7 @@
 import React, {createContext, useState, useContext, useEffect} from 'react';
 import {auth} from '../config/firebase';
 import {getUserProfile, createUserProfile} from '../services/userApi';
+import {storage} from '../config/firebase';
 
 import {storeUserData, processUserData} from '../utils/authUtils';
 
@@ -27,6 +28,7 @@ export const AuthContext = createContext({});
 export const AuthProvider = ({children}) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  let image;
 
   useEffect(() => {
     const handleAuthStateChange = async firebaseUser => {
@@ -51,6 +53,13 @@ export const AuthProvider = ({children}) => {
     const unsubscribe = auth.onAuthStateChanged(handleAuthStateChange);
     return unsubscribe;
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      console.log('getting user image');
+      image = getUserImage();
+    }
+  }, [user]);
 
   /**
    * Handles user login
@@ -111,11 +120,24 @@ export const AuthProvider = ({children}) => {
     }
   };
 
+  const getUserImage = async () => {
+    const imageRef = storage.ref(user.photoURL);
+    try {
+      const imageUrl = await imageRef.getDownloadURL();
+      console.log('imageUrl', imageUrl);
+      return imageUrl;
+    } catch (error) {
+      console.error('Error getting user image:', error);
+      return null;
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
         user,
         loading,
+        image,
         login,
         signOut,
         signUp,
