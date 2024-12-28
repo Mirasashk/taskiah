@@ -33,8 +33,9 @@ export function TaskProvider({children}) {
   }, [user]);
 
   useEffect(() => {
-    filterTasks(filteredTasks, filter);
-  }, [filteredTasks, filter]);
+    console.log('filter', filter);
+    filterTasks(filter);
+  }, [filter]);
 
   /**
    * Adds a new task with notification
@@ -62,8 +63,18 @@ export function TaskProvider({children}) {
    * @param {Array} filteredTasks - Array of filtered tasks
    * @param {string} filter - Filter criteria
    */
-  const filterTasks = (filteredTasks, filter) => {
+  const filterTasks = filter => {
     // sort filteredTasks by createdAt date
+    if (filter === 'important') {
+      const importantTasks = tasks.filter(task => task.priority === 'high');
+      setFilteredTasks(importantTasks);
+    } else if (filter === 'pastdue') {
+      const pastdueTasks = tasks.filter(task => task.dueDate < new Date());
+      setFilteredTasks(pastdueTasks);
+    } else {
+      setFilteredTasks(tasks);
+    }
+
     const sortedFilteredTasks = filteredTasks.sort(
       (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
     );
@@ -106,8 +117,6 @@ export function TaskProvider({children}) {
    * Retrieves tasks
    */
   const getTasks = async () => {
-    console.log('getTasks', user.id);
-
     const response = await taskService.getTasks(user.id);
 
     // sort tasks by createdAt date

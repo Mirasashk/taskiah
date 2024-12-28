@@ -24,18 +24,20 @@ const StatsSection = ({onTaskPress, stats}) => (
     <StatsCard
       title="Active tasks"
       subtitle={stats.active.toString()}
-      icon="clipboard-edit-outline"
-      onPress={onTaskPress}
+      icon="clipboard-list-outline"
+      onPress={() => onTaskPress('active')}
     />
     <StatsCard
-      title="Completed tasks"
+      title="Important tasks"
       subtitle={stats.completed.toString()}
-      icon="clipboard-check-outline"
+      icon="alert-circle-outline"
+      onPress={() => onTaskPress('important')}
     />
     <StatsCard
-      title="Overdue tasks"
+      title="Past due tasks"
       subtitle={stats.overdue.toString()}
-      icon="clipboard-alert-outline"
+      icon="calendar-alert"
+      onPress={() => onTaskPress('pastdue')}
     />
   </View>
 );

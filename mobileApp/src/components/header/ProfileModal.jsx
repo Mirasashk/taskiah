@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {View, TouchableOpacity, StyleSheet} from 'react-native';
 import {Modal, Portal, List, Divider, Avatar, Text} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';

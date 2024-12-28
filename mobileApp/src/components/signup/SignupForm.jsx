@@ -1,5 +1,12 @@
 import React, {useState, useContext} from 'react';
-import {View, TouchableOpacity} from 'react-native';
+import {
+  View,
+  TouchableOpacity,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+} from 'react-native';
 import {Text, TextInput, Button, useTheme} from 'react-native-paper';
 import {AuthContext} from '../../context/AuthContext';
 import FormInput from '../common/FormInput';
@@ -38,77 +45,85 @@ const SignupForm = () => {
   const styles = SignUpFormStyles(theme);
 
   return (
-    <View>
-      <FormInput
-        label="First Name"
-        testID="first-name-input"
-        value={formData.firstName}
-        onChangeText={value => handleChange('firstName', value)}
-        error={errors.firstName}
-      />
-
-      <FormInput
-        label="Last Name"
-        testID="last-name-input"
-        value={formData.lastName}
-        onChangeText={value => handleChange('lastName', value)}
-        error={errors.lastName}
-      />
-
-      <FormInput
-        label="Email"
-        testID="email-input"
-        value={formData.email}
-        onChangeText={value => handleChange('email', value)}
-        error={errors.email}
-      />
-
-      <FormInput
-        label="Username"
-        testID="username-input"
-        value={formData.username}
-        onChangeText={value => handleChange('username', value)}
-        error={errors.username}
-      />
-
-      <FormInput
-        label="Password"
-        testID="password-input"
-        value={formData.password}
-        onChangeText={value => handleChange('password', value)}
-        error={errors.password}
-        secureTextEntry={!showPassword}
-        rightIcon={
-          <TextInput.Icon
-            icon={showPassword ? 'eye-off' : 'eye'}
-            onPress={() => setShowPassword(!showPassword)}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.keyboardAvoidingView}>
+      <ScrollView
+        contentContainerStyle={styles.scrollViewContent}
+        keyboardShouldPersistTaps="handled">
+        <View style={styles.formContainer}>
+          <FormInput
+            label="First Name"
+            testID="first-name-input"
+            value={formData.firstName}
+            onChangeText={value => handleChange('firstName', value)}
+            error={errors.firstName}
           />
-        }
-      />
 
-      <FormInput
-        label="Confirm Password"
-        testID="confirm-password-input"
-        value={formData.confirmPassword}
-        onChangeText={value => handleChange('confirmPassword', value)}
-        error={errors.confirmPassword}
-        secureTextEntry={!showConfirmPassword}
-        rightIcon={
-          <TextInput.Icon
-            icon={showConfirmPassword ? 'eye-off' : 'eye'}
-            onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+          <FormInput
+            label="Last Name"
+            testID="last-name-input"
+            value={formData.lastName}
+            onChangeText={value => handleChange('lastName', value)}
+            error={errors.lastName}
           />
-        }
-      />
 
-      <Button
-        mode="contained"
-        style={styles.button}
-        onPress={handleSubmit}
-        testID="signup-button">
-        Sign Up
-      </Button>
-    </View>
+          <FormInput
+            label="Email"
+            testID="email-input"
+            value={formData.email}
+            onChangeText={value => handleChange('email', value)}
+            error={errors.email}
+          />
+
+          <FormInput
+            label="Username"
+            testID="username-input"
+            value={formData.username}
+            onChangeText={value => handleChange('username', value)}
+            error={errors.username}
+          />
+
+          <FormInput
+            label="Password"
+            testID="password-input"
+            value={formData.password}
+            onChangeText={value => handleChange('password', value)}
+            error={errors.password}
+            secureTextEntry={!showPassword}
+            rightIcon={
+              <TextInput.Icon
+                icon={showPassword ? 'eye-off' : 'eye'}
+                onPress={() => setShowPassword(!showPassword)}
+              />
+            }
+          />
+
+          <FormInput
+            label="Confirm Password"
+            testID="confirm-password-input"
+            value={formData.confirmPassword}
+            onChangeText={value => handleChange('confirmPassword', value)}
+            error={errors.confirmPassword}
+            secureTextEntry={!showConfirmPassword}
+            rightIcon={
+              <TextInput.Icon
+                icon={showConfirmPassword ? 'eye-off' : 'eye'}
+                onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+              />
+            }
+          />
+
+          <Button
+            mode="contained"
+            style={styles.button}
+            onPress={handleSubmit}
+            testID="signup-button">
+            Sign Up
+          </Button>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 

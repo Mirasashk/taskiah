@@ -91,12 +91,9 @@ const TaskSection = ({
 TaskSection.propTypes = {
   title: PropTypes.string.isRequired,
   tasks: PropTypes.array.isRequired,
-  filteredTasks: PropTypes.array.isRequired,
   filter: PropTypes.string,
-  onToggleComplete: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
   titleStyle: PropTypes.object,
-  rightComponent: PropTypes.func,
+  rightComponent: PropTypes.object,
   onPress: PropTypes.func,
   expanded: PropTypes.bool,
 };

@@ -7,6 +7,7 @@ import {useNotification} from '../../context/NotificationContext';
 import {useTaskContext} from '../../context/TaskContext';
 import {useTheme} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
+
 const notificationTypes = theme => ({
   dueDate: {
     title: 'Due date',
@@ -50,7 +51,7 @@ const NotificationsSection = () => {
       .slice(0, 3)
       .map(notification => (
         <NotificationCard
-          key={notification.id}
+          key={notification.taskId + notification.type + notification.id}
           title={notificationTypes(theme)[notification.type].title}
           subtitle={notification.message}
           icon={notificationTypes(theme)[notification.type].icon}

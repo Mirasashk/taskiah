@@ -13,7 +13,7 @@ import {DashboardStyles} from '../components/dashboard/styles/DashboardStyles';
  */
 const DashboardScreen = () => {
   const navigation = useNavigation();
-  const {getTasks, tasks, completedTasks} = useTaskContext();
+  const {getTasks, tasks, completedTasks, setFilter} = useTaskContext();
   const {user} = useAuth();
   const [stats, setStats] = useState({
     active: 0,
@@ -31,8 +31,17 @@ const DashboardScreen = () => {
     });
   }, [tasks, completedTasks]);
 
-  const handleTaskPress = () => {
-    navigation.navigate('Tasks');
+  const handleTaskPress = type => {
+    if (type === 'active') {
+      setFilter('All tasks');
+      navigation.navigate('Tasks');
+    } else if (type === 'important') {
+      setFilter('important');
+      navigation.navigate('Tasks');
+    } else if (type === 'pastdue') {
+      setFilter('pastdue');
+      navigation.navigate('Tasks');
+    }
   };
 
   return (

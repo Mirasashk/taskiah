@@ -20,10 +20,6 @@ export const NotificationProvider = ({children}) => {
     getNotifications();
   }, [tasks]);
 
-  useEffect(() => {
-    console.log(notifications);
-  }, [notifications]);
-
   const getNotifications = () => {
     const newNotifications = [];
     tasks.forEach(task => {

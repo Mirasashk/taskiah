@@ -28,7 +28,7 @@ export const AuthContext = createContext({});
 export const AuthProvider = ({children}) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  let image;
+  const [image, setImage] = useState(null);
 
   useEffect(() => {
     const handleAuthStateChange = async firebaseUser => {
@@ -56,8 +56,11 @@ export const AuthProvider = ({children}) => {
 
   useEffect(() => {
     if (user) {
-      console.log('getting user image');
-      image = getUserImage();
+      const loadImage = async () => {
+        const imageUrl = await getUserImage();
+        setImage(imageUrl);
+      };
+      loadImage();
     }
   }, [user]);
 
@@ -124,7 +127,7 @@ export const AuthProvider = ({children}) => {
     const imageRef = storage.ref(user.photoURL);
     try {
       const imageUrl = await imageRef.getDownloadURL();
-      console.log('imageUrl', imageUrl);
+      console.log(imageUrl);
       return imageUrl;
     } catch (error) {
       console.error('Error getting user image:', error);

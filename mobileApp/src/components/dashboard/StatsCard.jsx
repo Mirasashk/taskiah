@@ -2,6 +2,7 @@ import React from 'react';
 import {View} from 'react-native';
 import {Card, Avatar, IconButton} from 'react-native-paper';
 import {useTheme} from 'react-native-paper';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 /**
  * StatsCard Component
@@ -18,7 +19,7 @@ const StatsCard = ({title, subtitle, icon, onPress}) => {
     <Avatar.Icon
       {...props}
       size={48}
-      icon={icon}
+      icon={() => <Icon name={icon} size={32} color={theme.colors.onSurface} />}
       color={theme.colors.onSurface}
       style={{backgroundColor: theme.colors.surfaceContainerHigh}}
     />

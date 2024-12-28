@@ -14,7 +14,6 @@ export const TaskDetailFormStyles = theme =>
       backgroundColor: theme.colors.surfaceContainerHigh,
     },
     textInputContent: {
-      paddingLeft: 0,
       backgroundColor: theme.colors.surfaceContainerHigh,
     },
     updateButton: {

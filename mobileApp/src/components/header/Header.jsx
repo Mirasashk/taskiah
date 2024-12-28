@@ -66,6 +66,7 @@ const Header = ({title, openDrawer}) => {
         onSignOut={handleSignOut}
         onThemeToggle={toggleTheme}
         theme={theme}
+        image={image}
       />
     </>
   );
