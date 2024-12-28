@@ -12,14 +12,17 @@ const TaskContext = createContext(null);
 /**
  * Provider component for task management
  * @param {Object} props - Component props
+ * @property {boolean} loading - Loading state
  * @param {React.ReactNode} props.children - Child components
  */
 export function TaskProvider({children}) {
   const [tasks, setTasks] = useState([]);
   const [filteredTasks, setFilteredTasks] = useState([]);
+  const [completedTasks, setCompletedTasks] = useState([]);
   const [deletedTasks, setDeletedTasks] = useState([]);
   const [filter, setFilter] = useState('All tasks');
   const [selectedTask, setSelectedTask] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const {user} = useContext(AuthContext);
 
@@ -30,8 +33,9 @@ export function TaskProvider({children}) {
   }, [user]);
 
   useEffect(() => {
-    filterTasks(filteredTasks, filter);
-  }, [filteredTasks, filter]);
+    console.log('filter', filter);
+    filterTasks(filter);
+  }, [filter]);
 
   /**
    * Adds a new task with notification
@@ -59,8 +63,18 @@ export function TaskProvider({children}) {
    * @param {Array} filteredTasks - Array of filtered tasks
    * @param {string} filter - Filter criteria
    */
-  const filterTasks = (filteredTasks, filter) => {
+  const filterTasks = filter => {
     // sort filteredTasks by createdAt date
+    if (filter === 'important') {
+      const importantTasks = tasks.filter(task => task.priority === 'high');
+      setFilteredTasks(importantTasks);
+    } else if (filter === 'pastdue') {
+      const pastdueTasks = tasks.filter(task => task.dueDate < new Date());
+      setFilteredTasks(pastdueTasks);
+    } else {
+      setFilteredTasks(tasks);
+    }
+
     const sortedFilteredTasks = filteredTasks.sort(
       (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
     );
@@ -95,14 +109,14 @@ export function TaskProvider({children}) {
       tasks.map(task => (task.id === taskId ? {...task, ...taskData} : task)),
     );
     await taskService.updateTask(taskId, taskData);
+    await getTasks();
+    setLoading(false);
   };
 
   /**
    * Retrieves tasks
    */
   const getTasks = async () => {
-    console.log('getTasks', user.id);
-
     const response = await taskService.getTasks(user.id);
 
     // sort tasks by createdAt date
@@ -111,9 +125,15 @@ export function TaskProvider({children}) {
     );
     setDeletedTasks(deletedTasks);
 
-    const filteredTasks = response.data.filter(
-      task => task.status !== 'deleted',
+    const completedTasks = response.data.filter(
+      task => task.status === 'completed',
     );
+    setCompletedTasks(completedTasks);
+
+    const filteredTasks = response.data.filter(
+      task => task.status !== 'deleted' && task.status !== 'completed',
+    );
+
     const sortedTasks = filteredTasks.sort(
       (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
     );
@@ -135,8 +155,10 @@ export function TaskProvider({children}) {
    * @param {Object} newTaskData - New task data
    */
   const updateTask = async (taskId, newTaskData) => {
+    setLoading(true);
     await taskService.updateTask(taskId, newTaskData);
     await getTasks();
+    setLoading(false);
   };
 
   const value = {
@@ -144,7 +166,9 @@ export function TaskProvider({children}) {
     filter,
     filteredTasks,
     deletedTasks,
+    completedTasks,
     selectedTask,
+    loading,
     setSelectedTask,
     setFilteredTasks,
     setFilter,

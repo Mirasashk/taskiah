@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {View, TouchableOpacity, StyleSheet} from 'react-native';
 import {Modal, Portal, List, Divider, Avatar, Text} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
@@ -38,6 +38,7 @@ const ProfileModal = ({
   onSignOut,
   onThemeToggle,
   theme,
+  image,
 }) => {
   const navigation = useNavigation();
 
@@ -55,8 +56,8 @@ const ProfileModal = ({
             <Avatar.Image
               size={60}
               source={
-                user?.photoURL
-                  ? {uri: user.photoURL}
+                image
+                  ? {uri: image}
                   : require('../../assets/images/default_avatar.png')
               }
             />
@@ -89,7 +90,7 @@ const ProfileModal = ({
             left={props => <List.Icon {...props} icon="bell" />}
             onPress={() => {
               onDismiss();
-              navigation.navigate('Notifications');
+              navigation.navigate('Dashboard');
             }}
           />
           <List.Item

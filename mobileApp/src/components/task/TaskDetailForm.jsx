@@ -18,9 +18,9 @@ import TaskDetailField from '../task/TaskDetailField';
 import {STATUS_OPTIONS, PRIORITY_OPTIONS} from '../../config/taskConstants';
 import {useContext} from 'react';
 import {TaskDetailFormStyles} from './styles/TaskDetailFormStyles';
-
+import {LoadingView} from '../common/LoadingView';
 const TaskDetailForm = ({mode = 'edit', initialTask = {}}) => {
-  const {updateTask, addTask} = useTaskContext();
+  const {updateTask, addTask, loading} = useTaskContext();
   const theme = useTheme();
   const {user} = useContext(AuthContext);
   const navigation = useNavigation();
@@ -110,6 +110,10 @@ const TaskDetailForm = ({mode = 'edit', initialTask = {}}) => {
   const getDisplayValue = value => {
     return value ? value.charAt(0).toUpperCase() + value.slice(1) : '';
   };
+
+  if (loading) {
+    return <LoadingView />;
+  }
 
   return (
     <View>

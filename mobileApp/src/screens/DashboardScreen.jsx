@@ -13,7 +13,7 @@ import {DashboardStyles} from '../components/dashboard/styles/DashboardStyles';
  */
 const DashboardScreen = () => {
   const navigation = useNavigation();
-  const {getTasks, tasks} = useTaskContext();
+  const {getTasks, tasks, completedTasks, setFilter} = useTaskContext();
   const {user} = useAuth();
   const [stats, setStats] = useState({
     active: 0,
@@ -23,44 +23,31 @@ const DashboardScreen = () => {
 
   // Load task stats once when component mounts
   useEffect(() => {
-    let isMounted = true;
+    const now = new Date();
+    setStats({
+      active: tasks.length,
+      completed: completedTasks.length,
+      overdue: tasks.filter(task => new Date(task.dueDate) < now).length,
+    });
+  }, [tasks, completedTasks]);
 
-    const fetchTaskStats = async () => {
-      try {
-        await getTasks();
-
-        // Only update state if component is still mounted
-        if (isMounted && Array.isArray(tasks)) {
-          const now = new Date();
-          setStats({
-            active: tasks.filter(task => task.status === 'active').length,
-            completed: tasks.filter(task => task.status === 'completed').length,
-            overdue: tasks.filter(
-              task => task.status === 'active' && new Date(task.dueDate) < now,
-            ).length,
-          });
-        }
-      } catch (error) {
-        console.error('Error fetching task stats:', error);
-      }
-    };
-
-    fetchTaskStats();
-
-    // Cleanup function to prevent state updates after unmount
-    return () => {
-      isMounted = false;
-    };
-  }, []); // Empty dependency array means this runs once on mount
-
-  const handleTaskPress = () => {
-    navigation.navigate('Tasks');
+  const handleTaskPress = type => {
+    if (type === 'active') {
+      setFilter('All tasks');
+      navigation.navigate('Tasks');
+    } else if (type === 'important') {
+      setFilter('important');
+      navigation.navigate('Tasks');
+    } else if (type === 'pastdue') {
+      setFilter('pastdue');
+      navigation.navigate('Tasks');
+    }
   };
 
   return (
     <View style={DashboardStyles.container}>
       <StatsSection stats={stats} onTaskPress={handleTaskPress} />
-      <NotificationsSection />
+      <NotificationsSection navigation={navigation} />
     </View>
   );
 };

@@ -1,4 +1,4 @@
-import React, {useState, useContext} from 'react';
+import React, {useState, useContext, useEffect} from 'react';
 import {StyleSheet, TouchableOpacity} from 'react-native';
 import {Appbar, Avatar, Text, useTheme} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -21,7 +21,7 @@ const Header = ({title, openDrawer}) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const theme = useTheme();
   const {toggleTheme} = useContext(ThemeContext);
-  const {user, signOut} = useAuth();
+  const {user, signOut, image} = useAuth();
 
   const handleSignOut = async () => {
     try {
@@ -51,8 +51,8 @@ const Header = ({title, openDrawer}) => {
           <Avatar.Image
             size={35}
             source={
-              user?.photoURL
-                ? {uri: user.photoURL}
+              image
+                ? {uri: image}
                 : require('../../assets/images/default_avatar.png')
             }
           />
@@ -66,6 +66,7 @@ const Header = ({title, openDrawer}) => {
         onSignOut={handleSignOut}
         onThemeToggle={toggleTheme}
         theme={theme}
+        image={image}
       />
     </>
   );

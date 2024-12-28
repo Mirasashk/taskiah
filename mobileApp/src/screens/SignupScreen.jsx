@@ -27,9 +27,10 @@ export const SignupScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    justifyContent: 'start',
+    flex: 1,
+    justifyContent: 'flex-start',
     paddingHorizontal: 40,
-    paddingTop: 100,
+    paddingTop: 30,
   },
   title: {
     fontSize: 24,

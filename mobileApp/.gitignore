@@ -92,3 +92,7 @@ debug.keystore
 
 # Jest
 coverage/
+
+# Add these lines if they don't exist
+android/app/release.keystore
+android/app/release

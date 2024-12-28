@@ -29,7 +29,7 @@ export const AppContent = () => {
   const {user, loading} = useAuth();
 
   if (loading) {
-    return <LoadingView theme={theme} />;
+    return <LoadingView />;
   }
 
   return (
