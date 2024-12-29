@@ -1,40 +1,39 @@
 import React, {useState, useEffect} from 'react';
-import {View, StyleSheet} from 'react-native';
-import {Card, Text, useTheme} from 'react-native-paper';
+import {Card, useTheme} from 'react-native-paper';
 import PropTypes from 'prop-types';
 import TaskItem from './TaskItem';
 import {useTaskContext} from '../../context/TaskContext';
 import {TaskSectionStyles} from './styles/TaskSectionStyles';
 /**
- * Renders a section of tasks with a title and optional right component
+ * Renders a collapsible section of tasks with a title and optional actions.
+ *
  * @component
- * @param {Object} props
+ * @param {Object} props Component props
  * @param {string} props.title - Title of the section
- * @param {Array} props.tasks - Array of tasks
- * @param {Array} props.filteredTasks - Array of filtered tasks
- * @param {string} props.filter - Current filter name
- * @param {Function} props.onToggleComplete - Callback when task completion is toggled
- * @param {Function} props.onDelete - Callback when task is deleted
- * @param {Object} props.titleStyle - Style for the title
- * @param {Function} props.rightComponent - Component to render on the right
- * @param {Function} props.onPress - Callback when section is pressed
- * @param {boolean} props.expanded - Whether the section is expanded
- * @returns {React.ReactElement} Task section component
+ * @param {Array<Object>} props.tasks - Array of task objects
+ * @param {Array<Object>} [props.filteredTasks] - Array of filtered task objects
+ * @param {Object} [props.titleStyle] - Custom styles for the section title
+ * @param {React.ReactNode} [props.rightComponent] - Component to render on the right side of header
+ * @param {Function} [props.onPress] - Callback when section header is pressed
+ * @param {boolean} [props.expanded=true] - Whether the section is initially expanded
+ * @param {boolean} [props.completedTasksList=false] - Whether this section shows completed tasks
+ * @returns {React.ReactElement} The rendered TaskSection component
  */
 const TaskSection = ({
   title,
   tasks,
   filteredTasks,
-  filter,
   titleStyle,
   rightComponent,
   onPress,
   expanded = true,
+  completedTasksList = false,
 }) => {
-  const {toggleTask, deleteTask} = useTaskContext();
   const theme = useTheme();
   const styles = TaskSectionStyles(theme);
   const [expand, setExpand] = useState(expanded);
+  const {toggleTask, deleteTask, filter, deletedTasks, completedTasks} =
+    useTaskContext();
 
   const handlePress = () => {
     if (tasks.length > 0) {
@@ -42,13 +41,18 @@ const TaskSection = ({
     }
   };
 
-  const handleToggleComplete = (taskId, status) => {
-    console.log('handleToggleComplete', taskId, status);
-    if (status === 'completed') {
+  const handleToggleComplete = taskId => {
+    const task = tasks.find(task => task.id === taskId);
+    if (task.status === 'completed') {
       toggleTask(taskId, {status: 'active'});
     } else {
       toggleTask(taskId, {status: 'completed'});
     }
+  };
+
+  const handleDelete = taskId => {
+    console.log('handleDelete', taskId);
+    deleteTask(taskId);
   };
 
   return (
@@ -61,27 +65,32 @@ const TaskSection = ({
       />
       {expand && (
         <Card.Content>
-          {filteredTasks?.length > 0
-            ? filteredTasks.map(task => (
+          {filter === 'Deleted' && completedTasksList === false
+            ? deletedTasks.map(task => (
                 <TaskItem
                   key={task.id}
                   task={task}
-                  onToggleComplete={() =>
-                    handleToggleComplete(task.id, task.status)
-                  }
-                  onDelete={deleteTask}
+                  onToggleComplete={handleToggleComplete}
+                  onDelete={() => handleDelete(task)}
                 />
               ))
-            : tasks.map(task => (
-                <TaskItem
-                  key={task.id}
-                  task={task}
-                  onToggleComplete={() =>
-                    handleToggleComplete(task.id, task.status)
-                  }
-                  onDelete={deleteTask}
-                />
-              ))}
+            : filteredTasks?.length > 0
+              ? filteredTasks.map(task => (
+                  <TaskItem
+                    key={task.id}
+                    task={task}
+                    onToggleComplete={handleToggleComplete}
+                    onDelete={() => handleDelete(task)}
+                  />
+                ))
+              : tasks.map(task => (
+                  <TaskItem
+                    key={task.id}
+                    task={task}
+                    onToggleComplete={handleToggleComplete}
+                    onDelete={() => handleDelete(task)}
+                  />
+                ))}
         </Card.Content>
       )}
     </Card>

@@ -9,16 +9,27 @@ import {TaskListStyles} from './styles/TaskListStyles';
 import TaskSection from './TaskSection';
 import {useNavigation} from '@react-navigation/native';
 /**
- * Renders the main task list with filtering and refresh capabilities
+ * Renders the main task list component with filtering and refresh capabilities.
+ * Displays tasks in sections (active and completed) with the ability to filter, sort,
+ * and perform actions like delete.
+ *
  * @component
- * @returns {React.ReactElement} Task list component
+ * @returns {React.ReactElement} The rendered TaskList component
  */
 const TaskList = () => {
   const theme = useTheme();
-  const {tasks, getTasks, filter, filteredTasks, completedTasks} =
-    useTaskContext();
+  const {
+    tasks,
+    getTasks,
+    filter,
+    filteredTasks,
+    completedTasks,
+    deletedTasks,
+    deleteTask,
+  } = useTaskContext();
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const navigation = useNavigation();
+
   const handleRefresh = useCallback(async () => {
     await getTasks();
   }, [getTasks]);
@@ -26,8 +37,14 @@ const TaskList = () => {
   const getTaskList = () => {
     if (filter === 'All tasks') {
       return tasks;
+    } else if (filter === 'Deleted') {
+      return deletedTasks;
     }
     return filteredTasks;
+  };
+
+  const handleDelete = task => {
+    deleteTask(task);
   };
 
   const listActions = section => {
@@ -66,12 +83,15 @@ const TaskList = () => {
             tasks={getTaskList()}
             rightComponent={listActions()}
             expanded={true}
+            deleteTask={task => handleDelete(task)}
           />
           <TaskSection
             title={`Completed tasks (${completedTasks.length})`}
             tasks={completedTasks}
+            completedTasksList={true}
             rightComponent={listActions('completed')}
             expanded={false}
+            deleteTask={task => handleDelete(task)}
           />
         </View>
       </PullToRefresh>

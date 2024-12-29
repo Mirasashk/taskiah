@@ -4,15 +4,16 @@ import {AuthContext} from './AuthContext';
 import {createTaskNotification} from '../utils/notifications';
 
 /**
- * Context for managing tasks throughout the application
- * @type {React.Context}
+ * Context for managing tasks throughout the application.
+ * Provides task CRUD operations and filtering capabilities.
  */
 const TaskContext = createContext(null);
 
 /**
- * Provider component for task management
- * @param {Object} props - Component props
- * @property {boolean} loading - Loading state
+ * Provider component that manages task state and operations.
+ *
+ * @component
+ * @param {Object} props Component props
  * @param {React.ReactNode} props.children - Child components
  */
 export function TaskProvider({children}) {
@@ -38,8 +39,14 @@ export function TaskProvider({children}) {
   }, [filter]);
 
   /**
-   * Adds a new task with notification
-   * @param {Object} task - Task to add
+   * Adds a new task with associated notification.
+   *
+   * @async
+   * @param {Object} task - Task to be added
+   * @param {string} task.title - Title of the task
+   * @param {string} [task.description] - Description of the task
+   * @param {Date} [task.dueDate] - Due date of the task
+   * @throws {Error} When task creation fails
    */
   const addTask = async task => {
     try {
@@ -59,27 +66,22 @@ export function TaskProvider({children}) {
   };
 
   /**
-   * Filters tasks based on the filter criteria
-   * @param {Array} filteredTasks - Array of filtered tasks
-   * @param {string} filter - Filter criteria
+   * Filters tasks based on specified criteria.
+   *
+   * @param {string} filterCriteria - The filter to apply ('important'|'pastdue'|'all')
    */
-  const filterTasks = filter => {
-    // sort filteredTasks by createdAt date
-    if (filter === 'important') {
-      const importantTasks = tasks.filter(task => task.priority === 'high');
-      setFilteredTasks(importantTasks);
-    } else if (filter === 'pastdue') {
-      const pastdueTasks = tasks.filter(task => task.dueDate < new Date());
-      setFilteredTasks(pastdueTasks);
-    } else {
-      setFilteredTasks(tasks);
+  const filterTasks = filterCriteria => {
+    const sortByDate = (a, b) => new Date(b.createdAt) - new Date(a.createdAt);
+
+    let filtered = tasks;
+    if (filterCriteria === 'important') {
+      filtered = tasks.filter(task => task.priority === 'high');
+    } else if (filterCriteria === 'pastdue') {
+      filtered = tasks.filter(task => task.dueDate < new Date());
     }
 
-    const sortedFilteredTasks = filteredTasks.sort(
-      (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
-    );
-    setFilter(filter);
-    setFilteredTasks(sortedFilteredTasks);
+    setFilter(filterCriteria);
+    setFilteredTasks(filtered.sort(sortByDate));
   };
 
   /**
@@ -88,14 +90,17 @@ export function TaskProvider({children}) {
    */
   const deleteTask = async task => {
     if (task.status === 'deleted') {
-      await taskService.deleteTask(task.id);
-      setDeletedTasks(deletedTasks.filter(t => t.id !== task.id));
+      console.log('deleteTask', task.id);
+      await taskService.deleteTask(task.id).then(() => {
+        getTasks();
+      });
     } else {
       const deletedStatus = {
         status: 'deleted',
       };
-      await taskService.updateTask(task.id, deletedStatus);
-      await getTasks();
+      await taskService.updateTask(task.id, deletedStatus).then(() => {
+        getTasks();
+      });
     }
   };
 
