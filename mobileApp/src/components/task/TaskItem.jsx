@@ -6,13 +6,18 @@ import {useNavigation} from '@react-navigation/native';
 import TaskCheckbox from './TaskCheckbox';
 
 /**
- * Renders an individual task item with completion checkbox and delete button
+ * Renders an individual task item with completion checkbox and actions.
+ * Supports toggling completion status and deletion of tasks.
+ *
  * @component
- * @param {Object} props
- * @param {Object} props.task - Task object containing id, title, and status
+ * @param {Object} props Component props
+ * @param {Object} props.task - Task object
+ * @param {string} props.task.id - Unique identifier of the task
+ * @param {string} props.task.title - Title of the task
+ * @param {('active'|'completed'|'deleted')} props.task.status - Current status of the task
  * @param {Function} props.onToggleComplete - Callback when task completion is toggled
  * @param {Function} props.onDelete - Callback when task is deleted
- * @returns {React.ReactElement} Task item component
+ * @returns {React.ReactElement} The rendered TaskItem component
  */
 const TaskItem = ({task, onToggleComplete, onDelete}) => {
   const [isChecked, setIsChecked] = useState(false);
@@ -24,7 +29,7 @@ const TaskItem = ({task, onToggleComplete, onDelete}) => {
 
   const handleToggleComplete = () => {
     setIsChecked(!isChecked);
-    onToggleComplete?.(task.id);
+    onToggleComplete(task.id);
   };
 
   const handleTaskPress = () => {
@@ -44,7 +49,7 @@ const TaskItem = ({task, onToggleComplete, onDelete}) => {
           </Text>
         </View>
       </View>
-      <IconButton icon="delete" size={20} onPress={() => onDelete(task.id)} />
+      <IconButton icon="delete" size={20} onPress={onDelete} />
     </View>
   );
 };
