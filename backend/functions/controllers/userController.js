@@ -72,11 +72,29 @@ async function updateUserPublicKey(
 	const lastUsedDate = new Date();
 
 	try {
-		await db
+		const registration = await db
 			.collection('deviceRegistration')
 			.doc(deviceId)
-			.create({ userId, publicKey, createDate, lastUsedDate, userAgent });
-		return res.json({ message: 'User public key created' });
+			.get();
+
+		if (registration.exists) {
+			await db.collection('deviceRegistration').doc(deviceId).update({
+				publicKey,
+				createDate,
+				lastUsedDate,
+				userAgent,
+				userId,
+			});
+			return res.json({ message: 'User public key updated' });
+		} else {
+			await db.collection('deviceRegistration').doc(deviceId).create({
+				userId,
+				publicKey,
+				createDate,
+				lastUsedDate,
+				userAgent,
+			});
+		}
 	} catch (error) {
 		console.error('Error updating user public key:', error);
 		return res
@@ -131,6 +149,39 @@ async function verifyBiometricPublicKey(deviceId, signature, payload, res) {
 	}
 }
 
+async function checkDevice(deviceId, userId, res) {
+	console.log('deviceId', deviceId);
+	console.log('userId', userId);
+	try {
+		const device = await db
+			.collection('deviceRegistration')
+			.doc(deviceId)
+			.get();
+
+		if (device.exists) {
+			if (device.data().userId === userId) {
+				return res.json({
+					message: 'Device is registered',
+					statusState: true,
+				});
+			} else {
+				return res.json({
+					message: 'Device is registered but not for this user',
+					statusState: false,
+				});
+			}
+		} else {
+			return res.json({
+				message: 'Device is not registered',
+				statusState: false,
+			});
+		}
+	} catch (error) {
+		console.error('Error checking device:', error);
+		return res.status(500).json({ error: 'Internal Server Error' });
+	}
+}
+
 async function getBiometricChallenge(res) {
 	const challenge = dotenvConfig.biometricChallenge;
 	return res.json({ challenge });
@@ -148,4 +199,5 @@ module.exports = {
 	updateUserPublicKey,
 	getBiometricChallenge,
 	verifyBiometricPublicKey,
+	checkDevice,
 };

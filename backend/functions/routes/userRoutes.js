@@ -7,6 +7,7 @@ const {
 	updateUserPublicKey,
 	getBiometricChallenge,
 	verifyBiometricPublicKey,
+	checkDevice,
 } = require('../controllers/userController');
 
 router.post('/add', async (req, res) => {
@@ -44,6 +45,12 @@ router.post('/biometric/verify', async (req, res) => {
 
 router.get('/biometric/challenge', async (req, res) => {
 	await getBiometricChallenge(res);
+});
+
+router.get('/biometric/check-device/:deviceId/:userId', async (req, res) => {
+	const deviceId = req.params.deviceId;
+	const userId = req.params.userId;
+	await checkDevice(deviceId, userId, res);
 });
 
 module.exports = router;

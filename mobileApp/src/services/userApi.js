@@ -40,6 +40,13 @@ export const userService = {
     const response = await api.get(`/users/biometric/challenge/`);
     return response.data;
   },
+
+  checkDeviceRegistered: async (deviceId, userId) => {
+    const response = await api.get(
+      `/users/biometric/check-device/${deviceId}/${userId}`,
+    );
+    return response.data;
+  },
 };
 
 // Add named exports for individual functions

@@ -24,13 +24,15 @@ export const useBiometric = () => {
   let payload;
 
   const handleBiometric = async (result, userId) => {
-    payload = await userService.getBioChallenge();
-    if (result && payload) {
-      const token = await createSignature();
-      loginWithBiometric(token);
+    if (result) {
+      payload = await userService.getBioChallenge();
+      if (payload) {
+        const token = await createSignature();
+        loginWithBiometric(token);
+      }
     } else {
-      await createBiometricPrompt().then(result => {
-        if (result) {
+      await createBiometricPrompt().then(res => {
+        if (res) {
           createBiometric(userId);
         }
       });

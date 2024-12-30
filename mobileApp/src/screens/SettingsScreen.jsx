@@ -1,4 +1,4 @@
-import React, {useState, useCallback} from 'react';
+import React, {useState, useCallback, useEffect} from 'react';
 import {View, ScrollView} from 'react-native';
 import {
   List,
@@ -16,7 +16,9 @@ import BiometricSetup from '../components/settings/BiometricSetup';
 import ShareManagement from '../components/settings/ShareManagement';
 import StartLocationPicker from '../components/settings/StartLocationPicker';
 import {settingsStyles} from './styles/settingsStyles';
-
+import {useBiometric} from '../hooks/useBiometric';
+import userService from '../services/userApi';
+import {getUniqueId} from 'react-native-device-info';
 /**
  * Settings Screen Component for Taskiah app
  * Allows users to configure app preferences and manage sharing settings
@@ -29,10 +31,23 @@ const SettingsScreen = () => {
   const {user, updateUserPreferences} = useAuth();
   const {sharedLists} = useTaskContext();
 
+  const {
+    biometricKeysExist,
+    createBiometric,
+    deleteBiometric,
+    handleBiometric,
+  } = useBiometric();
   const [locationPickerVisible, setLocationPickerVisible] = useState(false);
-  const [biometricsEnabled, setBiometricsEnabled] = useState(
-    user?.preferences?.biometricsEnabled || false,
-  );
+  const [biometricsEnabled, setBiometricsEnabled] = useState(null);
+
+  useEffect(() => {
+    biometricKeysExist().then(async res => {
+      const deviceId = await getUniqueId();
+      userService.checkDeviceRegistered(deviceId, user._user.uid).then(res => {
+        setBiometricsEnabled(res.statusState);
+      });
+    });
+  }, []);
 
   const handleStartLocationChange = useCallback(
     location => {
@@ -45,14 +60,14 @@ const SettingsScreen = () => {
     [user?.preferences, updateUserPreferences],
   );
 
-  const handleBiometricsToggle = useCallback(async () => {
-    const newValue = !biometricsEnabled;
-    setBiometricsEnabled(newValue);
-    await updateUserPreferences({
-      ...user.preferences,
-      biometricsEnabled: newValue,
-    });
-  }, [biometricsEnabled, user?.preferences, updateUserPreferences]);
+  const handleBiometricsToggle = () => {
+    if (biometricsEnabled) {
+      deleteBiometric();
+    } else {
+      handleBiometric(false, user.id);
+    }
+    setBiometricsEnabled(!biometricsEnabled);
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -94,7 +109,7 @@ const SettingsScreen = () => {
         />
       </Portal>
 
-      <BiometricSetup enabled={biometricsEnabled} onSetupComplete={() => {}} />
+      {/* <BiometricSetup enabled={biometricsEnabled} onSetupComplete={() => {}} /> */}
     </ScrollView>
   );
 };
