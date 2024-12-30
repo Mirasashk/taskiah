@@ -7,6 +7,7 @@ import {StyleSheet} from 'react-native';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {useColorScheme} from 'react-native';
+import {AppState} from 'react-native';
 // Config
 import './config/firebase';
 
@@ -16,6 +17,8 @@ import {TaskProvider} from './context/TaskContext';
 import {ThemeContext} from './context/ThemeContext';
 import {NotificationProvider} from './context/NotificationContext';
 import {CustomLightTheme, CustomDarkTheme} from './theme';
+import {clearSessionTimer} from './utils/sessionTimer';
+import {clearStorageOnLaunch} from './utils/secureStorage';
 
 // Routes
 import {AppContent} from './routes';
@@ -49,6 +52,23 @@ const App = () => {
     [toggleTheme, isThemeDark],
   );
   let theme = isThemeDark ? CustomDarkTheme : CustomLightTheme;
+
+  // Handle app state changes
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', nextAppState => {
+      if (nextAppState === 'active') {
+        // App came to foreground
+        clearStorageOnLaunch();
+      }
+    });
+
+    // Clear storage on first launch
+    clearStorageOnLaunch();
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 
   return (
     <GestureHandlerRootView style={styles.root}>
