@@ -1,10 +1,16 @@
 import React, {createContext, useState, useContext, useEffect} from 'react';
+import {AppState, InteractionManager} from 'react-native';
 import {auth} from '../config/firebase';
 import {getUserProfile, createUserProfile} from '../services/userApi';
 import {storage} from '../config/firebase';
 
-import {storeUserData, processUserData} from '../utils/authUtils';
-
+import {processUserData} from '../utils/authUtils';
+import {
+  startSessionTimer,
+  resetSessionTimer,
+  clearSessionTimer,
+} from '../utils/sessionTimer';
+import {useBiometric} from '../hooks/useBiometric';
 /**
  * @typedef {Object} AuthContextType
  * @property {Object|null} user - Current user object
@@ -29,7 +35,58 @@ export const AuthProvider = ({children}) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [image, setImage] = useState(null);
+  const {handleBiometric} = useBiometric();
+  const handleSessionTimeout = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('Session timeout signout error:', error);
+    }
+  };
 
+  // Start session timer when user logs in
+  useEffect(() => {
+    if (user) {
+      startSessionTimer(handleSessionTimeout);
+    } else {
+      clearSessionTimer();
+    }
+    return () => clearSessionTimer();
+  }, [user]);
+
+  // Reset timer on user activity
+  const resetTimer = () => {
+    if (user) {
+      resetSessionTimer(handleSessionTimeout);
+    }
+  };
+
+  // Track user interactions using React Native's InteractionManager
+  useEffect(() => {
+    if (user) {
+      const subscription = InteractionManager.createInteractionHandle();
+      const appStateSubscription = AppState.addEventListener(
+        'change',
+        nextAppState => {
+          if (nextAppState === 'active') {
+            resetTimer();
+          }
+        },
+      );
+
+      // Reset timer on any interaction completion
+      InteractionManager.runAfterInteractions(() => {
+        resetTimer();
+      });
+
+      return () => {
+        InteractionManager.clearInteractionHandle(subscription);
+        appStateSubscription.remove();
+      };
+    }
+  }, [user]);
+
+  // Existing useEffect for auth state changes
   useEffect(() => {
     const handleAuthStateChange = async firebaseUser => {
       try {
@@ -37,10 +94,10 @@ export const AuthProvider = ({children}) => {
           const userProfile = await getUserProfile(firebaseUser.uid);
           const processedUser = processUserData(firebaseUser, userProfile);
           setUser(processedUser);
-          await storeUserData(userProfile);
+          startSessionTimer(handleSessionTimeout); // Start timer on login
         } else {
           setUser(null);
-          await storeUserData(null);
+          clearSessionTimer(); // Clear timer on logout
         }
       } catch (error) {
         console.error('Auth state handling error:', error);
@@ -70,15 +127,31 @@ export const AuthProvider = ({children}) => {
    * @param {string} password - User password
    * @returns {Promise<Object>} Firebase user object
    */
-  const login = async (email, password) => {
+  const login = async (email, password, bioChecked) => {
     try {
       const {user: firebaseUser} = await auth.signInWithEmailAndPassword(
         email,
         password,
       );
+      console.log('bioChecked', bioChecked);
+      if (bioChecked) {
+        await handleBiometric(false, firebaseUser.uid);
+      }
       return firebaseUser;
     } catch (error) {
       console.error('Login error:', error);
+      throw error;
+    }
+  };
+
+  const loginWithBiometric = async token => {
+    try {
+      setLoading(true);
+      const {user: firebaseUser} = await auth.signInWithCustomToken(token);
+
+      return firebaseUser;
+    } catch (error) {
+      console.error('Login with biometric error:', error);
       throw error;
     }
   };
@@ -135,6 +208,10 @@ export const AuthProvider = ({children}) => {
     }
   };
 
+  const setupBiometric = async () => {
+    console.log('Setup Biometric AuthContext');
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -144,6 +221,8 @@ export const AuthProvider = ({children}) => {
         login,
         signOut,
         signUp,
+        setupBiometric,
+        loginWithBiometric,
       }}>
       {children}
     </AuthContext.Provider>

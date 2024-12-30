@@ -1,6 +1,6 @@
-import {useState, useContext} from 'react';
+import {useState, useContext, useEffect} from 'react';
 import {AuthContext} from '../context/AuthContext';
-
+import {useBiometric} from './useBiometric';
 /**
  * Custom hook to handle login logic
  * @returns {Object} Login state and handlers
@@ -10,8 +10,19 @@ export const useLogin = () => {
   const [password, setPassword] = useState('Miras2010');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [bioChecked, setBioChecked] = useState(false);
+  const {login, user} = useContext(AuthContext);
+  const {handleBiometric} = useBiometric();
 
-  const {login} = useContext(AuthContext);
+  useEffect(() => {
+    if (user) {
+      console.log('user', user);
+      console.log('bioChecked', bioChecked);
+      if (bioChecked) {
+        handleBiometric(false, user.uid);
+      }
+    }
+  }, [user]);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -22,7 +33,7 @@ export const useLogin = () => {
     try {
       setLoading(true);
       setError('');
-      await login(email, password);
+      await login(email, password, bioChecked);
     } catch (err) {
       setError(err.message || 'An error occurred during login');
     } finally {
@@ -38,5 +49,7 @@ export const useLogin = () => {
     loading,
     error,
     handleLogin,
+    bioChecked,
+    setBioChecked,
   };
 };

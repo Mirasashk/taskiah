@@ -16,6 +16,7 @@ export const FormInput = ({
   value,
   onChangeText,
   placeholder,
+  styleComponent,
   ...inputProps
 }) => {
   const theme = useTheme();
@@ -24,6 +25,7 @@ export const FormInput = ({
     <TextInput
       style={[
         styles.input,
+        styleComponent,
         {
           borderColor: theme.colors.outline,
           color: theme.colors.onBackground,

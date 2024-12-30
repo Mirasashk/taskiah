@@ -1,0 +1,38 @@
+@startuml BiometricLogic
+
+start
+
+:Check if biometric is available;
+if (Biometric available?) then (yes)
+  :Check if biometric keys exist;
+  if (Keys exist?) then (yes)
+  :Prompt user for biometric authentication;
+  if (Authentication successful?) then (yes)
+    :Grant access;
+
+  else (no)
+    :Authentication failed;
+  
+  endif
+else (no)
+  :Create new biometric keys;
+  if (Key creation successful?) then (yes)
+    :Store public key;
+    :Prompt user for biometric setup;
+    if (Setup successful?) then (yes)
+      :Biometric enabled;
+    
+    else (no)
+      :Setup failed;
+      :Delete keys;
+	  
+    endif
+  else (no)
+    :Key creation failed;
+  endif
+endif
+
+:Biometric not available;
+stop
+
+@enduml
