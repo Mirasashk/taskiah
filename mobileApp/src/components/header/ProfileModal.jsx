@@ -2,6 +2,7 @@ import React, {useEffect} from 'react';
 import {View, TouchableOpacity, StyleSheet} from 'react-native';
 import {Modal, Portal, List, Divider, Avatar, Text} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
+import {STACK_SCREENS} from '../../routes/PrivateStack';
 
 /**
  * @typedef {Object} User
@@ -42,6 +43,12 @@ const ProfileModal = ({
 }) => {
   const navigation = useNavigation();
 
+  const handleSettingsPress = () => {
+    onDismiss();
+    // Try direct navigation first
+    navigation.navigate(STACK_SCREENS.SETTINGS);
+  };
+
   return (
     <Portal>
       <Modal
@@ -80,10 +87,7 @@ const ProfileModal = ({
           <List.Item
             title="Settings"
             left={props => <List.Icon {...props} icon="cog" />}
-            onPress={() => {
-              onDismiss();
-              navigation.navigate('Settings');
-            }}
+            onPress={handleSettingsPress}
           />
           <List.Item
             title="Notifications"

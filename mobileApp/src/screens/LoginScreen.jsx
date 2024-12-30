@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   StyleSheet,
@@ -6,10 +6,11 @@ import {
   Platform,
   TouchableOpacity,
 } from 'react-native';
-import {useTheme, Button, Text} from 'react-native-paper';
+import {useTheme, Button, Text, Checkbox} from 'react-native-paper';
 import {FormInput} from '../components/forms/FormInput';
 
 import {useLogin} from '../hooks/useLogin';
+import {useBiometric} from '../hooks/useBiometric';
 
 /**
  * LoginScreen component handling user authentication
@@ -19,8 +20,37 @@ import {useLogin} from '../hooks/useLogin';
  */
 export default function LoginScreen({navigation}) {
   const theme = useTheme();
-  const {email, setEmail, password, setPassword, loading, error, handleLogin} =
-    useLogin();
+  const {
+    email,
+    setEmail,
+    password,
+    setPassword,
+    loading,
+    error,
+    handleLogin,
+    bioChecked,
+    setBioChecked,
+  } = useLogin();
+  const {getAvaialableBiometric, biometricKeysExist, handleBiometric} =
+    useBiometric();
+
+  const [bioAvailable, setBioAvailable] = useState(false);
+
+  useEffect(() => {
+    getAvaialableBiometric().then(result => {
+      setBioAvailable(result);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (bioAvailable.available) {
+      biometricKeysExist().then(result => {
+        if (result) {
+          handleBiometric(result);
+        }
+      });
+    }
+  }, [bioAvailable]);
 
   return (
     <KeyboardAvoidingView
@@ -35,20 +65,33 @@ export default function LoginScreen({navigation}) {
 
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-        <FormInput
-          placeholder="Email"
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          keyboardType="email-address"
-        />
-
-        <FormInput
-          placeholder="Password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
+        <View style={{marginBottom: 16}}>
+          <FormInput
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            keyboardType="email-address"
+          />
+          <FormInput
+            placeholder="Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            styleComponent={{marginBottom: 0}}
+          />
+          <Checkbox.Item
+            label={`Setup ${bioAvailable.biometryType}`}
+            status={bioChecked ? 'checked' : 'unchecked'}
+            onPress={() => {
+              setBioChecked(!bioChecked);
+            }}
+            style={{
+              paddingTop: 0,
+              marginBottom: 0,
+            }}
+          />
+        </View>
 
         <Button
           mode="contained-tonal"

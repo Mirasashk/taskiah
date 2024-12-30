@@ -1,15 +1,17 @@
-import React, {useState, useContext, useEffect} from 'react';
+import React, {useState, useContext} from 'react';
 import {StyleSheet, TouchableOpacity} from 'react-native';
 import {Appbar, Avatar, Text, useTheme} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useAuth} from '../../context/AuthContext';
 import ProfileModal from './ProfileModal';
 import {ThemeContext} from '../../context/ThemeContext';
+import {useNavigation, useRoute} from '@react-navigation/native';
+import {STACK_SCREENS} from '../../routes/PrivateStack';
+import {DrawerActions} from '@react-navigation/native';
 
 /**
  * @typedef {Object} HeaderProps
  * @property {string} title - The title to display in the header
- * @property {() => void} openDrawer - Function to open the navigation drawer
  */
 
 /**
@@ -17,11 +19,21 @@ import {ThemeContext} from '../../context/ThemeContext';
  * @param {HeaderProps} props - The component props
  * @returns {JSX.Element} The Header component
  */
-const Header = ({title, openDrawer}) => {
+const Header = ({title, onMenuPress}) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const theme = useTheme();
   const {toggleTheme} = useContext(ThemeContext);
   const {user, signOut, image} = useAuth();
+  const navigation = useNavigation();
+  const route = useRoute();
+
+  const handleMenuPress = () => {
+    if (route.name === STACK_SCREENS.SETTINGS) {
+      navigation.goBack();
+    } else {
+      onMenuPress?.();
+    }
+  };
 
   const handleSignOut = async () => {
     try {
@@ -39,8 +51,12 @@ const Header = ({title, openDrawer}) => {
           styles.header,
           {backgroundColor: theme.colors.surfaceContainerHigh},
         ]}>
-        <TouchableOpacity onPress={openDrawer}>
-          <Icon name="menu" size={24} color={theme.colors.onSurface} />
+        <TouchableOpacity onPress={handleMenuPress}>
+          <Icon
+            name={route.name === STACK_SCREENS.SETTINGS ? 'arrow-left' : 'menu'}
+            size={24}
+            color={theme.colors.onSurface}
+          />
         </TouchableOpacity>
 
         <Text variant="titleLarge" style={styles.title}>

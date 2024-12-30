@@ -16,6 +16,7 @@ const dotenvConfig = {
 		projectId: process.env.APP_PROJECT_ID,
 		storageBucket: process.env.APP_STORAGE_BUCKET,
 	},
+	biometricChallenge: process.env.BIOMETRIC_CHALLENGE,
 };
 
 module.exports = dotenvConfig;

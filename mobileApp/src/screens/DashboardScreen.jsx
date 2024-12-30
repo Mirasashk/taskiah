@@ -47,7 +47,7 @@ const DashboardScreen = () => {
   return (
     <View style={DashboardStyles.container}>
       <StatsSection stats={stats} onTaskPress={handleTaskPress} />
-      <NotificationsSection navigation={navigation} />
+      <NotificationsSection />
     </View>
   );
 };
