@@ -1,3 +1,8 @@
+/**
+ * Task routes
+ * @module routes/taskRoutes
+ */
+
 const express = require('express');
 const router = express.Router();
 const {
@@ -9,6 +14,10 @@ const {
 	deleteAllTasks,
 } = require('../controllers/taskController');
 
+/**
+ * Routes
+ * @type {import('express').Router}
+ */
 router.post('/add', async (req, res) => {
 	const task = req.body;
 	const newTask = {

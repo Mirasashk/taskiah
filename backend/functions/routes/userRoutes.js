@@ -1,3 +1,8 @@
+/**
+ * User routes
+ * @module routes/userRoutes
+ */
+
 const express = require('express');
 const router = express.Router();
 const {
@@ -10,6 +15,10 @@ const {
 	checkDevice,
 } = require('../controllers/userController');
 
+/**
+ * Routes
+ * @type {import('express').Router}
+ */
 router.post('/add', async (req, res) => {
 	const user = req.body;
 	await addUser(user);

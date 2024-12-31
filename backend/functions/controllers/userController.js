@@ -1,9 +1,19 @@
+/**
+ * User controller
+ * @module controllers/userController
+ */
+
 const User = require('../models/userModel');
 const { db, storage, bucket } = require('../config/firebase');
 const { auth } = require('firebase-admin');
 const dotenvConfig = require('../config/dotenv.config');
 const crypto = require('crypto');
 
+/**
+ * Adds a new user to the database
+ * @param {Object} user - The user data
+ * @returns {Promise<Object>} The user data
+ */
 async function addUser(user) {
 	const userModel = new User(user);
 	userModel.validate();
@@ -11,11 +21,23 @@ async function addUser(user) {
 	return userModel.toJSON();
 }
 
+/**
+ * Retrieves a user from the database by their ID
+ * @param {string} userId - The ID of the user to retrieve
+ * @returns {Promise<Object>} The user data
+ */
 async function getUser(userId) {
 	const user = await db.collection('users').doc(userId).get();
 	return user.data();
 }
 
+/**
+ * Updates a user in the database
+ * @param {string} userId - The ID of the user to update
+ * @param {Object} user - The updated user data
+ * @param {Object} res - The response object
+ * @returns {Promise<Object>} The updated user data
+ */
 async function updateUser(userId, user, res) {
 	try {
 		// If email is being updated, update it in Firebase Auth first
@@ -58,6 +80,15 @@ async function updateUser(userId, user, res) {
 	}
 }
 
+/**
+ * Updates a user's public key in the database
+ * @param {string} userId - The ID of the user to update
+ * @param {string} deviceId - The ID of the device to update
+ * @param {string} publicKey - The public key to update
+ * @param {string} userAgent - The user agent to update
+ * @param {Object} res - The response object
+ * @returns {Promise<Object>} The updated user data
+ */
 async function updateUserPublicKey(
 	userId,
 	deviceId,
@@ -103,6 +134,14 @@ async function updateUserPublicKey(
 	}
 }
 
+/**
+ * Verifies a biometric public key
+ * @param {string} deviceId - The ID of the device to verify
+ * @param {string} signature - The signature to verify
+ * @param {string} payload - The payload to verify
+ * @param {Object} res - The response object
+ * @returns {Promise<Object>} The token
+ */
 async function verifyBiometricPublicKey(deviceId, signature, payload, res) {
 	try {
 		// Retrieve device registration
@@ -149,6 +188,13 @@ async function verifyBiometricPublicKey(deviceId, signature, payload, res) {
 	}
 }
 
+/**
+ * Checks if a device is registered for a user
+ * @param {string} deviceId - The ID of the device to check
+ * @param {string} userId - The ID of the user to check
+ * @param {Object} res - The response object
+ * @returns {Promise<Object>} The device status
+ */
 async function checkDevice(deviceId, userId, res) {
 	console.log('deviceId', deviceId);
 	console.log('userId', userId);
@@ -182,12 +228,21 @@ async function checkDevice(deviceId, userId, res) {
 	}
 }
 
+/**
+ * Retrieves a biometric challenge
+ * @param {Object} res - The response object
+ * @returns {Promise<Object>} The challenge
+ */
 async function getBiometricChallenge(res) {
 	const challenge = dotenvConfig.biometricChallenge;
 	return res.json({ challenge });
 }
 
-// Helper function to format public key
+/**
+ * Formats a public key
+ * @param {string} publicKey - The public key to format
+ * @returns {string} The formatted public key
+ */
 function formatPublicKey(publicKey) {
 	return `-----BEGIN PUBLIC KEY-----\n${publicKey}\n-----END PUBLIC KEY-----`;
 }

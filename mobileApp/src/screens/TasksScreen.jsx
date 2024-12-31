@@ -6,7 +6,7 @@ import AddListTab from '../components/task/AddListTab';
 import TabLabel from '../components/task/TabLabel';
 import {useTaskContext} from '../context/TaskContext';
 import {getTabNavigatorConfig} from '../config/navigation';
-
+import {Dimensions} from 'react-native';
 const Tab = createMaterialTopTabNavigator();
 
 /**
@@ -19,6 +19,7 @@ const TasksScreen = () => {
   const {tasks, addTask, deleteTask, getTasks} = useTaskContext();
   const [visible, setVisible] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState('');
+  const tabLength = 2;
 
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
@@ -29,19 +30,16 @@ const TasksScreen = () => {
     setNewTaskTitle('');
   };
 
-  const handleToggleComplete = taskId => {
-    // Implement toggle complete logic
-  };
-
-  const handleDeleteTask = taskId => {
-    // Implement delete task logic
-  };
-
   return (
     <Tab.Navigator
       testID="tasks-screen"
       initialRouteName="Active"
-      screenOptions={getTabNavigatorConfig(theme)}>
+      screenOptions={{
+        ...getTabNavigatorConfig(theme),
+        tabBarStyle: {width: Dimensions.get('window').width},
+        tabBarScrollEnabled: true,
+        tabBarItemStyle: {width: Dimensions.get('window').width / tabLength},
+      }}>
       <Tab.Screen
         name="Active"
         component={TaskList}
@@ -51,6 +49,7 @@ const TasksScreen = () => {
           ),
         }}
       />
+
       <Tab.Screen
         name="AddList"
         component={AddListTab}

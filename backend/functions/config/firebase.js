@@ -1,13 +1,21 @@
+/**
+ * Firebase configuration
+ * @module config/firebase
+ */
+
 const admin = require('firebase-admin');
 const config = require('./dotenv.config');
 const { getStorage } = require('firebase-admin/storage');
 
-// Initialize Admin SDK
+/**
+ * Initialize Admin SDK
+ * @type {Object}
+ */
 const serviceAccount = require('../taskiah-53c29-firebase-adminsdk-43twl-80aa86f054.json');
 
 admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    //storageBucket: config.firebase.storageBucket,
+	credential: admin.credential.cert(serviceAccount),
+	//storageBucket: config.firebase.storageBucket,
 });
 
 const db = admin.firestore(); // Firestore via Admin SDK

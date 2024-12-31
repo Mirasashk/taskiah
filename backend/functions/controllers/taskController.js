@@ -1,7 +1,17 @@
+/**
+ * Task controller
+ * @module controllers/taskController
+ */
+
 const { db } = require('../config/firebase');
 const Task = require('../models/taskModel');
 const Notification = require('../models/notificationModel');
 
+/**
+ * Adds a new task to the database
+ * @param {Object} task - The task data
+ * @returns {Promise<Object>} The task data
+ */
 async function addTask(task) {
 	const taskModel = new Task(task);
 	taskModel.validate();
@@ -25,6 +35,11 @@ async function addTask(task) {
 	}
 }
 
+/**
+ * Retrieves tasks from the database by owner ID
+ * @param {string} userId - The ID of the owner to retrieve tasks for
+ * @returns {Promise<Array<Object>>} The tasks data
+ */
 async function getTasks(userId) {
 	try {
 		const tasksSnapshot = await db
@@ -41,6 +56,12 @@ async function getTasks(userId) {
 	}
 }
 
+/**
+ * Updates a task in the database
+ * @param {string} taskId - The ID of the task to update
+ * @param {Object} newTaskData - The updated task data
+ * @returns {Promise<void>}
+ */
 async function updateTask(taskId, newTaskData) {
 	console.log('taskId', taskId);
 	console.log('newTaskData', newTaskData);
@@ -53,6 +74,11 @@ async function updateTask(taskId, newTaskData) {
 	}
 }
 
+/**
+ * Deletes a task from the database
+ * @param {string} taskId - The ID of the task to delete
+ * @returns {Promise<void>}
+ */
 async function deleteTask(taskId) {
 	try {
 		await db.collection('tasks').doc(taskId).delete();
@@ -62,6 +88,11 @@ async function deleteTask(taskId) {
 	}
 }
 
+/**
+ * Deletes all tasks from the database by owner ID
+ * @param {string} userId - The ID of the owner to delete tasks for
+ * @returns {Promise<void>}
+ */
 async function deleteAllTasks(userId) {
 	try {
 		const querySnapshot = await db
