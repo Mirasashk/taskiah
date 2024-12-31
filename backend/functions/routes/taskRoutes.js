@@ -19,13 +19,7 @@ const {
  * @type {import('express').Router}
  */
 router.post('/add', async (req, res) => {
-	const task = req.body;
-	const newTask = {
-		id: await addTask(task),
-		...task,
-	};
-	console.log('newTask', newTask);
-	res.json(newTask);
+	await addTask(req.body, res);
 });
 
 router.get('/:userId', async (req, res) => {

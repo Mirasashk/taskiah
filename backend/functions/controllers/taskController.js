@@ -12,24 +12,10 @@ const Notification = require('../models/notificationModel');
  * @param {Object} task - The task data
  * @returns {Promise<Object>} The task data
  */
-async function addTask(task) {
-	const taskModel = new Task(task);
-	taskModel.validate();
-	const notificationModel = new Notification(
-		Object.values(task.notifications)[0]
-	);
-	notificationModel.validate();
-	console.log('taskModel', taskModel);
-	taskModel.notifications = {
-		[notificationModel.type]: notificationModel.toJSON(),
-	};
-
-	console.log('taskModel', taskModel);
-
+async function addTask(task, res) {
 	try {
-		const docRef = await db.collection('tasks').add(taskModel.toJSON());
-		console.log('Task added with ID:', docRef.id);
-		return docRef.id;
+		const taskData = await Task.createTask(task);
+		return res.json(taskData);
 	} catch (error) {
 		console.error('Error adding task:', error);
 	}

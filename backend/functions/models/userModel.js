@@ -1,3 +1,5 @@
+const { db } = require('../config/firebase');
+
 /**
  * Represents a user in the system
  * @class User
@@ -84,7 +86,7 @@ class User {
 	static async createUser(userData) {
 		const user = new User(userData);
 		await user.validate();
-		const userRef = db.collection('users').doc();
+		const userRef = db.collection('users').doc(userData.id);
 		await userRef.set(user.toJSON());
 		return userRef.id;
 	}
@@ -104,13 +106,13 @@ class User {
 	 * Updates a user in the database
 	 * @param {string} userId - The ID of the user to update
 	 * @param {Object} userData - The updated user data
-	 * @returns {Promise<void>}
+	 * @returns {Promise<Object>} The updated user data
 	 */
 	static async updateUser(userId, userData) {
-		const user = new User(userData);
-		await user.validate();
 		const userRef = db.collection('users').doc(userId);
-		await userRef.update(user.toJSON());
+		await userRef.update({ ...userData, updatedAt: new Date() });
+		const userDoc = await userRef.get();
+		return userDoc.data();
 	}
 
 	/**

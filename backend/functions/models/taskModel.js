@@ -1,4 +1,5 @@
 const { db } = require('../config/firebase');
+const Notification = require('./notificationModel');
 
 /**
  * Represents a task in the system
@@ -45,7 +46,6 @@ class Task {
 		// Enum validations
 		const validStatuses = ['active', 'completed'];
 		const validPriorities = ['low', 'medium', 'high'];
-		const validPermissions = ['read', 'edit'];
 
 		if (!validStatuses.includes(this.status)) {
 			throw new Error('Invalid status value');
@@ -90,10 +90,18 @@ class Task {
 	 */
 	static async createTask(taskData) {
 		const task = new Task(taskData);
+		const notification = new Notification(
+			Object.values(taskData.notifications)[0]
+		);
+		await notification.validate();
+		task.notifications = {
+			notification: notification.toJSON(),
+		};
 		await task.validate();
 		const taskRef = db.collection('tasks').doc();
 		await taskRef.set(task.toJSON());
-		return taskRef.id;
+		const taskDoc = await taskRef.get();
+		return taskDoc.data();
 	}
 
 	/**

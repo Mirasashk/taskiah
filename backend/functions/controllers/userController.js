@@ -12,23 +12,23 @@ const crypto = require('crypto');
 /**
  * Adds a new user to the database
  * @param {Object} user - The user data
+ * @param {Object} res - The response object
  * @returns {Promise<Object>} The user data
  */
-async function addUser(user) {
-	const userModel = new User(user);
-	userModel.validate();
-	await db.collection('users').doc(user.id).set(userModel.toJSON());
-	return userModel.toJSON();
+async function addUser(user, res) {
+	const userId = await User.createUser(user);
+	return res.json({ id: userId });
 }
 
 /**
  * Retrieves a user from the database by their ID
  * @param {string} userId - The ID of the user to retrieve
+ * @param {Object} res - The response object
  * @returns {Promise<Object>} The user data
  */
-async function getUser(userId) {
-	const user = await db.collection('users').doc(userId).get();
-	return user.data();
+async function getUser(userId, res) {
+	const userData = await User.getUser(userId);
+	return res.json(userData);
 }
 
 /**
@@ -39,41 +39,15 @@ async function getUser(userId) {
  * @returns {Promise<Object>} The updated user data
  */
 async function updateUser(userId, user, res) {
+	console.log('Updating user', userId);
 	try {
 		// If email is being updated, update it in Firebase Auth first
-		if (user.email) {
-			try {
-				await auth().updateUser(userId, {
-					email: user.email,
-				});
-			} catch (error) {
-				console.error('Error updating email in Firebase Auth:', error);
-				return res.status(400).json({
-					error: 'Failed to update email. ' + error.message,
-				});
-			}
-		}
-
-		// Update user document in Firestore
-		await db
-			.collection('users')
-			.doc(userId)
-			.update({
-				...user,
-				updatedAt: new Date(),
-			});
-
-		// Get the updated user data
-		const userDoc = await db.collection('users').doc(userId).get();
-
-		if (!userDoc.exists) {
-			return res.status(404).json({ error: 'User not found' });
-		}
-
-		return res.json({
-			id: userDoc.id,
-			...userDoc.data(),
+		await auth().updateUser(userId, {
+			email: user.email,
 		});
+		// Update user document in Firestore
+		const updatedUser = await User.updateUser(userId, user);
+		return res.json(updatedUser);
 	} catch (error) {
 		console.error('Error updating user:', error);
 		return res.status(500).json({ error: 'Failed to update user' });
