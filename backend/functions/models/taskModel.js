@@ -4,6 +4,23 @@ const Notification = require('./notificationModel');
 /**
  * Represents a task in the system
  * @class Task
+ * @method createTask
+ * @method getTask
+ * @method updateTask
+ * @method deleteTask
+ * @method getTasksByOwnerId
+ * @method getTasksByTagId
+ * @method getTasksBySharedWith
+ * @method getTasksByNotification
+ * @method getTasksByDueDate
+ * @method getTasksByStatus
+ * @method getTasksByCategory
+ * @method getTasksByPriority
+ * @method getTasksByTitle
+ * @method getTasksByDescription
+ * @method getTasksByCreatedAt
+ * @method getTasksByUpdatedAt
+ * @method getTasksByOwnerIdAndTagId
  */
 class Task {
 	/**

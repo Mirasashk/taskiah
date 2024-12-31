@@ -1,52 +1,55 @@
 {
-    "hosting": {
-        "public": "hosting",
-        "site": "taskiah-api",
-        "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-        "rewrites": [
-            {
-                "source": "**",
-                "function": "api"
-            }
-        ]
-    },
-    "functions": {
-        "source": "functions",
-        "ignore": [
-            "node_modules",
-            ".git",
-            "firebase-debug.log",
-            "firebase-debug.*.log",
-            "*.local"
-        ]
-    },
-    "emulators": {
-        "functions": {
-            "port": 5001
-        },
-        "firestore": {
-            "port": 8082
-        },
-        "auth": {
-            "host": "0.0.0.0",
-            "port": 9099
-        },
-        "ui": {
-            "enabled": true,
-            "host": "localhost",
-            "port": 4000
-        },
-        "storage": {
-            "port": 9199,
-            "rules": "storage.rules"
-        },
-        "hosting": {
-            "port": 5000
-        },
-        "singleProjectMode": true
-    },
-    "storage": {
-        "port": 9199,
-        "rules": "storage.rules"
-    }
+	"hosting": {
+		"public": "hosting",
+		"site": "taskiah-api",
+		"ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+		"rewrites": [
+			{
+				"source": "**",
+				"function": "api"
+			}
+		]
+	},
+	"functions": {
+		"source": "functions",
+		"ignore": [
+			"node_modules",
+			".git",
+			"firebase-debug.log",
+			"firebase-debug.*.log",
+			"*.local"
+		]
+	},
+	"emulators": {
+		"functions": {
+			"port": 5001
+		},
+		"firestore": {
+			"port": 8082
+		},
+		"auth": {
+			"host": "0.0.0.0",
+			"port": 9099
+		},
+		"ui": {
+			"enabled": true,
+			"host": "localhost",
+			"port": 4000
+		},
+		"storage": {
+			"port": 9199,
+			"rules": "storage.rules"
+		},
+		"hosting": {
+			"port": 5000
+		},
+		"singleProjectMode": true
+	},
+	"storage": {
+		"port": 9199,
+		"rules": "storage.rules"
+	},
+	"firestore": {
+		"rules": "firestore.rules"
+	}
 }

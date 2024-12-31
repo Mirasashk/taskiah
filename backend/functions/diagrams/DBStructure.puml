@@ -1,0 +1,119 @@
+@startuml Database Structure
+
+skinparam classAttributeIconSize 0
+
+class User {
+  -id: string
+  -email: string
+  -firstName: string
+  -lastName: string
+  -username: string
+  -photoURL: string
+  -role: string
+  -createdAt: timestamp
+  -updatedAt: timestamp
+  -extraInfo: object
+  +validate()
+  +toJSON()
+  +{static} createUser()
+  +{static} getUser()
+  +{static} updateUser()
+  +{static} deleteUser()
+  +{static} getUsersByRole()
+}
+
+class Task {
+  -title: string
+  -description: string
+  -status: enum
+  -category: string
+  -priority: enum
+  -dueDate: timestamp
+  -createdAt: timestamp
+  -updatedAt: timestamp
+  -ownerId: string
+  -sharedWith: string[]
+  -notifications: object
+  +validate()
+  +toJSON()
+  +{static} createTask()
+  +{static} getTask()
+  +{static} updateTask()
+  +{static} deleteTask()
+  +{static} getTasksByOwnerId()
+  +{static} getTasksByTagId()
+  +{static} getTasksBySharedWith()
+}
+
+class List {
+  -name: string
+  -ownerId: string
+  -sharedWith: string[]
+  -createdAt: timestamp
+  -updatedAt: timestamp
+  -tasks: string[]
+  +validate()
+  +toJSON()
+  +{static} createList()
+  +{static} getList()
+  +{static} updateList()
+  +{static} deleteList()
+  +{static} getListsByOwnerId()
+}
+
+class Tag {
+  -name: string
+  -color: string
+  -priority: number
+  -ownerId: string
+  +validate()
+  +toJSON()
+  +{static} createTag()
+  +{static} getTag()
+  +{static} updateTag()
+  +{static} deleteTag()
+  +{static} getTagsByOwnerId()
+}
+
+class Notification {
+  -message: string
+  -type: enum
+  -status: enum
+  -createdAt: timestamp
+  -notifyOn: timestamp
+  -updatedAt: timestamp
+  +validate()
+  +toJSON()
+  +{static} createNotification()
+  +{static} getNotification()
+  +{static} updateNotification()
+  +{static} deleteNotification()
+}
+
+class ActivityLog {
+  -taskId: string
+  -userId: string
+  -action: string
+  -timestamp: timestamp
+  +validate()
+  +toJSON()
+  +{static} createActivityLog()
+  +{static} getActivityLog()
+  +{static} updateActivityLog()
+  +{static} deleteActivityLog()
+}
+
+' Relationships
+User "1" -- "*" Task : owns
+User "1" -- "*" List : owns
+User "1" -- "*" Tag : owns
+User "1" -- "*" ActivityLog : performs
+
+Task "*" -- "*" Tag : tagged with
+Task "1" -- "*" Notification : has
+Task "1" -- "*" ActivityLog : logged for
+
+List "*" -- "*" Task : contains
+List "*" -- "*" User : shared with
+
+@enduml

@@ -1,8 +1,14 @@
 const { db } = require('../config/firebase');
+const List = require('./listModel');
 
 /**
  * Represents a user in the system
  * @class User
+ * @method createUser
+ * @method getUser
+ * @method updateUser
+ * @method deleteUser
+ * @method getUsersByRole
  */
 class User {
 	constructor(data) {
@@ -88,6 +94,18 @@ class User {
 		await user.validate();
 		const userRef = db.collection('users').doc(userData.id);
 		await userRef.set(user.toJSON());
+
+		// Create master list with proper initialization
+		const masterList = new List({
+			name: 'My Tasks',
+			ownerId: userRef.id,
+			sharedWith: [],
+			createdAt: new Date().toISOString(),
+			updatedAt: new Date().toISOString(),
+			tasks: [], // Initialize empty tasks array
+		});
+
+		await List.createList(masterList.toJSON());
 		return userRef.id;
 	}
 

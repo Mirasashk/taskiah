@@ -3,6 +3,11 @@ const { db } = require('../config/firebase');
 /**
  * Represents a tag in the system
  * @class Tag
+ * @method createTag
+ * @method getTag
+ * @method updateTag
+ * @method deleteTag
+ * @method getTagsByOwnerId
  */
 class Tag {
 	/**

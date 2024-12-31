@@ -3,6 +3,14 @@ const { db } = require('../config/firebase');
 /**
  * Represents an activity log entry in the system
  * @class ActivityLog
+ * @method createActivityLog
+ * @method getActivityLog
+ * @method updateActivityLog
+ * @method deleteActivityLog
+ * @method getActivityLogsByTaskId
+ * @method getActivityLogsByUserId
+ * @method getActivityLogsByAction
+ * @method getActivityLogsByTimestamp
  */
 class ActivityLog {
 	/**

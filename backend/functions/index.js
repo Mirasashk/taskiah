@@ -23,51 +23,53 @@ const app = express();
 const taskRoutes = require('./routes/taskRoutes');
 const userRoutes = require('./routes/userRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
+const listRoutes = require('./routes/listRoutes');
 
 // Middleware
 app.use(
-    cors({
-        origin: [
-            'https://taskiah.web.app',
-            'https://taskiah.firebaseapp.com',
-            'http://localhost:5173',
-            'http://localhost:5000',
-            'https://taskiah-53c29.web.app',
-            'https://taskiah-53c29.firebaseapp.com',
-            'https://taskiah.com',
-            'http://10.0.2.2',
-        ],
-        optionsSuccessStatus: 200,
-    })
+	cors({
+		origin: [
+			'https://taskiah.web.app',
+			'https://taskiah.firebaseapp.com',
+			'http://localhost:5173',
+			'http://localhost:5000',
+			'https://taskiah-53c29.web.app',
+			'https://taskiah-53c29.firebaseapp.com',
+			'https://taskiah.com',
+			'http://10.0.2.2',
+		],
+		optionsSuccessStatus: 200,
+	})
 );
 
 app.use(express.json());
 
 // Routes
 app.get('/api/health', (req, res) => {
-    res.status(200).json({ status: 'ok' });
+	res.status(200).json({ status: 'ok' });
 });
 
 app.use('/api/tasks', taskRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/lists', listRoutes);
 // Error handling middleware
 
 // Add this route to simulate an error
 app.get('/error', (req, res, next) => {
-    // Throw an error intentionally
-    throw new Error('Test error');
+	// Throw an error intentionally
+	throw new Error('Test error');
 });
 
 app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ error: 'Something went wrong!' });
+	console.error(err.stack);
+	res.status(500).json({ error: 'Something went wrong!' });
 });
 
 app.listen(config.port, () => {
-    console.log(
-        `Server is running on port ------------------------------------------------------- ${config.serverPort}`
-    );
+	console.log(
+		`Server is running on port ------------------------------------------------------- ${config.serverPort}`
+	);
 });
 
 // Export the Express app as a Firebase Cloud Function

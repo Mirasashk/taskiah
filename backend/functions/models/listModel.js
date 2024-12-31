@@ -13,6 +13,14 @@ const { db } = require('../config/firebase');
 /**
  * Represents a list in the system
  * @class List
+ * @method createList
+ * @method getList
+ * @method updateList
+ * @method deleteList
+ * @method getListsByOwnerId
+ * @method getListsBySharedWith
+ * @method getListsByTaskId
+ * @method getListsByTagId
  */
 class List {
 	/**

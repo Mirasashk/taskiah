@@ -3,6 +3,17 @@ const { db } = require('../config/firebase');
 /**
  * Represents a notification in the system
  * @class Notification
+ * @method createNotification
+ * @method getNotification
+ * @method updateNotification
+ * @method deleteNotification
+ * @method getNotificationsByUserId
+ * @method getNotificationsByTaskId
+ * @method getNotificationsByType
+ * @method getNotificationsByStatus
+ * @method getNotificationsByNotifyOn
+ * @method getNotificationsByCreatedAt
+ * @method getNotificationsByUpdatedAt
  */
 class Notification {
 	/**
