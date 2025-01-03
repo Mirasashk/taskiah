@@ -36,10 +36,10 @@ class List {
 	constructor(data) {
 		this.name = data.name;
 		this.ownerId = data.ownerId;
-		this.sharedWith = data.sharedWith;
-		this.createdAt = data.createdAt;
-		this.updatedAt = data.updatedAt;
-		this.tasks = data.tasks;
+		this.sharedWith = data.sharedWith || [];
+		this.createdAt = data.createdAt || new Date().toISOString();
+		this.updatedAt = data.updatedAt || new Date().toISOString();
+		this.tasks = data.tasks || [];
 	}
 
 	/**

@@ -87,29 +87,6 @@ const TaskList = ({ setIsEditing }) => {
 					))
 				)}
 			</div>
-			{/* {selectedTask && (
-                <div className='flex'>
-                    <div
-                        className='fixed top-0 pt-16 right-0 bottom-0 w-96 transform transition-transform duration-300 ease-in-out z-50 bg-white dark:bg-gray-800'
-                        style={{
-                            transform: selectedTask
-                                ? 'translateX(0)'
-                                : 'translateX(100%)',
-                        }}
-                    >
-                        <div className='h-full overflow-y-auto pr-4'>
-                            <div className='animate-slideIn'>
-                                <TaskDetailSideBar
-                                    task={selectedTask}
-                                    onClose={() =>
-                                        setSelectedTask(null)
-                                    }
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )} */}
 		</div>
 	);
 };

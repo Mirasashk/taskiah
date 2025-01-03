@@ -90,7 +90,17 @@ class User {
 	 * @returns {Promise<string>} The ID of the created user
 	 */
 	static async createUser(userData) {
+		for (const key in userData) {
+			if (typeof userData[key] === 'string') {
+				if (key !== 'id') {
+					userData[key] = userData[key].toLowerCase();
+				}
+			}
+		}
+
 		const user = new User(userData);
+		// make all fields lowercase
+
 		await user.validate();
 		const userRef = db.collection('users').doc(userData.id);
 		await userRef.set(user.toJSON());
@@ -150,6 +160,21 @@ class User {
 	 */
 	static async getUsersByRole(role) {
 		const usersRef = db.collection('users').where('role', '==', role);
+		const users = await usersRef.get();
+		return users.docs.map((doc) => doc.data());
+	}
+
+	/**
+	 * Searches for users
+	 * @param {string} query - The query to search for
+	 * @returns {Promise<Array<Object>>} The users data
+	 */
+	static async searchUsers(query) {
+		const queryLower = query.toLowerCase();
+		const usersRef = db
+			.collection('users')
+			.where('email', '>=', queryLower)
+			.where('email', '<=', queryLower + '\uFFFF');
 		const users = await usersRef.get();
 		return users.docs.map((doc) => doc.data());
 	}

@@ -21,7 +21,12 @@ const SideBarGroup = ({ title, icon, items, children }) => {
 				<div className='flex justify-end'>
 					<div className='w-11/12'>
 						{items.map((item) => {
-							return <SideBarItem item={item} />;
+							return (
+								<SideBarItem
+									item={item}
+									trash={true}
+								/>
+							);
 						})}
 						{children}
 					</div>

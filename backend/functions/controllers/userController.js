@@ -221,6 +221,32 @@ function formatPublicKey(publicKey) {
 	return `-----BEGIN PUBLIC KEY-----\n${publicKey}\n-----END PUBLIC KEY-----`;
 }
 
+/**
+ * Searches for users
+ * @param {string} query - The query to search for
+ * @param {Object} res - The response object
+ * @returns {Promise<Object>} The users
+ */
+async function searchUsers(query, res) {
+	console.log('Searching users with query:', query);
+	const users = await User.searchUsers(query);
+	return res.json(users);
+}
+
+/**
+ * Invites a user
+ * @param {string} email - The email to invite
+ * @param {string} message - The message to invite
+ * @param {Object} res - The response object
+ * @returns {Promise<Object>} The invite
+ * TODO: Implement this function
+ */
+async function inviteUser(email, message, res) {
+	console.log('Inviting user with email:', email);
+	console.log('Inviting user with message:', message);
+	return res.json({ message: 'User invited' });
+}
+
 module.exports = {
 	addUser,
 	getUser,
@@ -229,4 +255,6 @@ module.exports = {
 	getBiometricChallenge,
 	verifyBiometricPublicKey,
 	checkDevice,
+	searchUsers,
+	inviteUser,
 };
