@@ -1,13 +1,3 @@
-// {
-// 	"id": "listId123",
-// 	"name": "Weekend Chores",
-// 	"ownerId": "userId123",
-// 	"sharedWith": ["userId456"],
-// 	"createdAt": "2024-12-31T07:48:33.769Z",
-// 	"updatedAt": "2024-12-31T08:00:00.000Z",
-// 	"tasks": ["taskId123", "taskId456"]
-//   }
-
 const { db } = require('../config/firebase');
 
 /**
@@ -126,14 +116,18 @@ class List {
 
 	/**
 	 * Retrieves lists from the database by shared with
-	 * @param {string} sharedWith - The ID of the shared with to retrieve lists for
+	 * @param {string} email - The email of the shared with to retrieve lists for
 	 * @returns {Promise<Array<Object>>} The lists data
 	 */
-	static async getListsBySharedWith(sharedWith) {
+	static async getSharedWithListsByEmail(email) {
 		const listsRef = db
 			.collection('lists')
-			.where('sharedWith', '==', sharedWith);
+			.where('sharedWith', 'array-contains', email);
 		const lists = await listsRef.get();
+		console.log(
+			'Lists:',
+			lists.docs.map((doc) => doc.data())
+		);
 		return lists.docs.map((doc) => doc.data());
 	}
 

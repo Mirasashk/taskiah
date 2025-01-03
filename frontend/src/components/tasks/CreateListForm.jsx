@@ -7,38 +7,33 @@ const CreateListForm = ({ onClose }) => {
 	const [formData, setFormData] = useState({
 		name: '',
 		ownerId: '',
-		sharedWith: [],
-		createdAt: '',
-		updatedAt: '',
-		tasks: [],
 	});
 	const [selectedUsers, setSelectedUsers] = useState([]);
 	const { userData } = useUser();
 
 	useEffect(() => {
-		console.log('userData.id:', userData.id);
-		console.log('Current formData before update:', formData);
 		setFormData((prevFormData) => {
 			const newFormData = {
 				...prevFormData,
 				ownerId: userData.id,
 			};
-			console.log('New formData after update:', newFormData);
 			return newFormData;
 		});
 	}, [userData.id]);
 
-	useEffect(() => {
-		setFormData((prevFormData) => ({
-			...prevFormData,
-			sharedWith: selectedUsers,
-		}));
-	}, [selectedUsers]);
-
-	const handleSubmit = (e) => {
+	const handleSubmit = async (e) => {
 		e.preventDefault();
-		console.log('Submitting formData:', formData);
-		listService.createList(formData);
+		const listResponse = await listService.createList(formData);
+		const listId = listResponse.data.listId;
+		selectedUsers.forEach(async (user) => {
+			await listService.postSharedListInvite({
+				listId: listId,
+				email: user.email,
+				message: `${userData.username} has invited you to join ${formData.name}`,
+				accepted: false,
+				status: 'pending',
+			});
+		});
 		onClose();
 	};
 

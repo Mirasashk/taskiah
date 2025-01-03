@@ -3,23 +3,24 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import { notificationService } from '../services/notificationApi';
 import { useUser } from './UserContext';
 import { useTaskContext } from './TaskContext';
-
+import { listService } from '../services/listApi';
 const NotificationContext = createContext();
 
 export const NotificationProvider = ({ children }) => {
 	const [notifications, setNotifications] = useState([]);
 	const { userData } = useUser();
 	const { tasks } = useTaskContext();
+	const [sharedListNotifications, setSharedListNotifications] = useState([]);
 
 	useEffect(() => {
 		getNotifications();
 	}, [tasks]);
 
+	useEffect(() => {
+		getSharedListNotifications();
+	}, [userData]);
+
 	const getNotifications = async () => {
-		// get all notifications for the user by iterating through the tasks
-		// filter out the ones that are not for the current task
-		// sort them by notifyOn date
-		// set the notifications
 		const notifications = [];
 		tasks.forEach((task) => {
 			if (task.notifications) {
@@ -32,16 +33,31 @@ export const NotificationProvider = ({ children }) => {
 		setNotifications(notifications);
 	};
 
+	const getSharedListNotifications = async () => {
+		const response = await listService.getListInvitesByEmail(
+			userData.email
+		);
+		setSharedListNotifications(response.data);
+	};
+
 	const deleteNotification = async (taskId) => {
 		const res = await notificationService.deleteNotification(taskId);
 		setNotifications(notifications.filter((n) => n.taskId !== taskId));
 	};
 
+	const refreshContext = async () => {
+		await getSharedListNotifications();
+		await getNotifications();
+	};
+
 	const value = {
 		notifications,
 		setNotifications,
+		sharedListNotifications,
+		setSharedListNotifications,
 		getNotifications,
 		deleteNotification,
+		refreshContext,
 	};
 
 	return (

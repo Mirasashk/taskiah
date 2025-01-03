@@ -45,6 +45,7 @@ const UserSearch = ({ selectedUsers, onSelectUsers }) => {
 				email: user.email,
 				firstName: user.firstName,
 				lastName: user.lastName,
+				accepted: false,
 			},
 		]);
 		clearSearch();
