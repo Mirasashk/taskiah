@@ -8,7 +8,7 @@ const router = express.Router();
 const {
 	addList,
 	getListByOwnerId,
-	getSharedWithListsByEmail,
+	getSharedWithListsByUserId,
 	inviteToList,
 	getListInviteByEmail,
 	acceptListInvite,
@@ -27,8 +27,8 @@ router.get('/:ownerId', async (req, res) => {
 	await getListByOwnerId(req.params.ownerId, res);
 });
 
-router.get('/shared/:email', async (req, res) => {
-	await getSharedWithListsByEmail(req.params.email, res);
+router.get('/shared/:userId', async (req, res) => {
+	await getSharedWithListsByUserId(req.params.userId, res);
 });
 
 router.post('/invite', async (req, res) => {

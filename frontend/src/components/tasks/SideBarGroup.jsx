@@ -2,8 +2,20 @@ import React, { useState } from 'react';
 import SideBarItem from './SideBarItem';
 import { FiChevronDown, FiChevronRight } from 'react-icons/fi';
 
-const SideBarGroup = ({ title, icon, items, children }) => {
+const SideBarGroup = ({
+	title,
+	icon,
+	items,
+	children,
+	selected,
+	onSelectedFilter,
+}) => {
 	const [showProjects, setShowProjects] = useState(false);
+
+	const handleOnClick = (item) => {
+		console.log(item);
+		onSelectedFilter(item.name);
+	};
 
 	return (
 		<div>
@@ -23,7 +35,13 @@ const SideBarGroup = ({ title, icon, items, children }) => {
 						{items.map((item) => {
 							return (
 								<SideBarItem
-									item={item}
+									icon={item.icon}
+									label={item.name}
+									count={item.count}
+									selected={selected === item.name}
+									onClick={() => handleOnClick(item)}
+									color={item.color}
+									labelStyle={item.labelStyle}
 									trash={true}
 								/>
 							);

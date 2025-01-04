@@ -8,12 +8,14 @@ export function ListProvider({ children }) {
 	const [lists, setLists] = useState([]);
 	const [myTasksList, setMyTasksList] = useState(null);
 	const [sharedLists, setSharedLists] = useState([]);
+	const [tags, setTags] = useState([]);
 	const { userData } = useUser();
 
 	useEffect(() => {
 		if (userData) {
 			getLists(userData.id);
-			getSharedLists(userData.email);
+			getSharedLists(userData.id);
+			getTags(userData.id);
 		}
 	}, [userData]);
 
@@ -23,17 +25,31 @@ export function ListProvider({ children }) {
 		setMyTasksList(response.data.find((list) => list.name === 'My Tasks'));
 	};
 
-	const getSharedLists = async (email) => {
-		const response = await listService.getSharedListsByEmail(email);
+	const getSharedLists = async (userId) => {
+		const response = await listService.getSharedListsByUserId(userId);
 		setSharedLists(response.data);
+	};
+
+	const getTags = async (userId) => {
+		const response = await listService.getTagsByUserId(userId);
+		setTags(response.data);
+	};
+
+	const refreshContext = async () => {
+		await getLists(userData.id);
+		await getSharedLists(userData.email);
+		await getTags(userData.id);
 	};
 
 	const value = {
 		lists,
 		sharedLists,
 		myTasksList,
+		tags,
+		getTags,
 		getLists,
 		getSharedLists,
+		refreshContext,
 	};
 
 	return (

@@ -132,6 +132,19 @@ class List {
 	}
 
 	/**
+	 * Retrieves shared with lists from the database by user ID
+	 * @param {string} userId - The ID of the user to retrieve lists for
+	 * @returns {Promise<Array<Object>>} The lists data
+	 */
+	static async getSharedWithListsByUserId(userId) {
+		const listsRef = db
+			.collection('lists')
+			.where('sharedWith', 'array-contains', userId);
+		const lists = await listsRef.get();
+		return lists.docs.map((doc) => doc.data());
+	}
+
+	/**
 	 * Retrieves lists from the database by task ID
 	 * @param {string} taskId - The ID of the task to retrieve lists for
 	 * @returns {Promise<Array<Object>>} The lists data

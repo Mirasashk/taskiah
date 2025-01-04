@@ -6,21 +6,24 @@ import Input from '../forms/Input';
 
 import { useColor } from 'react-color-palette';
 import CustomColorPicker from '../common/ColorPicker';
-import { FiTrash2 } from 'react-icons/fi';
+import { FiTrash2, FiShare } from 'react-icons/fi';
 import SideBarGroup from './SideBarGroup';
 import AddNewBtn from './AddNewBtn';
-import { useListContext } from '../../context/ListContext';
 import Modal from '../common/Modal';
 import CreateListForm from './CreateListForm';
+import CreateTagForm from './CreateTagForm';
+import { useListContext } from '../../context/ListContext';
+import SideBarItem from './SideBarItem';
 const TasksSidebar = ({ onFilterTasks }) => {
 	// Contexts
-	const { lists } = useListContext();
 	const { userData } = useUser();
+	const { sharedLists, lists, tags } = useListContext();
 	const { tasks, filterTasks, filter, deletedTasks } = useTaskContext();
 
 	// States
-	const [tags, setTags] = useState(Object.values(userData?.tags || {}) || []);
+
 	const [selectedFilter, setSelectedFilter] = useState(filter);
+
 	// const [selectedTag, setSelectedTag] = useState(null);
 	const [isListModalOpen, setIsListModalOpen] = useState(false);
 	const [isTagModalOpen, setIsTagModalOpen] = useState(false);
@@ -40,44 +43,21 @@ const TasksSidebar = ({ onFilterTasks }) => {
 
 	const staticFilterOptions = [
 		{
-			icon: <FiInbox />,
+			icon: 'inbox',
 			label: 'All tasks',
 			count: tasks.length,
 		},
 		{
-			icon: <FiCalendar />,
+			icon: 'calendar',
 			label: 'Today',
 			count: todayTasks.length,
 		},
 		{
-			icon: <FiStar />,
+			icon: 'star',
 			label: 'Important',
 			count: importantTasks.length,
 		},
 	];
-
-	useEffect(() => {
-		setSelectedFilter(filter);
-	}, [filter]);
-
-	useEffect(() => {
-		setTags(Object.values(userData?.tags || {}));
-	}, [userData?.tags]);
-
-	const handleFilter = (label) => {
-		console.log('Filtering by:', label);
-		setSelectedFilter(label);
-		setSelectedTag(null);
-		if (label === 'All tasks') {
-			filterTasks(tasks, label);
-		} else if (label === 'Today') {
-			filterTasks(todayTasks, label);
-		} else if (label === 'Important') {
-			filterTasks(importantTasks, label);
-		} else if (label === 'Deleted') {
-			filterTasks(deletedTasks, label);
-		}
-	};
 
 	const renderListModal = () => {
 		return (
@@ -98,7 +78,7 @@ const TasksSidebar = ({ onFilterTasks }) => {
 				onClose={() => setIsTagModalOpen(false)}
 				title='Tag'
 			>
-				<Input label='Tag Name' />
+				<CreateTagForm onClose={() => setIsTagModalOpen(false)} />
 			</Modal>
 		);
 	};
@@ -109,30 +89,25 @@ const TasksSidebar = ({ onFilterTasks }) => {
 				{/* Filter Options */}
 				<nav className='space-y-2'>
 					{staticFilterOptions.map((option, index) => (
-						<button
+						<SideBarItem
 							key={index}
-							className={`flex items-center w-full px-3 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg ${
-								selectedFilter === option.label
-									? 'bg-gray-200 dark:bg-gray-600'
-									: ''
-							}`}
-							onClick={() => handleFilter(option.label)}
-						>
-							<span className='text-lg mr-3'>{option.icon}</span>
-							<span className='flex-1'>{option.label}</span>
-							<span className='text-sm text-gray-500'>
-								{option.count}
-							</span>
-						</button>
+							icon={option.icon}
+							label={option.label}
+							count={option.count}
+							selected={selectedFilter === option.label}
+							onClick={() => setSelectedFilter(option.label)}
+						/>
 					))}
 				</nav>
 
 				<hr className='my-4 border-gray-200 dark:border-gray-700' />
 
 				<SideBarGroup
-					title='Lists'
+					title='My Lists'
 					icon={<FiList />}
 					items={lists}
+					selected={selectedFilter}
+					onSelectedFilter={setSelectedFilter}
 				>
 					<AddNewBtn
 						onClick={() => setIsListModalOpen(true)}
@@ -141,9 +116,19 @@ const TasksSidebar = ({ onFilterTasks }) => {
 				</SideBarGroup>
 
 				<SideBarGroup
+					title='Shared with me'
+					icon={<FiShare />}
+					items={sharedLists}
+					selected={selectedFilter}
+					onSelectedFilter={setSelectedFilter}
+				/>
+
+				<SideBarGroup
 					title='Tags'
 					icon={<FiTag />}
 					items={tags}
+					selected={selectedFilter}
+					onSelectedFilter={setSelectedFilter}
 					children={
 						<AddNewBtn
 							onClick={() => setIsTagModalOpen(true)}
@@ -154,21 +139,13 @@ const TasksSidebar = ({ onFilterTasks }) => {
 
 				<hr className='my-4 border-gray-200 dark:border-gray-700' />
 
-				<button
-					className={`flex items-center w-full px-3 py-2 text-gray-700 
-						dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg ${
-							selectedFilter === 'Deleted'
-								? 'bg-gray-200 dark:bg-gray-600'
-								: ''
-						}`}
-					onClick={() => handleFilter('Deleted')}
-				>
-					<span className='text-lg mr-3'>{<FiTrash2 />}</span>
-					<span className='flex-1'>Deleted</span>
-					<span className='text-sm text-gray-500'>
-						{deletedTasks.length}
-					</span>
-				</button>
+				<SideBarItem
+					icon='trash'
+					label='Deleted'
+					count={deletedTasks.length}
+					selected={selectedFilter === 'Deleted'}
+					onClick={() => setSelectedFilter('Deleted')}
+				/>
 			</div>
 			{renderListModal()}
 			{renderTagModal()}

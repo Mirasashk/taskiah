@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTaskContext } from '../../context/TaskContext';
 import { useUser } from '../../context/UserContext';
 import { useNotificationContext } from '../../context/NotificationContext';
+import { useListContext } from '../../context/ListContext';
 import FormField from '../forms/FormField';
 import Input from '../forms/Input';
 import CustomDropdown from '../forms/CustomDropdown';
@@ -10,12 +11,9 @@ const TaskForm = () => {
 	const { addTask } = useTaskContext();
 	const { addNotification } = useNotificationContext();
 	const { userData } = useUser();
-
+	const { tags } = useListContext();
 	const [showNewTaskSubForm, setShowNewTaskSubForm] = useState(false);
-	const [selectedTag, setSelectedTag] = useState(
-		Object.values(userData?.tags || {})[0]
-	);
-
+	const [selectedTag, setSelectedTag] = useState(tags[0]);
 	const [formData, setFormData] = useState({
 		title: '',
 		description: '',
@@ -23,14 +21,10 @@ const TaskForm = () => {
 		category: '',
 		priority: 'low',
 		dueDate: '',
-		tags: Object.values(userData?.tags || {})[0],
+		tags: [tags[0]?.id].filter(Boolean),
 		createdAt: new Date(),
 		ownerId: userData?.id,
 	});
-
-	useEffect(() => {
-		setFormData({ ...formData, tags: selectedTag?.name });
-	}, [selectedTag]);
 
 	useEffect(() => {
 		if (formData.title.trim() === '') {
@@ -54,7 +48,7 @@ const TaskForm = () => {
 			category: '',
 			priority: 'low',
 			dueDate: '',
-			tags: '',
+			tags: [tags[0]?.id].filter(Boolean),
 			createdAt: new Date(),
 			ownerId: userData.id,
 		});
@@ -75,7 +69,7 @@ const TaskForm = () => {
 			category: '',
 			priority: 'low',
 			dueDate: '',
-			tags: '',
+			tags: [tags[0]?.id].filter(Boolean),
 			createdAt: new Date(),
 			ownerId: userData.id,
 		});
@@ -98,18 +92,6 @@ const TaskForm = () => {
 						/>
 					</div>
 					<FormField
-						label='Category'
-						className=''
-					>
-						<Input
-							type='text'
-							name='category'
-							value={formData.category}
-							onChange={handleFormChange}
-							placeholder='Enter category'
-						/>
-					</FormField>
-					<FormField
 						label='Priority'
 						className=''
 					>
@@ -117,7 +99,8 @@ const TaskForm = () => {
 							name='priority'
 							value={formData.priority}
 							onChange={handleFormChange}
-							className='w-full p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700'
+							className='w-full p-2 border rounded bg-white dark:bg-gray-800
+							 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700'
 						>
 							<option value='low'>Low</option>
 							<option value='medium'>Medium</option>
@@ -129,29 +112,16 @@ const TaskForm = () => {
 				{/* Second Row */}
 				<div className='grid col-span-1 gap-2'>
 					<FormField
-						label='Status'
-						className='w-36'
-					>
-						<select
-							name='status'
-							value={formData.status}
-							onChange={handleFormChange}
-							className='w-full p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700'
-						>
-							<option value='active'>Active</option>
-							<option value='completed'>Completed</option>
-							<option value='archived'>Archived</option>
-						</select>
-					</FormField>
-
-					<FormField
 						label='Tags'
 						labelClassName=''
 					>
 						<CustomDropdown
-							options={Object.values(userData?.tags || {})}
+							options={tags}
 							selected={selectedTag}
-							onChange={setSelectedTag}
+							onChange={(value) => {
+								setSelectedTag(value);
+								setFormData({ ...formData, tags: [value.id] });
+							}}
 						/>
 					</FormField>
 
@@ -169,13 +139,15 @@ const TaskForm = () => {
 					<div className='flex gap-2 justify-end'>
 						<button
 							type='submit'
-							className='px-4 h-12 w-16 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700'
+							className='px-4 h-12 w-16 py-2 bg-blue-500 text-white rounded
+							 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700'
 						>
 							Add
 						</button>
 						<button
 							type='cancel'
-							className='px-4 py-2 bg-red-800 text-white rounded hover:bg-red-900 dark:bg-gray-500 dark:hover:bg-gray-900 h-12 w-24 justify-self-end'
+							className='px-4 py-2 bg-red-800 text-white rounded hover:bg-red-900
+							 dark:bg-gray-500 dark:hover:bg-gray-900 h-12 w-24 justify-self-end'
 							onClick={handleCancel}
 						>
 							Cancel
@@ -200,11 +172,14 @@ const TaskForm = () => {
 						name='title'
 						onChange={(e) => handleFormChange(e)}
 						placeholder='Add a new task'
-						className='flex-1 p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border-gray-300 dark:border-gray-700'
+						className='flex-1 p-2 border rounded bg-white dark:bg-gray-800
+						 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400
+						  border-gray-300 dark:border-gray-700'
 					/>
 					<button
 						type='submit'
-						className='px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700'
+						className='px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600
+						 dark:bg-blue-600 dark:hover:bg-blue-700'
 					>
 						Add
 					</button>

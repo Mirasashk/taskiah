@@ -24,7 +24,7 @@ const taskRoutes = require('./routes/taskRoutes');
 const userRoutes = require('./routes/userRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const listRoutes = require('./routes/listRoutes');
-
+const tagRoutes = require('./routes/tagRoutes');
 // Middleware
 app.use(
 	cors({
@@ -53,6 +53,7 @@ app.use('/api/tasks', taskRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/lists', listRoutes);
+app.use('/api/tags', tagRoutes);
 // Error handling middleware
 
 // Add this route to simulate an error

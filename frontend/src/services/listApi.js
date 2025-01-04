@@ -3,8 +3,9 @@ import axiosInstance from '../config/axios';
 export const listService = {
 	getListsByUserId: (userId) => axiosInstance.get(`/lists/${userId}`),
 
-	getSharedListsByEmail: (email) =>
-		axiosInstance.get(`/lists/shared/${email}`),
+	getSharedListsByUserId: (userId) =>
+		axiosInstance.get(`/lists/shared/${userId}`),
+
 	createList: (list) => axiosInstance.post('/lists/add', list),
 
 	postSharedListInvite: (invite) =>
@@ -26,4 +27,8 @@ export const listService = {
 
 	rejectSharedListInvite: (id) =>
 		axiosInstance.put(`/lists/invite/${id}/reject`),
+
+	createTag: (tag) => axiosInstance.post('/tags/add', tag),
+
+	getTagsByUserId: (userId) => axiosInstance.get(`/tags/${userId}`),
 };

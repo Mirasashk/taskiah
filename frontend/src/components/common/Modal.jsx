@@ -32,21 +32,21 @@ const Modal = ({
 
 	return createPortal(
 		<div
-			className='fixed inset-0 z-50 flex items-center justify-center'
+			className='fixed inset-0 z-30 flex items-center justify-center'
 			role='dialog'
 			aria-modal='true'
 			aria-labelledby='modal-title'
 		>
 			{/* Backdrop */}
 			<div
-				className='fixed inset-0 bg-black/50 dark:bg-black/70 transition-opacity'
+				className='fixed inset-0 bg-black/50 dark:bg-black/70 transition-opacity z-30'
 				onClick={onClose}
 			/>
 
 			{/* Modal Content */}
 			<div
 				className={`
-					relative z-50 w-full max-w-md transform overflow-hidden 
+					relative z-40 w-full max-w-md transform overflow-visible 
 					bg-white dark:bg-gray-800 rounded-lg shadow-xl
 					transition-all duration-300 ease-in-out
 					p-6 m-4

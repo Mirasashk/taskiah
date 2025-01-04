@@ -104,7 +104,12 @@ class Tag {
 	static async getTagsByOwnerId(ownerId) {
 		const tagsRef = db.collection('tags').where('ownerId', '==', ownerId);
 		const tags = await tagsRef.get();
-		return tags.docs.map((doc) => doc.data());
+		return tags.docs.map((doc) => {
+			return {
+				id: doc.id,
+				...doc.data(),
+			};
+		});
 	}
 }
 

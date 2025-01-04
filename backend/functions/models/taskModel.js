@@ -43,6 +43,7 @@ class Task {
 		this.category = data.category;
 		this.priority = data.priority;
 		this.dueDate = data.dueDate;
+		this.tagIds = data.tags || [];
 		this.createdAt = data.createdAt || new Date().toISOString();
 		this.updatedAt = data.updatedAt || new Date().toISOString();
 		this.ownerId = data.ownerId;
@@ -94,6 +95,7 @@ class Task {
 			dueDate: this.dueDate,
 			createdAt: this.createdAt,
 			updatedAt: this.updatedAt,
+			tagIds: this.tagIds,
 			ownerId: this.ownerId,
 			sharedWith: this.sharedWith,
 			notifications: this.notifications,
@@ -106,6 +108,7 @@ class Task {
 	 * @returns {Promise<string>} The ID of the created task
 	 */
 	static async createTask(taskData) {
+		console.log('taskData', taskData);
 		const task = new Task(taskData);
 		const notification = new Notification(
 			Object.values(taskData.notifications)[0]

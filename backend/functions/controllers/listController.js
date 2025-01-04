@@ -41,12 +41,12 @@ const inviteToList = async (listInviteData, res) => {
 
 /**
  * Gets a list by shared with
- * @param {string} email - The email of the shared with
+ * @param {string} userId - The user ID of the shared with
  * @param {Object} res - The response object
  * @returns {Promise<Object>} The list data
  */
-const getSharedWithListsByEmail = async (email, res) => {
-	const list = await List.getSharedWithListsByEmail(email);
+const getSharedWithListsByUserId = async (userId, res) => {
+	const list = await List.getSharedWithListsByUserId(userId);
 	res.status(200).json(list);
 };
 
@@ -86,7 +86,7 @@ const rejectListInvite = async (id, res) => {
 module.exports = {
 	addList,
 	getListByOwnerId,
-	getSharedWithListsByEmail,
+	getSharedWithListsByUserId,
 	inviteToList,
 	getListInviteByEmail,
 	acceptListInvite,

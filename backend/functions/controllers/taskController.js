@@ -5,7 +5,6 @@
 
 const { db } = require('../config/firebase');
 const Task = require('../models/taskModel');
-const Notification = require('../models/notificationModel');
 
 /**
  * Adds a new task to the database

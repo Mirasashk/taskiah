@@ -1,7 +1,14 @@
 import { FaHome } from 'react-icons/fa';
 import { IoHomeOutline } from 'react-icons/io5';
 import { IoMdCodeWorking } from 'react-icons/io';
-import { FiInbox, FiCalendar, FiStar, FiTag, FiList } from 'react-icons/fi';
+import {
+	FiInbox,
+	FiCalendar,
+	FiStar,
+	FiTag,
+	FiList,
+	FiTrash2,
+} from 'react-icons/fi';
 import { MdFormatListBulleted } from 'react-icons/md';
 
 // import 20 icons from react-icons
@@ -16,6 +23,7 @@ export const Icons = ({ icon }) => {
 		star: <FiStar />,
 		tag: <FiTag />,
 		list: <MdFormatListBulleted />,
+		trash: <FiTrash2 />,
 	};
 
 	return icons[icon];
