@@ -22,7 +22,7 @@ const TaskList = ({ setIsEditing }) => {
 	const [showDeletePermBtn, setShowDeletePermBtn] = useState(false);
 
 	useEffect(() => {
-		getTasks(userData.id);
+		getTasks(userData?.id);
 	}, []);
 
 	useEffect(() => {

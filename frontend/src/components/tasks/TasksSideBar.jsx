@@ -17,7 +17,7 @@ import SideBarItem from './SideBarItem';
 const TasksSidebar = ({ onFilterTasks }) => {
 	// Contexts
 	const { userData } = useUser();
-	const { sharedLists, lists, tags } = useListContext();
+	const { sharedLists, myLists, tags } = useListContext();
 	const { tasks, filterTasks, filter, deletedTasks } = useTaskContext();
 
 	// States
@@ -105,7 +105,7 @@ const TasksSidebar = ({ onFilterTasks }) => {
 				<SideBarGroup
 					title='My Lists'
 					icon={<FiList />}
-					items={lists}
+					items={myLists}
 					selected={selectedFilter}
 					onSelectedFilter={setSelectedFilter}
 				>

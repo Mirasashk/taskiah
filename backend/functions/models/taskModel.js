@@ -1,4 +1,5 @@
 const { db } = require('../config/firebase');
+const { FieldPath } = require('firebase-admin/firestore');
 const Notification = require('./notificationModel');
 
 /**
@@ -35,6 +36,7 @@ class Task {
 	 * @param {string} data.ownerId - The ID of the task owner
 	 * @param {string[]} [data.sharedWith=[]] - Array of user IDs the task is shared with
 	 * @param {Object} [data.notifications={}] - Notification settings for the task
+	 * @param {string[]} [data.tags=[]] - Array of tag IDs the task is associated with
 	 */
 	constructor(data) {
 		this.title = data.title;
@@ -121,6 +123,14 @@ class Task {
 		const taskRef = db.collection('tasks').doc();
 		await taskRef.set(task.toJSON());
 		const taskDoc = await taskRef.get();
+
+		// Add the task to the list of tasks
+		const listRef = db.collection('lists').doc(taskData.listId);
+		const list = await listRef.get();
+		const listData = list.data();
+		listData.tasks = [...listData.tasks, taskDoc.id];
+		await listRef.update(listData);
+
 		return taskDoc.data();
 	}
 
@@ -159,14 +169,81 @@ class Task {
 	}
 
 	/**
-	 * Retrieves tasks from the database by owner ID
-	 * @param {string} ownerId - The ID of the owner to retrieve tasks for
+	 * Retrieves tasks from the database by user ID
+	 * @param {string} userId - The ID of the user to retrieve tasks for
 	 * @returns {Promise<Array<Object>>} The tasks data
 	 */
-	static async getTasksByOwnerId(ownerId) {
-		const tasksRef = db.collection('tasks').where('ownerId', '==', ownerId);
-		const tasks = await tasksRef.get();
-		return tasks.docs.map((doc) => doc.data());
+	static async getAllTasksByUserId(userId) {
+		const tasksRef = db.collection('tasks');
+		const [ownerTasks, sharedTasks] = await Promise.all([
+			tasksRef.where('ownerId', '==', userId).get(),
+			tasksRef.where('sharedWith', 'array-contains', userId).get(),
+		]);
+
+		const sharedListsTasks = await this.getAllSharedListsTasks(userId);
+
+		const ownerTasksData = ownerTasks.docs.map((doc) => ({
+			id: doc.id,
+			...doc.data(),
+		}));
+		const sharedTasksData = sharedTasks.docs.map((doc) => ({
+			id: doc.id,
+			...doc.data(),
+		}));
+
+		console.log('ownerTasksData', ownerTasksData);
+		console.log('sharedTasksData', sharedTasksData);
+		console.log('sharedListsTasks', sharedListsTasks);
+		//Combine and remove duplicates
+		return [
+			...ownerTasksData,
+			...sharedTasksData.filter(
+				(shared) =>
+					!ownerTasksData.some((owner) => owner.id === shared.id)
+			),
+			...sharedListsTasks.filter(
+				(shared) =>
+					!ownerTasksData.some((owner) => owner.id === shared.id) &&
+					!sharedTasksData.some((shared) => shared.id === shared.id)
+			),
+		];
+	}
+
+	/**
+	 * Retrieves tasks from the database by shared lists
+	 * @param {string} userId - The ID of the user to retrieve tasks for
+	 * @returns {Promise<Array<Object>>} The tasks data
+	 */
+	static async getAllSharedListsTasks(userId) {
+		const sharedLists = await db
+			.collection('lists')
+			.where('sharedWith', 'array-contains', userId)
+			.get();
+
+		// Collect all task IDs from all shared lists
+		const allTaskIds = [];
+		for (const list of sharedLists.docs) {
+			const listData = list.data();
+			if (listData.tasks && listData.tasks.length) {
+				allTaskIds.push(...listData.tasks);
+			}
+		}
+
+		// If no tasks found, return empty array
+		if (allTaskIds.length === 0) {
+			return [];
+		}
+
+		// Fetch all tasks in a single query
+		const tasksSnapshot = await db
+			.collection('tasks')
+			.where(FieldPath.documentId(), 'in', allTaskIds)
+			.get();
+
+		return tasksSnapshot.docs.map((doc) => ({
+			id: doc.id,
+			...doc.data(),
+		}));
 	}
 
 	/**

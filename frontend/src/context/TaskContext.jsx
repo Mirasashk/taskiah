@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { taskService } from '../services/taskApi';
 import { useUser } from './UserContext';
+import { useListContext } from './ListContext';
 
 const TaskContext = createContext(null); // Initialize with null
 
@@ -10,6 +11,7 @@ export function TaskProvider({ children }) {
 	const [deletedTasks, setDeletedTasks] = useState([]);
 	const [filter, setFilter] = useState('All tasks');
 	const { userData } = useUser();
+	const { listData, myTasksList } = useListContext();
 	const [selectedTask, setSelectedTask] = useState(null);
 
 	useEffect(() => {
@@ -73,6 +75,8 @@ export function TaskProvider({ children }) {
 	};
 
 	const getTasks = async (userId) => {
+		const response = await taskService.getTasks(userId);
+		setTasks(response.data);
 		// const response = await taskService.getTasks(userId);
 		// // sort tasks by createdAt date
 		// const deletedTasks = response.data.filter(

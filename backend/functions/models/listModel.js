@@ -111,7 +111,10 @@ class List {
 	static async getListsByOwnerId(ownerId) {
 		const listsRef = db.collection('lists').where('ownerId', '==', ownerId);
 		const lists = await listsRef.get();
-		return lists.docs.map((doc) => doc.data());
+		return lists.docs.map((doc) => ({
+			id: doc.id,
+			...doc.data(),
+		}));
 	}
 
 	/**
@@ -128,7 +131,10 @@ class List {
 			'Lists:',
 			lists.docs.map((doc) => doc.data())
 		);
-		return lists.docs.map((doc) => doc.data());
+		return lists.docs.map((doc) => ({
+			id: doc.id,
+			...doc.data(),
+		}));
 	}
 
 	/**
@@ -141,7 +147,10 @@ class List {
 			.collection('lists')
 			.where('sharedWith', 'array-contains', userId);
 		const lists = await listsRef.get();
-		return lists.docs.map((doc) => doc.data());
+		return lists.docs.map((doc) => ({
+			id: doc.id,
+			...doc.data(),
+		}));
 	}
 
 	/**
@@ -154,7 +163,10 @@ class List {
 			.collection('lists')
 			.where('tasks', 'array-contains', taskId);
 		const lists = await listsRef.get();
-		return lists.docs.map((doc) => doc.data());
+		return lists.docs.map((doc) => ({
+			id: doc.id,
+			...doc.data(),
+		}));
 	}
 
 	/**
@@ -165,7 +177,10 @@ class List {
 	static async getListsByTagId(tagId) {
 		const listsRef = db.collection('lists').where('tagId', '==', tagId);
 		const lists = await listsRef.get();
-		return lists.docs.map((doc) => doc.data());
+		return lists.docs.map((doc) => ({
+			id: doc.id,
+			...doc.data(),
+		}));
 	}
 }
 

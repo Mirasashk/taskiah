@@ -23,19 +23,13 @@ async function addTask(task, res) {
 /**
  * Retrieves tasks from the database by owner ID
  * @param {string} userId - The ID of the owner to retrieve tasks for
+ * @param {Object} res - The response object
  * @returns {Promise<Array<Object>>} The tasks data
  */
-async function getTasks(userId) {
+async function getTasks(userId, res) {
 	try {
-		const tasksSnapshot = await db
-			.collection('tasks')
-			.where('ownerId', '==', userId)
-			.get();
-		const tasks = tasksSnapshot.docs.map((doc) => ({
-			id: doc.id,
-			...doc.data(),
-		}));
-		return tasks;
+		const tasks = await Task.getAllTasksByUserId(userId);
+		return res.json(tasks);
 	} catch (error) {
 		console.error('Error getting tasks:', error);
 	}

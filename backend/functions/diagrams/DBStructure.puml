@@ -1,119 +1,75 @@
-@startuml Database Structure
+@startuml
 
-skinparam classAttributeIconSize 0
-
-class User {
-  -id: string
-  -email: string
-  -firstName: string
-  -lastName: string
-  -username: string
-  -photoURL: string
-  -role: string
-  -createdAt: timestamp
-  -updatedAt: timestamp
-  -extraInfo: object
-  +validate()
-  +toJSON()
-  +{static} createUser()
-  +{static} getUser()
-  +{static} updateUser()
-  +{static} deleteUser()
-  +{static} getUsersByRole()
+' Entity Definitions
+entity "Users" as Users {
+  + id: String
+  --
+  + firstName: String
+  + lastName: String
+  + email: String
+  + username: String
+  + photoURL: String
+  + role: String
+  + createdAt: Timestamp
+  + updatedAt: Timestamp
+  + extraInfo: Map
 }
 
-class Task {
-  -title: string
-  -description: string
-  -status: enum
-  -category: string
-  -priority: enum
-  -dueDate: timestamp
-  -createdAt: timestamp
-  -updatedAt: timestamp
-  -ownerId: string
-  -sharedWith: string[]
-  -notifications: object
-  +validate()
-  +toJSON()
-  +{static} createTask()
-  +{static} getTask()
-  +{static} updateTask()
-  +{static} deleteTask()
-  +{static} getTasksByOwnerId()
-  +{static} getTasksByTagId()
-  +{static} getTasksBySharedWith()
+entity "Tasks" as Tasks {
+  + id: String
+  --
+  + title: String
+  + description: String
+  + status: String
+  + priority: String
+  + category: String
+  + dueDate: Timestamp
+  + tags: [String]
+  + ownerId: String
+  + sharedWith: [String]
+  + notifications: Array<Map>
+  + createdAt: Timestamp
+  + updatedAt: Timestamp
 }
 
-class List {
-  -name: string
-  -ownerId: string
-  -sharedWith: string[]
-  -createdAt: timestamp
-  -updatedAt: timestamp
-  -tasks: string[]
-  +validate()
-  +toJSON()
-  +{static} createList()
-  +{static} getList()
-  +{static} updateList()
-  +{static} deleteList()
-  +{static} getListsByOwnerId()
+entity "Tags" as Tags {
+  + id: String
+  --
+  + name: String
+  + color: String
+  + priority: String
+  + ownerId: String
 }
 
-class Tag {
-  -name: string
-  -color: string
-  -priority: number
-  -ownerId: string
-  +validate()
-  +toJSON()
-  +{static} createTag()
-  +{static} getTag()
-  +{static} updateTag()
-  +{static} deleteTag()
-  +{static} getTagsByOwnerId()
+entity "Task Lists" as TaskLists {
+  + id: String
+  --
+  + name: String
+  + ownerId: String
+  + sharedWith: [String]
+  + tasks: [String]
+  + createdAt: Timestamp
+  + updatedAt: Timestamp
 }
 
-class Notification {
-  -message: string
-  -type: enum
-  -status: enum
-  -createdAt: timestamp
-  -notifyOn: timestamp
-  -updatedAt: timestamp
-  +validate()
-  +toJSON()
-  +{static} createNotification()
-  +{static} getNotification()
-  +{static} updateNotification()
-  +{static} deleteNotification()
-}
-
-class ActivityLog {
-  -taskId: string
-  -userId: string
-  -action: string
-  -timestamp: timestamp
-  +validate()
-  +toJSON()
-  +{static} createActivityLog()
-  +{static} getActivityLog()
-  +{static} updateActivityLog()
-  +{static} deleteActivityLog()
+entity "Activity Logs" as ActivityLogs {
+  + id: String
+  --
+  + taskId: String
+  + userId: String
+  + action: String
+  + timestamp: Timestamp
 }
 
 ' Relationships
-User "1" -- "*" Task : owns
-User "1" -- "*" List : owns
-User "1" -- "*" Tag : owns
-User "1" -- "*" ActivityLog : performs
-
-Task "*" -- "*" Tag : tagged with
-Task "1" -- "*" Notification : has
-Task "1" -- "*" ActivityLog : logged for
-
-List "*" -- "*" Task : contains
-List "*" -- "*" User : shared with
+Users ||--o{ Tasks : "owns"
+Users ||--o{ Tags : "owns"
+Users ||--o{ TaskLists : "owns"
+Tasks ||--o{ Tags : "references"
+Tasks ||--o{ TaskLists : "belongs to"
+Tasks ||--o{ Users : "shared with"
+TaskLists ||--o{ Tasks : "contains"
+ActivityLogs ||--o{ Tasks : "logs actions on"
+ActivityLogs ||--o{ Users : "performed by"
 
 @enduml

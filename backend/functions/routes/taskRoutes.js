@@ -24,8 +24,7 @@ router.post('/add', async (req, res) => {
 
 router.get('/:userId', async (req, res) => {
 	const userId = req.params.userId;
-	const tasks = await getTasks(userId);
-	res.json(tasks);
+	await getTasks(userId, res);
 });
 
 router.get('/:taskId', async (req, res) => {
