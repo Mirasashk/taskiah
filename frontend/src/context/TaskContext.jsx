@@ -11,7 +11,7 @@ export function TaskProvider({ children }) {
 	const [deletedTasks, setDeletedTasks] = useState([]);
 	const [filter, setFilter] = useState('All tasks');
 	const { userData } = useUser();
-	const { listData, myTasksList } = useListContext();
+	const { myLists, sharedLists, tags } = useListContext();
 	const [selectedTask, setSelectedTask] = useState(null);
 
 	useEffect(() => {
@@ -40,13 +40,69 @@ export function TaskProvider({ children }) {
 		}
 	};
 
-	const filterTasks = (filteredTasks, filter) => {
-		// sort filteredTasks by createdAt date
+	const filterTasks = (tasks, filterName) => {
+		let filteredTasks = [];
+		const today = new Date();
+		console.log('filterName', filterName);
+		switch (filterName) {
+			case 'All tasks':
+				filteredTasks = tasks.filter(
+					(task) => task.status !== 'deleted'
+				);
+				break;
+			case 'Today':
+				filteredTasks = tasks.filter((task) => {
+					if (!task.dueDate || task.status === 'deleted')
+						return false;
+					const taskDate = new Date(task.dueDate);
+					return taskDate.toDateString() === today.toDateString();
+				});
+				break;
+			case 'Important':
+				filteredTasks = tasks.filter(
+					(task) =>
+						task.priority === 'high' && task.status !== 'deleted'
+				);
+				break;
+			case 'Deleted':
+				filteredTasks = tasks.filter(
+					(task) => task.status === 'deleted'
+				);
+				break;
+			default:
+				// Check if it's a list or tag
+				const list =
+					myLists.find((list) => list.name === filterName) ||
+					sharedLists.find((list) => list.name === filterName);
+				const tag = tags.find((tag) => tag.name === filterName);
+
+				if (list) {
+					console.log('list', list);
+					filteredTasks = tasks.filter(
+						(task) =>
+							list.tasks?.includes(task.id) &&
+							task.status !== 'deleted'
+					);
+				} else if (tag) {
+					console.log('tag', tag);
+					filteredTasks = tasks.filter(
+						(task) =>
+							task.tagIds?.includes(tag.id) &&
+							task.status !== 'deleted'
+					);
+				} else {
+					filteredTasks = tasks.filter(
+						(task) => task.status !== 'deleted'
+					);
+				}
+		}
+
+		// Sort filteredTasks by createdAt date
 		const sortedFilteredTasks = filteredTasks.sort(
 			(a, b) => new Date(b.createdAt) - new Date(a.createdAt)
 		);
 		setFilteredTasks(sortedFilteredTasks);
-		setFilter(filter);
+		setFilter(filterName);
 	};
 
 	const deleteTask = async (task) => {
@@ -77,19 +133,6 @@ export function TaskProvider({ children }) {
 	const getTasks = async (userId) => {
 		const response = await taskService.getTasks(userId);
 		setTasks(response.data);
-		// const response = await taskService.getTasks(userId);
-		// // sort tasks by createdAt date
-		// const deletedTasks = response.data.filter(
-		//     (task) => task.status === 'deleted'
-		// );
-		// setDeletedTasks(deletedTasks);
-		// const filteredTasks = response.data.filter(
-		//     (task) => task.status !== 'deleted'
-		// );
-		// const sortedTasks = filteredTasks.sort(
-		//     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-		// );
-		// setTasks(sortedTasks);
 	};
 
 	const deleteAllTasks = async (userId) => {

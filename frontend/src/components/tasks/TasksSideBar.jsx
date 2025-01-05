@@ -21,7 +21,6 @@ const TasksSidebar = ({ onFilterTasks }) => {
 	const { tasks, filterTasks, filter, deletedTasks } = useTaskContext();
 
 	// States
-
 	const [selectedFilter, setSelectedFilter] = useState(filter);
 
 	// const [selectedTag, setSelectedTag] = useState(null);
@@ -31,14 +30,25 @@ const TasksSidebar = ({ onFilterTasks }) => {
 	//variables
 	const today = new Date();
 
+	useEffect(() => {
+		//console.log('Selected filter changed:', selectedFilter);
+		filterTasks(tasks, selectedFilter);
+	}, [selectedFilter, tasks]);
+
 	// Functions
 	const todayTasks = tasks.filter((task) => {
 		const taskDate = new Date(task.dueDate);
-		return taskDate.toDateString() === today.toDateString();
+		return (
+			taskDate.toDateString() === today.toDateString() &&
+			task.status !== 'deleted'
+		);
 	});
 
 	const importantTasks = tasks.filter(
-		(task) => task.priority === 'high' && task.ownerId === userData.id
+		(task) =>
+			task.priority === 'high' &&
+			task.ownerId === userData.id &&
+			task.status !== 'deleted'
 	);
 
 	const staticFilterOptions = [

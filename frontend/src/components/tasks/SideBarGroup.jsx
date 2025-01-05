@@ -13,7 +13,6 @@ const SideBarGroup = ({
 	const [showProjects, setShowProjects] = useState(false);
 
 	const handleOnClick = (item) => {
-		console.log(item);
 		onSelectedFilter(item.name);
 	};
 
