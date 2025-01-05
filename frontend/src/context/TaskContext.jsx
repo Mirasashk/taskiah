@@ -20,6 +20,11 @@ export function TaskProvider({ children }) {
 		}
 	}, [userData]);
 
+	const refreshContext = async () => {
+		await getTasks(userData.id);
+		await filterTasks(tasks, filter);
+	};
+
 	const addTask = async (task) => {
 		try {
 			await addNotification(task).then((notification) => {
@@ -38,16 +43,17 @@ export function TaskProvider({ children }) {
 		} catch (error) {
 			console.error('Error adding task:', error);
 		}
+		await refreshContext();
 	};
 
 	const filterTasks = (tasks, filterName) => {
 		let filteredTasks = [];
 		const today = new Date();
-		console.log('filterName', filterName);
 		switch (filterName) {
 			case 'All tasks':
 				filteredTasks = tasks.filter(
-					(task) => task.status !== 'deleted'
+					(task) =>
+						task.status !== 'deleted' && task.status !== 'archived'
 				);
 				break;
 			case 'Today':
@@ -65,8 +71,10 @@ export function TaskProvider({ children }) {
 				);
 				break;
 			case 'Deleted':
-				filteredTasks = tasks.filter(
-					(task) => task.status === 'deleted'
+				console.log('deletedTasks', deletedTasks);
+				filteredTasks = deletedTasks.filter(
+					(task) =>
+						task.updatedAt > new Date() - 1000 * 60 * 60 * 24 * 7 // 1 week ago
 				);
 				break;
 			default:
@@ -77,14 +85,12 @@ export function TaskProvider({ children }) {
 				const tag = tags.find((tag) => tag.name === filterName);
 
 				if (list) {
-					console.log('list', list);
 					filteredTasks = tasks.filter(
 						(task) =>
 							list.tasks?.includes(task.id) &&
 							task.status !== 'deleted'
 					);
 				} else if (tag) {
-					console.log('tag', tag);
 					filteredTasks = tasks.filter(
 						(task) =>
 							task.tagIds?.includes(tag.id) &&
@@ -106,33 +112,46 @@ export function TaskProvider({ children }) {
 	};
 
 	const deleteTask = async (task) => {
-		if (task.status === 'deleted') {
-			await taskService.deleteTask(task.id);
-			setDeletedTasks(deletedTasks.filter((t) => t.id !== task.id));
-		} else {
-			const deletedStatus = {
-				status: 'deleted',
-			};
-			await taskService.updateTask(task.id, deletedStatus);
-			await getTasks(task.ownerId);
-
-			// setDeletedTasks([...deletedTasks, task]);
-			// setTasks(tasks.filter((t) => t.id !== task.id));
-		}
+		const deletedStatus = {
+			status: 'deleted',
+		};
+		await taskService.updateTask(task.id, deletedStatus);
+		await refreshContext();
 	};
 
 	const toggleTask = async (taskId, taskData) => {
+		console.log('toggleTask', taskId, taskData);
 		setTasks(
 			tasks.map((task) =>
 				task.id === taskId ? { ...task, ...taskData } : task
 			)
 		);
 		await taskService.updateTask(taskId, taskData);
+		await refreshContext();
 	};
 
 	const getTasks = async (userId) => {
 		const response = await taskService.getTasks(userId);
-		setTasks(response.data);
+		const sevenDaysAgo = new Date();
+		sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+		const filteredTasks = response.data.filter(
+			(task) =>
+				(task.status !== 'completed' &&
+					task.status !== 'archived' &&
+					task.status !== 'deleted') ||
+				(task.status === 'completed' &&
+					new Date(task.updatedAt) > sevenDaysAgo)
+		);
+
+		setTasks(filteredTasks);
+		setDeletedTasks(
+			response.data.filter(
+				(task) =>
+					task.status === 'deleted' &&
+					new Date(task.updatedAt) > sevenDaysAgo
+			)
+		);
 	};
 
 	const deleteAllTasks = async (userId) => {

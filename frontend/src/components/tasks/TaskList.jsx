@@ -26,11 +26,10 @@ const TaskList = ({ setIsEditing }) => {
 	}, []);
 
 	useEffect(() => {
+		setLocalTasks(filteredTasks);
 		if (filter === 'Deleted') {
-			setShowDeletePermBtn(true);
 			setLocalTasks(deletedTasks);
 		} else {
-			setShowDeletePermBtn(false);
 			setLocalTasks(filteredTasks);
 		}
 	}, [filteredTasks, deletedTasks]);
@@ -38,12 +37,6 @@ const TaskList = ({ setIsEditing }) => {
 	useEffect(() => {
 		setLocalTasks(tasks);
 	}, [tasks]);
-
-	const handleDeleteAll = async () => {
-		console.log('deleting all tasks');
-		await deleteAllTasks(userData.id);
-		setFilter('All tasks');
-	};
 
 	const handleTaskSelect = (task) => {
 		setSelectedTask(task);
@@ -63,14 +56,6 @@ const TaskList = ({ setIsEditing }) => {
 							Filtered by {filter}
 						</span>
 					)}
-					{showDeletePermBtn && (
-						<button
-							onClick={handleDeleteAll}
-							className='bg-red-500 text-white px-4 py-2 rounded-md'
-						>
-							Delete all permanently
-						</button>
-					)}
 				</div>
 				{localTasks.length === 0 ? (
 					<p className='text-gray-500 dark:text-gray-400'>
@@ -83,6 +68,7 @@ const TaskList = ({ setIsEditing }) => {
 							task={task}
 							onTaskSelect={handleTaskSelect}
 							onTaskEdit={handleTaskEdit}
+							showDelete={filter === 'Deleted' ? false : true}
 						/>
 					))
 				)}

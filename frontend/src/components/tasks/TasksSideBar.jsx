@@ -55,17 +55,19 @@ const TasksSidebar = ({ onFilterTasks }) => {
 		{
 			icon: 'inbox',
 			label: 'All tasks',
-			count: tasks.length,
+			count: tasks.filter((task) => task.status !== 'deleted').length,
 		},
 		{
 			icon: 'calendar',
 			label: 'Today',
-			count: todayTasks.length,
+			count: todayTasks.filter((task) => task.status !== 'deleted')
+				.length,
 		},
 		{
 			icon: 'star',
 			label: 'Important',
-			count: importantTasks.length,
+			count: importantTasks.filter((task) => task.status !== 'deleted')
+				.length,
 		},
 	];
 
