@@ -11,15 +11,11 @@ const TaskList = ({ setIsEditing }) => {
 		filteredTasks,
 		filter,
 		deletedTasks,
-		deleteAllTasks,
-		setFilter,
-		selectedTask,
 		setSelectedTask,
 	} = useTaskContext();
 
 	const { userData } = useUser();
 	const [localTasks, setLocalTasks] = useState([]);
-	const [showDeletePermBtn, setShowDeletePermBtn] = useState(false);
 
 	useEffect(() => {
 		getTasks(userData?.id);

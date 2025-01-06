@@ -14,7 +14,7 @@ export const listService = {
 	deleteList: (listId) => axiosInstance.delete(`/lists/${listId}`),
 
 	updateList: (listId, newListData) =>
-		axiosInstance.put(`/lists/${listId}`, newListData),
+		axiosInstance.put(`/lists/${listId}/update`, newListData),
 
 	getListInvitesByEmail: (email) =>
 		axiosInstance.get(`/lists/invite/${email}`),
@@ -29,6 +29,8 @@ export const listService = {
 		axiosInstance.put(`/lists/invite/${id}/reject`),
 
 	createTag: (tag) => axiosInstance.post('/tags/add', tag),
+
+	deleteTag: (tagId) => axiosInstance.delete(`/tags/${tagId}`),
 
 	getTagsByUserId: (userId) => axiosInstance.get(`/tags/${userId}`),
 };

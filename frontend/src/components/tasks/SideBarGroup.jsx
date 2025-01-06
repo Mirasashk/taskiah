@@ -16,6 +16,19 @@ const SideBarGroup = ({
 		onSelectedFilter(item.name);
 	};
 
+	const getItemType = () => {
+		switch (title) {
+			case 'My Lists':
+				return 'list';
+			case 'Shared with me':
+				return 'sharedList';
+			case 'Tags':
+				return 'tag';
+			default:
+				return null;
+		}
+	};
+
 	return (
 		<div>
 			<div
@@ -34,6 +47,7 @@ const SideBarGroup = ({
 						{items.map((item) => {
 							return (
 								<SideBarItem
+									key={item.id}
 									icon={item.icon}
 									label={item.name}
 									count={item.count}
@@ -42,6 +56,8 @@ const SideBarGroup = ({
 									color={item.color}
 									labelStyle={item.labelStyle}
 									trash={true}
+									itemType={getItemType()}
+									item={item}
 								/>
 							);
 						})}

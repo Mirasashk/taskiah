@@ -1,235 +1,347 @@
 import { useState, useEffect } from 'react';
 import { FiX } from 'react-icons/fi';
+import { TiDelete } from 'react-icons/ti';
 import { FaCircle } from 'react-icons/fa';
 import { useUser } from '../../context/UserContext';
+import { useListContext } from '../../context/ListContext';
 
 import CustomDropdown from '../forms/CustomDropdown';
 import FormField from '../forms/FormField';
-// @BUG: There is a bug with states, when a task is selected then the
-//edit button on a different task is clicked the information
-//is the old selected task and not the newly selected task.
 
-const TaskDetailSideBar = ({
-    task,
-    onClose,
-    onSave,
-    isEditing,
-    onEdit,
-}) => {
-    const { userData } = useUser();
-    const tags = Object.values(userData?.tags || {});
-    const [editedTask, setEditedTask] = useState(task);
-    const [selectedTags, setSelectedTags] = useState([]);
+const TaskDetailSideBar = ({ task, onClose, onSave, isEditing, onEdit }) => {
+	const { userData } = useUser();
+	const { lists, sharedLists, tags } = useListContext();
+	const [editedTask, setEditedTask] = useState(task);
+	const [selectedTags, setSelectedTags] = useState([]);
+	const [showTagDropdown, setShowTagDropdown] = useState(false);
 
-    if (!task) return null;
+	if (!task) return null;
 
-    useEffect(() => {
-        console.log(task);
-        console.log(userData);
-        if (task.tags) {
-            setSelectedTags(
-                tags.filter((tag) => task.tags.includes(tag.name))[0]
-            );
-        }
-    }, [task]);
+	useEffect(() => {
+		setEditedTask(task);
+		if (task.tags) {
+			// Convert string of tags to array if it's a string
+			const tagsArray =
+				typeof task.tags === 'string' ? [task.tags] : task.tags;
+			setSelectedTags(tags.filter((tag) => tagsArray.includes(tag.name)));
+		} else {
+			setSelectedTags([]);
+		}
+	}, [task, tags]);
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setEditedTask({ ...editedTask, [name]: value });
-    };
+	const handleInputChange = (e) => {
+		const { name, value } = e.target;
+		setEditedTask({ ...editedTask, [name]: value });
+	};
 
-    const handleSave = () => {
-        editedTask.tags = selectedTags.name;
-        onSave(editedTask);
-        onEdit(false);
-    };
+	const handleSave = () => {
+		// Convert selected tags to array of names
+		editedTask.tags = selectedTags.map((tag) => tag.name);
+		onSave(editedTask);
+		onEdit(false);
+	};
 
-    return (
-        <aside className='w-96 bg-white dark:bg-gray-800 h-full rounded-lg p-6 shadow-lg'>
-            <div className='flex justify-between items-center mb-6'>
-                <h2 className='text-xl font-semibold text-gray-900 dark:text-white'>
-                    Task Details
-                </h2>
-                <button
-                    onClick={onClose}
-                    className='text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
-                >
-                    <FiX size={24} />
-                </button>
-            </div>
+	const handleTagSelect = (tag) => {
+		const tagExists = selectedTags.some((t) => t.id === tag.id);
+		if (!tagExists) {
+			setSelectedTags([...selectedTags, tag]);
+		}
+		setShowTagDropdown(false);
+	};
 
-            <div className='space-y-6'>
-                {/* Title */}
-                <div>
-                    <label className='block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1'>
-                        Title
-                    </label>
-                    {isEditing ? (
-                        <input
-                            type='text'
-                            name='title'
-                            value={editedTask.title}
-                            onChange={handleInputChange}
-                            className='flex-1 p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border-gray-300 dark:border-gray-700'
-                        />
-                    ) : (
-                        <p className='text-gray-900 dark:text-white'>
-                            {task.title}
-                        </p>
-                    )}
-                </div>
+	const handleRemoveTag = (tagToRemove) => {
+		setSelectedTags(
+			selectedTags.filter((tag) => tag.id !== tagToRemove.id)
+		);
+	};
 
-                {/* Description */}
+	const renderSelectedTags = () => {
+		return selectedTags.map((tag) => (
+			<div
+				key={tag.id}
+				className='inline-block mr-2 mb-2'
+			>
+				<div
+					className='flex items-center gap-1 border border-gray-300 p-2 rounded-3xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700'
+					onClick={() => handleRemoveTag(tag)}
+				>
+					<span className='flex items-center gap-2 text-sm'>
+						<FaCircle
+							size={12}
+							color={tag.color}
+						/>
+						{tag.name}
+					</span>
+					<TiDelete size={20} />
+				</div>
+			</div>
+		));
+	};
 
-                {isEditing ? (
-                    <div>
-                        <label className='block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1'>
-                            Description
-                        </label>
-                        <textarea
-                            className='p-2 w-full h-40 max-h-[30rem] border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border-gray-300 dark:border-gray-700'
-                            name='description'
-                            value={editedTask.description}
-                            onChange={handleInputChange}
-                            placeholder='Enter task description'
-                        />
-                    </div>
-                ) : (
-                    task.description && (
-                        <div>
-                            <label className='block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1'>
-                                Description
-                            </label>
-                            <p className='text-gray-900 dark:text-white whitespace-pre-wrap'>
-                                {task.description}
-                            </p>
-                        </div>
-                    )
-                )}
+	const isSharedList = sharedLists.some((list) => list.id === task.listId);
 
-                {/* Status */}
-                <div>
-                    <label className='block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1'>
-                        Status
-                    </label>
-                    {isEditing ? (
-                        <select
-                            name='status'
-                            value={editedTask.status}
-                            onChange={handleInputChange}
-                            className='w-full p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700'
-                        >
-                            <option value='active'>Active</option>
-                            <option value='completed'>
-                                Completed
-                            </option>
-                            <option value='deleted'>Deleted</option>
-                        </select>
-                    ) : (
-                        <p className='capitalize text-gray-900 dark:text-white'>
-                            {task.status}
-                        </p>
-                    )}
-                </div>
+	return (
+		<aside className='w-full bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg max-h-[calc(100vh-2rem)] overflow-y-auto'>
+			<div className='flex justify-between items-center mb-6'>
+				<h2 className='text-xl font-semibold text-gray-900 dark:text-white'>
+					Task Details
+				</h2>
+				<button
+					onClick={onClose}
+					className='text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+				>
+					<FiX size={24} />
+				</button>
+			</div>
 
-                {/* Priority */}
-                {task.priority && (
-                    <div>
-                        <label className='block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1'>
-                            Priority
-                        </label>
-                        {isEditing ? (
-                            <select
-                                name='priority'
-                                value={editedTask.priority}
-                                onChange={handleInputChange}
-                                className='w-full p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700'
-                            >
-                                <option value='low'>Low</option>
-                                <option value='medium'>Medium</option>
-                                <option value='high'>High</option>
-                            </select>
-                        ) : (
-                            <p className='capitalize text-gray-900 dark:text-white'>
-                                {task.priority}
-                            </p>
-                        )}
-                    </div>
-                )}
+			<div className='space-y-6'>
+				{/* Title */}
+				<div>
+					<label className='block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1'>
+						Title
+					</label>
+					{isEditing ? (
+						<input
+							type='text'
+							name='title'
+							value={editedTask.title}
+							onChange={handleInputChange}
+							className='flex-1 w-full p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border-gray-300 dark:border-gray-700'
+						/>
+					) : (
+						<p className='text-gray-900 dark:text-white'>
+							{task.title}
+						</p>
+					)}
+				</div>
 
-                {/* Category */}
+				{/* Description */}
+				{isEditing ? (
+					<div>
+						<label className='block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1'>
+							Description
+						</label>
+						<textarea
+							className='p-2 w-full h-40 max-h-[30rem] border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border-gray-300 dark:border-gray-700'
+							name='description'
+							value={editedTask.description}
+							onChange={handleInputChange}
+							placeholder='Enter task description'
+						/>
+					</div>
+				) : (
+					task.description && (
+						<div>
+							<label className='block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1'>
+								Description
+							</label>
+							<p className='text-gray-900 dark:text-white whitespace-pre-wrap'>
+								{task.description}
+							</p>
+						</div>
+					)
+				)}
 
-                <div>
-                    <label className='block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1'>
-                        Category
-                    </label>
-                    {isEditing ? (
-                        <input
-                            type='text'
-                            name='category'
-                            value={editedTask.category}
-                            onChange={handleInputChange}
-                            className='flex-1 p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border-gray-300 dark:border-gray-700'
-                        />
-                    ) : (
-                        <p className='text-gray-900 dark:text-white'>
-                            {task.category}
-                        </p>
-                    )}
-                </div>
+				{/* List */}
+				<div>
+					<label className='block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1'>
+						List
+					</label>
+					{isEditing && !isSharedList ? (
+						<select
+							name='listId'
+							value={editedTask.listId}
+							onChange={handleInputChange}
+							className='w-full p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700'
+						>
+							{lists.map((list) => (
+								<option
+									key={list.id}
+									value={list.id}
+								>
+									{list.name}
+								</option>
+							))}
+						</select>
+					) : (
+						<p className='text-gray-900 dark:text-white'>
+							{lists.find((list) => list.id === task.listId)
+								?.name || 'Unknown List'}
+						</p>
+					)}
+				</div>
 
-                {/* Tags */}
+				{/* Status */}
+				<div>
+					<label className='block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1'>
+						Status
+					</label>
+					{isEditing ? (
+						<select
+							name='status'
+							value={editedTask.status}
+							onChange={handleInputChange}
+							className='w-full p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700'
+						>
+							<option value='active'>Active</option>
+							<option value='completed'>Completed</option>
+							<option value='deleted'>Deleted</option>
+						</select>
+					) : (
+						<p className='capitalize text-gray-900 dark:text-white'>
+							{task.status}
+						</p>
+					)}
+				</div>
 
-                <div>
-                    <label className='block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1'>
-                        Tags
-                    </label>
-                    {isEditing ? (
-                        <CustomDropdown
-                            options={Object.values(tags)}
-                            selected={selectedTags}
-                            onChange={setSelectedTags}
-                        />
-                    ) : (
-                        <p className='text-gray-900 dark:text-white'>
-                            {task.tags}
-                        </p>
-                    )}
-                </div>
+				{/* Priority */}
+				{task.priority && (
+					<div>
+						<label className='block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1'>
+							Priority
+						</label>
+						{isEditing ? (
+							<select
+								name='priority'
+								value={editedTask.priority}
+								onChange={handleInputChange}
+								className='w-full p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700'
+							>
+								<option value='low'>Low</option>
+								<option value='medium'>Medium</option>
+								<option value='high'>High</option>
+							</select>
+						) : (
+							<p className='capitalize text-gray-900 dark:text-white'>
+								{task.priority}
+							</p>
+						)}
+					</div>
+				)}
 
-                {/* Due Date */}
-                {task.dueDate && (
-                    <div>
-                        <label className='block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1'>
-                            Due Date
-                        </label>
-                        {isEditing ? (
-                            <input
-                                type='date'
-                                name='dueDate'
-                                value={editedTask.dueDate}
-                                onChange={handleInputChange}
-                                className='w-full p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700'
-                            />
-                        ) : (
-                            <p className='text-gray-900 dark:text-white'>
-                                {task.dueDate}
-                            </p>
-                        )}
-                    </div>
-                )}
+				{/* Tags */}
+				<div>
+					<label className='block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1'>
+						Tags
+					</label>
+					{isEditing ? (
+						<div className='space-y-2'>
+							<div className='flex flex-wrap gap-2'>
+								{renderSelectedTags()}
+							</div>
+							<div className='relative'>
+								<button
+									onClick={() =>
+										setShowTagDropdown(!showTagDropdown)
+									}
+									className='w-full p-2 text-left border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700'
+								>
+									Select tags...
+								</button>
+								{showTagDropdown && (
+									<div className='absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md shadow-lg'>
+										<div className='max-h-48 overflow-y-auto'>
+											{tags.map((tag) => (
+												<div
+													key={tag.id}
+													className='p-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer'
+													onClick={() =>
+														handleTagSelect(tag)
+													}
+												>
+													<div className='flex items-center gap-2'>
+														<FaCircle
+															size={12}
+															color={tag.color}
+														/>
+														{tag.name}
+													</div>
+												</div>
+											))}
+										</div>
+									</div>
+								)}
+							</div>
+						</div>
+					) : (
+						<div className='flex flex-wrap gap-2'>
+							{selectedTags.map((tag) => (
+								<span
+									key={tag.id}
+									className='px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded-full text-sm'
+								>
+									<div className='flex items-center gap-2'>
+										<FaCircle
+											size={12}
+											color={tag.color}
+										/>
+										{tag.name}
+									</div>
+								</span>
+							))}
+						</div>
+					)}
+				</div>
 
-                {isEditing && (
-                    <button
-                        onClick={handleSave}
-                        className='bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700'
-                    >
-                        Save
-                    </button>
-                )}
-            </div>
-        </aside>
-    );
+				{/* Due Date */}
+				<div>
+					<label className='block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1'>
+						Due Date
+					</label>
+					{isEditing ? (
+						<div className='flex gap-2'>
+							<input
+								type='date'
+								name='dueDate'
+								value={(editedTask.dueDate || '').split('T')[0]}
+								onChange={handleInputChange}
+								className='flex-1 p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 [color-scheme:light] dark:[color-scheme:dark]'
+							/>
+							{editedTask.dueDate && (
+								<input
+									type='time'
+									name='dueTime'
+									value={
+										(editedTask.dueDate || '')
+											.split('T')[1]
+											?.split('.')[0] || ''
+									}
+									onChange={(e) => {
+										const date = (
+											editedTask.dueDate || ''
+										).split('T')[0];
+										const newDateTime = `${date}T${e.target.value}`;
+										handleInputChange({
+											target: {
+												name: 'dueDate',
+												value: newDateTime,
+											},
+										});
+									}}
+									className='w-32 p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 [color-scheme:light] dark:[color-scheme:dark]'
+								/>
+							)}
+						</div>
+					) : (
+						task.dueDate && (
+							<p className='text-gray-900 dark:text-white'>
+								{new Date(task.dueDate).toLocaleString()}
+							</p>
+						)
+					)}
+				</div>
+
+				{isEditing && (
+					<button
+						onClick={handleSave}
+						className='bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700'
+					>
+						Save
+					</button>
+				)}
+			</div>
+		</aside>
+	);
 };
 
 export default TaskDetailSideBar;

@@ -19,10 +19,6 @@ export function ListProvider({ children }) {
 		}
 	}, [userData]);
 
-	useEffect(() => {
-		console.log('Lists:', lists);
-	}, [lists]);
-
 	const getLists = async (userId) => {
 		const response = await listService.getListsByUserId(userId);
 

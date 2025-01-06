@@ -91,6 +91,7 @@ class List {
 		await list.validate();
 		const listRef = db.collection('lists').doc(listId);
 		await listRef.update(list.toJSON());
+		return listRef.id;
 	}
 
 	/**
@@ -101,6 +102,7 @@ class List {
 	static async deleteList(listId) {
 		const listRef = db.collection('lists').doc(listId);
 		await listRef.delete();
+		return listRef.id;
 	}
 
 	/**

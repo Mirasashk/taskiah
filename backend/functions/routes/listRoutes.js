@@ -13,6 +13,8 @@ const {
 	getListInviteByEmail,
 	acceptListInvite,
 	rejectListInvite,
+	deleteList,
+	updateList,
 } = require('../controllers/listController');
 
 /**
@@ -48,6 +50,14 @@ router.put('/invite/:id/accept', async (req, res) => {
 router.put('/invite/:id/reject', async (req, res) => {
 	console.log('id', req.params.id);
 	await rejectListInvite(req.params.id, res);
+});
+
+router.put('/:id/update', async (req, res) => {
+	await updateList(req.params.id, req.body, res);
+});
+
+router.delete('/:id', async (req, res) => {
+	await deleteList(req.params.id, res);
 });
 
 module.exports = router;

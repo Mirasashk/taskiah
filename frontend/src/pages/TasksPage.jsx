@@ -12,8 +12,8 @@ const TasksPage = () => {
 	const [isEditing, setIsEditing] = useState(false);
 
 	useEffect(() => {
-		setSelectedTask(null);
-	}, [filter]);
+		setSelectedTask();
+	}, [filteredTasks]);
 
 	const handleTaskSave = async (updatedTask) => {
 		await updateTask(updatedTask.id, updatedTask);
@@ -45,18 +45,20 @@ const TasksPage = () => {
 							/>
 						</div>
 						{selectedTask && (
-							<div className='flex'>
-								<div className='container mx-auto w-96'>
-									<div className='mt-4'>
-										<div className='fixed'>
-											<TaskDetailSideBar
-												task={selectedTask}
-												onClose={handleOnClose}
-												onSave={handleTaskSave}
-												isEditing={isEditing}
-												onEdit={setIsEditing}
-											/>
-										</div>
+							<div
+								className={`flex w-2/5 ${
+									filter === 'All tasks' ? 'mt-4' : 'mt-10'
+								}`}
+							>
+								<div className='container mx-auto '>
+									<div className='sticky top-4'>
+										<TaskDetailSideBar
+											task={selectedTask}
+											onClose={handleOnClose}
+											onSave={handleTaskSave}
+											isEditing={isEditing}
+											onEdit={setIsEditing}
+										/>
 									</div>
 								</div>
 							</div>

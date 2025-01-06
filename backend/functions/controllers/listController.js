@@ -83,6 +83,29 @@ const rejectListInvite = async (id, res) => {
 	res.status(200).json(listInvite);
 };
 
+/**
+ * Deletes a list
+ * @param {string} id - The ID of the list
+ * @param {Object} res - The response object
+ * @returns {Promise<Object>} The list data
+ */
+const deleteList = async (id, res) => {
+	const list = await List.deleteList(id);
+	res.status(200).json(list);
+};
+
+/**
+ * Updates a list
+ * @param {string} id - The ID of the list
+ * @param {Object} listData - The list data
+ * @param {Object} res - The response object
+ * @returns {Promise<Object>} The list data
+ */
+const updateList = async (id, listData, res) => {
+	const list = await List.updateList(id, listData);
+	res.status(200).json(list);
+};
+
 module.exports = {
 	addList,
 	getListByOwnerId,
@@ -91,4 +114,6 @@ module.exports = {
 	getListInviteByEmail,
 	acceptListInvite,
 	rejectListInvite,
+	deleteList,
+	updateList,
 };

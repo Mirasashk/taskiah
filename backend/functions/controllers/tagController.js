@@ -32,4 +32,15 @@ const getTags = async (id, res) => {
 	res.status(200).json(tags);
 };
 
-module.exports = { addTag, getTags };
+/**
+ * Deletes a tag
+ * @param {string} id - The ID of the tag
+ * @param {Object} res - The response object
+ * @returns {Promise<Object>} The tag data
+ */
+const deleteTag = async (id, res) => {
+	const tag = await Tag.deleteTag(id);
+	res.status(200).json(tag);
+};
+
+module.exports = { addTag, getTags, deleteTag };

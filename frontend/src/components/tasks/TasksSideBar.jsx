@@ -96,7 +96,7 @@ const TasksSidebar = ({ onFilterTasks }) => {
 	};
 
 	return (
-		<aside className='w-64 bg-white rounded-lg dark:bg-gray-800 h-full border-r border-gray-200 dark:border-gray-700'>
+		<aside className='w-64 bg-white rounded-lg dark:bg-gray-800  border-r border-gray-200 dark:border-gray-700'>
 			<div className='p-4 space-y-2'>
 				{/* Filter Options */}
 				<nav className='space-y-2'>

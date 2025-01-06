@@ -94,6 +94,7 @@ class Tag {
 	static async deleteTag(tagId) {
 		const tagRef = db.collection('tags').doc(tagId);
 		await tagRef.delete();
+		return tagRef.id;
 	}
 
 	/**
