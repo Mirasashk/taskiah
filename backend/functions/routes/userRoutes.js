@@ -1,3 +1,8 @@
+/**
+ * User routes
+ * @module routes/userRoutes
+ */
+
 const express = require('express');
 const router = express.Router();
 const {
@@ -8,24 +13,27 @@ const {
 	getBiometricChallenge,
 	verifyBiometricPublicKey,
 	checkDevice,
+	searchUsers,
+	inviteUser,
 } = require('../controllers/userController');
 
+/**
+ * Routes
+ * @type {import('express').Router}
+ */
 router.post('/add', async (req, res) => {
-	const user = req.body;
-	await addUser(user);
-	res.send('User added!');
+	await addUser(req.body, res);
 });
 
-router.get('/:userId', async (req, res) => {
-	const userId = req.params.userId;
-	const user = await getUser(userId);
-	res.json(user);
+router.get('/search', async (req, res) => {
+	const query = req.query.query;
+	await searchUsers(query, res);
 });
 
-router.put('/:userId', async (req, res) => {
-	const userId = req.params.userId;
-	const user = req.body;
-	await updateUser(userId, user, res);
+router.post('/invite', async (req, res) => {
+	const email = req.body.email;
+	const message = req.body.message;
+	await inviteUser(email, message, res);
 });
 
 router.post('/biometric/public-key', async (req, res) => {
@@ -51,6 +59,16 @@ router.get('/biometric/check-device/:deviceId/:userId', async (req, res) => {
 	const deviceId = req.params.deviceId;
 	const userId = req.params.userId;
 	await checkDevice(deviceId, userId, res);
+});
+
+router.get('/:userId', async (req, res) => {
+	await getUser(req.params.userId, res);
+});
+
+router.put('/:userId', async (req, res) => {
+	const userId = req.params.userId;
+	const user = req.body;
+	await updateUser(userId, user, res);
 });
 
 module.exports = router;

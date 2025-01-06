@@ -1,13 +1,25 @@
+/**
+ * Dotenv configuration
+ * @module config/dotenv.config
+ */
+
 const dotenv = require('dotenv');
 const path = require('path');
 
-// Load environment variables based on NODE_ENV
+/**
+ * Load environment variables based on NODE_ENV
+ * @type {string}
+ */
 const envFile =
 	process.env.NODE_ENV === 'development' ? '.env.dev' : '.env.prod';
 const envPath = path.resolve(__dirname, '..', envFile);
 
 dotenv.config({ path: envPath });
 
+/**
+ * Dotenv configuration
+ * @type {Object}
+ */
 const dotenvConfig = {
 	serverPort: process.env.SERVER_PORT || 8080,
 	firebase: {

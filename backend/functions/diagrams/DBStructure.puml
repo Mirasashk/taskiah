@@ -1,0 +1,75 @@
+@startuml
+
+' Entity Definitions
+entity "Users" as Users {
+  + id: String
+  --
+  + firstName: String
+  + lastName: String
+  + email: String
+  + username: String
+  + photoURL: String
+  + role: String
+  + createdAt: Timestamp
+  + updatedAt: Timestamp
+  + extraInfo: Map
+}
+
+entity "Tasks" as Tasks {
+  + id: String
+  --
+  + title: String
+  + description: String
+  + status: String
+  + priority: String
+  + category: String
+  + dueDate: Timestamp
+  + tags: [String]
+  + ownerId: String
+  + sharedWith: [String]
+  + notifications: Array<Map>
+  + createdAt: Timestamp
+  + updatedAt: Timestamp
+}
+
+entity "Tags" as Tags {
+  + id: String
+  --
+  + name: String
+  + color: String
+  + priority: String
+  + ownerId: String
+}
+
+entity "Task Lists" as TaskLists {
+  + id: String
+  --
+  + name: String
+  + ownerId: String
+  + sharedWith: [String]
+  + tasks: [String]
+  + createdAt: Timestamp
+  + updatedAt: Timestamp
+}
+
+entity "Activity Logs" as ActivityLogs {
+  + id: String
+  --
+  + taskId: String
+  + userId: String
+  + action: String
+  + timestamp: Timestamp
+}
+
+' Relationships
+Users ||--o{ Tasks : "owns"
+Users ||--o{ Tags : "owns"
+Users ||--o{ TaskLists : "owns"
+Tasks ||--o{ Tags : "references"
+Tasks ||--o{ TaskLists : "belongs to"
+Tasks ||--o{ Users : "shared with"
+TaskLists ||--o{ Tasks : "contains"
+ActivityLogs ||--o{ Tasks : "logs actions on"
+ActivityLogs ||--o{ Users : "performed by"
+
+@enduml
