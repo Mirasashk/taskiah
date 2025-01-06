@@ -9,7 +9,6 @@ import CustomDropdown from '../forms/CustomDropdown';
 import FormField from '../forms/FormField';
 
 const TaskDetailSideBar = ({ task, onClose, onSave, isEditing, onEdit }) => {
-	const { userData } = useUser();
 	const { lists, sharedLists, tags } = useListContext();
 	const [editedTask, setEditedTask] = useState(task);
 	const [selectedTags, setSelectedTags] = useState([]);
@@ -18,12 +17,32 @@ const TaskDetailSideBar = ({ task, onClose, onSave, isEditing, onEdit }) => {
 	if (!task) return null;
 
 	useEffect(() => {
+		console.log('selectedTags', selectedTags);
+	}, [selectedTags]);
+
+	useEffect(() => {
 		setEditedTask(task);
-		if (task.tags) {
-			// Convert string of tags to array if it's a string
+		console.log('Task:', task);
+		console.log('Tags:', tags);
+		console.log('Task.tagIds:', task.tagIds);
+
+		if (tags && task.tagIds) {
 			const tagsArray =
-				typeof task.tags === 'string' ? [task.tags] : task.tags;
-			setSelectedTags(tags.filter((tag) => tagsArray.includes(tag.name)));
+				typeof task.tagIds === 'string' ? [task.tagIds] : task.tagIds;
+			console.log('TagsArray:', tagsArray);
+
+			const filteredTags = tags.filter((tag) => {
+				console.log(
+					'Checking tag:',
+					tag.id,
+					'against tagsArray:',
+					tagsArray
+				);
+				return tagsArray.includes(tag.id);
+			});
+			console.log('Filtered Tags:', filteredTags);
+
+			setSelectedTags(filteredTags);
 		} else {
 			setSelectedTags([]);
 		}
@@ -36,7 +55,7 @@ const TaskDetailSideBar = ({ task, onClose, onSave, isEditing, onEdit }) => {
 
 	const handleSave = () => {
 		// Convert selected tags to array of names
-		editedTask.tags = selectedTags.map((tag) => tag.name);
+		editedTask.tagIds = selectedTags.map((tag) => tag.id);
 		onSave(editedTask);
 		onEdit(false);
 	};

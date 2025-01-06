@@ -15,6 +15,10 @@ const TasksPage = () => {
 		setSelectedTask();
 	}, [filteredTasks]);
 
+	useEffect(() => {
+		setIsEditing(false);
+	}, [filter]);
+
 	const handleTaskSave = async (updatedTask) => {
 		await updateTask(updatedTask.id, updatedTask);
 		setSelectedTask(null);
