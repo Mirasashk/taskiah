@@ -178,6 +178,19 @@ class User {
 		const users = await usersRef.get();
 		return users.docs.map((doc) => doc.data());
 	}
+
+	/**
+	 * Updates a user's preferences
+	 * @param {string} userId - The ID of the user to update
+	 * @param {Object} preferences - The preferences to update
+	 * @returns {Promise<Object>} The updated user data
+	 */
+	static async updateUserPreferences(userId, preferences) {
+		const userRef = db.collection('users').doc(userId);
+		await userRef.update({ extraInfo: { preferences } });
+		const userDoc = await userRef.get();
+		return userDoc.data();
+	}
 }
 
 module.exports = User;

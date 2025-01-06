@@ -247,6 +247,18 @@ async function inviteUser(email, message, res) {
 	return res.json({ message: 'User invited' });
 }
 
+/**
+ * Updates a user's preferences
+ * @param {string} userId - The ID of the user to update
+ * @param {Object} preferences - The preferences to update
+ * @param {Object} res - The response object
+ * @returns {Promise<Object>} The updated user data
+ */
+async function updateUserPreferences(userId, preferences, res) {
+	const user = await User.updateUserPreferences(userId, preferences);
+	return res.json(user);
+}
+
 module.exports = {
 	addUser,
 	getUser,
@@ -257,4 +269,5 @@ module.exports = {
 	checkDevice,
 	searchUsers,
 	inviteUser,
+	updateUserPreferences,
 };

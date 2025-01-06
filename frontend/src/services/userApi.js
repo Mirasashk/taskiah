@@ -10,4 +10,6 @@ export const userService = {
 	// Add other user-related API calls
 	inviteUser: (email, message) =>
 		axiosInstance.post(`/users/invite`, { email, message }),
+	updateUserPreferences: (userId, preferences) =>
+		axiosInstance.put(`/users/${userId}/preferences`, preferences),
 };

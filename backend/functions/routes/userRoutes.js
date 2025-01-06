@@ -15,6 +15,7 @@ const {
 	checkDevice,
 	searchUsers,
 	inviteUser,
+	updateUserPreferences,
 } = require('../controllers/userController');
 
 /**
@@ -69,6 +70,13 @@ router.put('/:userId', async (req, res) => {
 	const userId = req.params.userId;
 	const user = req.body;
 	await updateUser(userId, user, res);
+});
+
+router.put('/:userId/preferences', async (req, res) => {
+	const userId = String(req.params.userId);
+	const preferences = req.body;
+	console.log('preferences', preferences);
+	await updateUserPreferences(userId, preferences, res);
 });
 
 module.exports = router;
