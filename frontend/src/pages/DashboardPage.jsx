@@ -22,11 +22,76 @@ const DashboardPage = () => {
 	}, [tasks]);
 
 	const activeTasks = tasks.filter((task) => task.status === 'active');
-	const completedLastWeek = tasks.filter(
+
+	// Get the start of the current week (Monday)
+	const now = new Date();
+	const currentWeekStart = new Date(now);
+	currentWeekStart.setDate(
+		now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1)
+	); // Adjust to Monday
+	currentWeekStart.setHours(0, 0, 0, 0);
+
+	const completedThisWeek = tasks.filter(
 		(task) =>
 			task.status === 'completed' &&
-			new Date(task.completedAt) >
-				new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+			new Date(task.completedAt) >= currentWeekStart
+	);
+
+	const calculateTrend = (currentCount, previousCount) => {
+		if (previousCount === 0) return { trend: 'up', value: 100 };
+		const percentageChange =
+			((currentCount - previousCount) / previousCount) * 100;
+		return {
+			trend: percentageChange >= 0 ? 'up' : 'down',
+			value: Math.abs(Math.round(percentageChange)),
+		};
+	};
+
+	const getTasksInTimeRange = (startDate, endDate) => {
+		return tasks.filter((task) => {
+			const createdAt = new Date(task.createdAt);
+			return createdAt >= startDate && createdAt < endDate;
+		});
+	};
+
+	const oneWeekAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
+	const twoWeeksAgo = new Date(now - 14 * 24 * 60 * 60 * 1000);
+
+	const currentWeekActiveTasks = getTasksInTimeRange(oneWeekAgo, now).filter(
+		(task) => task.status === 'active'
+	);
+	const previousWeekActiveTasks = getTasksInTimeRange(
+		twoWeeksAgo,
+		oneWeekAgo
+	).filter((task) => task.status === 'active');
+	const activeTrendData = calculateTrend(
+		currentWeekActiveTasks.length,
+		previousWeekActiveTasks.length
+	);
+
+	const currentWeekCompletedTasks = getTasksInTimeRange(
+		oneWeekAgo,
+		now
+	).filter((task) => task.status === 'completed');
+	const previousWeekCompletedTasks = getTasksInTimeRange(
+		twoWeeksAgo,
+		oneWeekAgo
+	).filter((task) => task.status === 'completed');
+	const completedTrendData = calculateTrend(
+		currentWeekCompletedTasks.length,
+		previousWeekCompletedTasks.length
+	);
+
+	const currentOverdueTasks = activeTasks.filter(
+		(task) => new Date(task.dueDate) < now
+	).length;
+	const previousOverdueTasks = activeTasks.filter((task) => {
+		const dueDate = new Date(task.dueDate);
+		return dueDate < oneWeekAgo && dueDate >= twoWeeksAgo;
+	}).length;
+	const overdueTrendData = calculateTrend(
+		currentOverdueTasks,
+		previousOverdueTasks
 	);
 
 	const handleDismissNotification = (id) => {
@@ -45,26 +110,22 @@ const DashboardPage = () => {
 					title='Active Tasks'
 					value={activeTasks.length}
 					icon={<FiClock className='h-6 w-6 text-blue-500' />}
-					trend='up'
-					trendValue='12'
+					trend={activeTrendData.trend}
+					trendValue={activeTrendData.value}
 				/>
 				<StatsCard
 					title='Completed This Week'
-					value={completedLastWeek.length}
+					value={currentWeekCompletedTasks.length}
 					icon={<FiCheckSquare className='h-6 w-6 text-green-500' />}
-					trend='up'
-					trendValue='8'
+					trend={completedTrendData.trend}
+					trendValue={completedTrendData.value}
 				/>
 				<StatsCard
 					title='Overdue Tasks'
-					value={
-						activeTasks.filter(
-							(task) => new Date(task.dueDate) < new Date()
-						).length
-					}
+					value={currentOverdueTasks}
 					icon={<FiAlertTriangle className='h-6 w-6 text-red-500' />}
-					trend='down'
-					trendValue='5'
+					trend={overdueTrendData.trend}
+					trendValue={overdueTrendData.value}
 				/>
 			</div>
 

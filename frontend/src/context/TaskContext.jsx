@@ -49,9 +49,6 @@ export function TaskProvider({ children }) {
 	const filterTasks = (tasks, filterName) => {
 		let filteredTasks = [];
 		const today = new Date();
-		// Clear selected task when filter changes
-		setSelectedTask(null);
-
 		switch (filterName) {
 			case 'All tasks':
 				filteredTasks = tasks.filter(
