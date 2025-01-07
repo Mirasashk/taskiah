@@ -41,12 +41,6 @@ export default function SettingsSideBar() {
 		},
 
 		{
-			name: 'Shared With Me',
-			path: '/settings/shared-with-me',
-			icon: <HiShare />,
-		},
-
-		{
 			name: 'Notifications',
 			path: '/settings/notifications',
 			icon: <HiBell />,
@@ -56,7 +50,7 @@ export default function SettingsSideBar() {
 	return (
 		<div className='w-64 h-full rounded-lg bg-white dark:bg-gray-800 pb-4'>
 			<nav className='mt-5 px-2'>
-				<div className='space-y-1'>
+				<div className='space-y-2'>
 					{menuItems.map((item) => (
 						<Link
 							key={item.name}
@@ -64,8 +58,8 @@ export default function SettingsSideBar() {
 							className={`${
 								location.pathname === item.path
 									? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white font-normal'
-									: 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white font-normal'
-							} group flex items-center px-2 py-2 text-base font-medium rounded-md`}
+									: 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white font-normal text-base'
+							} group flex items-center px-2 py-2 text-base font-normal rounded-md`}
 						>
 							{item.icon}
 							<span className='ml-3'>{item.name}</span>
