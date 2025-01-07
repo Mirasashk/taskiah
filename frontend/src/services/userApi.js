@@ -12,4 +12,8 @@ export const userService = {
 		axiosInstance.post(`/users/invite`, { email, message }),
 	updateUserPreferences: (userId, preferences) =>
 		axiosInstance.put(`/users/${userId}/preferences`, preferences),
+	getUsersByUserIds: (userIds) =>
+		axiosInstance.get(`/users/getUsersByUserIds`, {
+			params: { userIds },
+		}),
 };

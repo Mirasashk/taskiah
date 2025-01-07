@@ -99,24 +99,33 @@ class User {
 		}
 
 		const user = new User(userData);
-		// make all fields lowercase
-
 		await user.validate();
+
 		const userRef = db.collection('users').doc(userData.id);
-		await userRef.set(user.toJSON());
+		const masterListRef = db.collection('lists').doc();
 
-		// Create master list with proper initialization
-		const masterList = new List({
-			name: 'My Tasks',
-			ownerId: userRef.id,
-			sharedWith: [],
-			createdAt: new Date().toISOString(),
-			updatedAt: new Date().toISOString(),
-			tasks: [], // Initialize empty tasks array
+		return await db.runTransaction(async (transaction) => {
+			// Create user
+			const userJson = user.toJSON();
+			transaction.set(userRef, userJson);
+
+			// Create master list
+			const masterList = new List({
+				name: 'My Tasks',
+				ownerId: userRef.id,
+				sharedWith: [],
+				createdAt: new Date().toISOString(),
+				updatedAt: new Date().toISOString(),
+				tasks: [], // Initialize empty tasks array
+			});
+
+			transaction.set(masterListRef, masterList.toJSON());
+
+			return {
+				userId: userRef.id,
+				masterListId: masterListRef.id,
+			};
 		});
-
-		await List.createList(masterList.toJSON());
-		return userRef.id;
 	}
 
 	/**
@@ -138,9 +147,12 @@ class User {
 	 */
 	static async updateUser(userId, userData) {
 		const userRef = db.collection('users').doc(userId);
-		await userRef.update({ ...userData, updatedAt: new Date() });
-		const userDoc = await userRef.get();
-		return userDoc.data();
+
+		return await db.runTransaction(async (transaction) => {
+			const updatedData = { ...userData, updatedAt: new Date() };
+			transaction.update(userRef, updatedData);
+			return { ...updatedData, id: userId };
+		});
 	}
 
 	/**
@@ -187,9 +199,41 @@ class User {
 	 */
 	static async updateUserPreferences(userId, preferences) {
 		const userRef = db.collection('users').doc(userId);
-		await userRef.update({ extraInfo: { preferences } });
-		const userDoc = await userRef.get();
-		return userDoc.data();
+
+		return await db.runTransaction(async (transaction) => {
+			const userDoc = await transaction.get(userRef);
+			const userData = userDoc.data();
+			const existingPreferences =
+				(userData.extraInfo && userData.extraInfo.preferences) || {};
+
+			const updatedPreferences = {
+				extraInfo: {
+					...userData.extraInfo,
+					preferences: {
+						...existingPreferences,
+						...preferences,
+					},
+				},
+			};
+
+			transaction.update(userRef, updatedPreferences);
+
+			return {
+				...userData,
+				...updatedPreferences,
+			};
+		});
+	}
+
+	/**
+	 * Retrieves users by their IDs
+	 * @param {string} userIds - The IDs of the users to retrieve
+	 * @returns {Promise<Array<Object>>} The users data
+	 */
+	static async getUsersByUserIds(userIds) {
+		const usersRef = db.collection('users').where('id', 'in', userIds);
+		const users = await usersRef.get();
+		return users.docs.map((doc) => doc.data());
 	}
 }
 

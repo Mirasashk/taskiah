@@ -259,6 +259,17 @@ async function updateUserPreferences(userId, preferences, res) {
 	return res.json(user);
 }
 
+/**
+ * Retrieves users by their IDs
+ * @param {string} userIds - The IDs of the users to retrieve
+ * @param {Object} res - The response object
+ * @returns {Promise<Object>} The users
+ */
+async function getUsersByUserIds(userIds, res) {
+	const users = await User.getUsersByUserIds(userIds);
+	return res.json(users);
+}
+
 module.exports = {
 	addUser,
 	getUser,
@@ -270,4 +281,5 @@ module.exports = {
 	searchUsers,
 	inviteUser,
 	updateUserPreferences,
+	getUsersByUserIds,
 };

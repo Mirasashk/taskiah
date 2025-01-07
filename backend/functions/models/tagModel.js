@@ -52,14 +52,21 @@ class Tag {
 	/**
 	 * Creates a new tag in the database
 	 * @param {Object} tagData - The tag data
-	 * @returns {Promise<string>} The ID of the created tag
+	 * @returns {Promise<Object>} The created tag data
 	 */
 	static async createTag(tagData) {
 		const tag = new Tag(tagData);
 		await tag.validate();
 		const tagRef = db.collection('tags').doc();
-		await tagRef.set(tag.toJSON());
-		return tagRef.id;
+
+		return await db.runTransaction(async (transaction) => {
+			const tagJson = tag.toJSON();
+			transaction.set(tagRef, tagJson);
+			return {
+				id: tagRef.id,
+				...tagJson,
+			};
+		});
 	}
 
 	/**
@@ -70,20 +77,37 @@ class Tag {
 	static async getTag(tagId) {
 		const tagRef = db.collection('tags').doc(tagId);
 		const tag = await tagRef.get();
-		return tag.data();
+		return {
+			id: tag.id,
+			...tag.data(),
+		};
 	}
 
 	/**
 	 * Updates a tag in the database
 	 * @param {string} tagId - The ID of the tag to update
 	 * @param {Object} tagData - The updated tag data
-	 * @returns {Promise<void>}
+	 * @returns {Promise<Object>} The updated tag data
 	 */
 	static async updateTag(tagId, tagData) {
 		const tag = new Tag(tagData);
 		await tag.validate();
 		const tagRef = db.collection('tags').doc(tagId);
-		await tagRef.update(tag.toJSON());
+
+		return await db.runTransaction(async (transaction) => {
+			const tagDoc = await transaction.get(tagRef);
+			if (!tagDoc.exists) {
+				throw new Error('Tag not found');
+			}
+
+			const updatedData = tag.toJSON();
+			transaction.update(tagRef, updatedData);
+
+			return {
+				id: tagId,
+				...updatedData,
+			};
+		});
 	}
 
 	/**

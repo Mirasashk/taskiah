@@ -19,6 +19,7 @@ const { FieldValue } = require('firebase-admin/firestore');
  * @method getListInviteByListId
  * @method getListInviteByEmailAndListId
  * @method acceptListInvite
+ * @method rejectListInvite
  */
 class ListInvite {
 	/**
@@ -87,7 +88,6 @@ class ListInvite {
 			.where('accepted', '==', false)
 			.where('status', '==', 'pending')
 			.get();
-
 		// Get all invites data and fetch corresponding lists
 		const invitesWithLists = await Promise.all(
 			listInvites.docs.map(async (doc) => {
