@@ -39,7 +39,6 @@ async function getUser(userId, res) {
  * @returns {Promise<Object>} The updated user data
  */
 async function updateUser(userId, user, res) {
-	console.log('Updating user', userId);
 	try {
 		// If email is being updated, update it in Firebase Auth first
 		await auth().updateUser(userId, {
@@ -70,9 +69,6 @@ async function updateUserPublicKey(
 	userAgent,
 	res
 ) {
-	console.log('userId', userId);
-	console.log('deviceId', deviceId);
-	console.log('publicKey', publicKey);
 	const createDate = new Date();
 	const lastUsedDate = new Date();
 
@@ -170,8 +166,6 @@ async function verifyBiometricPublicKey(deviceId, signature, payload, res) {
  * @returns {Promise<Object>} The device status
  */
 async function checkDevice(deviceId, userId, res) {
-	console.log('deviceId', deviceId);
-	console.log('userId', userId);
 	try {
 		const device = await db
 			.collection('deviceRegistration')
@@ -228,7 +222,6 @@ function formatPublicKey(publicKey) {
  * @returns {Promise<Object>} The users
  */
 async function searchUsers(query, res) {
-	console.log('Searching users with query:', query);
 	const users = await User.searchUsers(query);
 	return res.json(users);
 }
@@ -242,8 +235,6 @@ async function searchUsers(query, res) {
  * TODO: Implement this function
  */
 async function inviteUser(email, message, res) {
-	console.log('Inviting user with email:', email);
-	console.log('Inviting user with message:', message);
 	return res.json({ message: 'User invited' });
 }
 

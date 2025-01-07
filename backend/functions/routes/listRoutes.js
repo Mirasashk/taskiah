@@ -34,7 +34,6 @@ router.get('/shared/:userId', async (req, res) => {
 });
 
 router.post('/invite', async (req, res) => {
-	console.log('invite', req.body);
 	await inviteToList(req.body, res);
 });
 
@@ -48,7 +47,6 @@ router.put('/invite/:id/accept', async (req, res) => {
 });
 
 router.put('/invite/:id/reject', async (req, res) => {
-	console.log('id', req.params.id);
 	await rejectListInvite(req.params.id, res);
 });
 

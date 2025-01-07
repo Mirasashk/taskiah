@@ -42,7 +42,6 @@ router.delete('/:taskId', async (req, res) => {
 router.put('/:taskId', async (req, res) => {
 	const taskId = req.params.taskId;
 	const newTaskData = req.body;
-	console.log('newTaskData', newTaskData);
 	await updateTask(taskId, newTaskData);
 	res.send('Task updated!');
 });

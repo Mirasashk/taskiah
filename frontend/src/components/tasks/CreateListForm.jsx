@@ -17,7 +17,6 @@ const CreateListForm = ({ onClose, list }) => {
 	useEffect(() => {
 		if (list) {
 			setFormData(list);
-			console.log(list);
 			if (list.sharedWith.length > 0) {
 				const fetchUsers = async () => {
 					const users = await userService.getUsersByUserIds(

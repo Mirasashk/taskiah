@@ -20,7 +20,6 @@ const UserInviteModal = ({ isOpen, onClose, emailSearch }) => {
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		console.log({ email, message });
 		userService.inviteUser(email, message);
 		onClose();
 	};

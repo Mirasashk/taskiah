@@ -110,7 +110,6 @@ class Task {
 	 * @returns {Promise<string>} The ID of the created task
 	 */
 	static async createTask(taskData) {
-		console.log('taskData', taskData);
 		const task = new Task(taskData);
 		const notification = new Notification(
 			Object.values(taskData.notifications)[0]
@@ -218,9 +217,6 @@ class Task {
 			...doc.data(),
 		}));
 
-		console.log('ownerTasksData', ownerTasksData);
-		console.log('sharedTasksData', sharedTasksData);
-		console.log('sharedListsTasks', sharedListsTasks);
 		//Combine and remove duplicates
 		return [
 			...ownerTasksData,

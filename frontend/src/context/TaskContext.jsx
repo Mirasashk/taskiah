@@ -71,7 +71,6 @@ export function TaskProvider({ children }) {
 				);
 				break;
 			case 'Deleted':
-				console.log('deletedTasks', deletedTasks);
 				filteredTasks = deletedTasks.filter(
 					(task) =>
 						task.updatedAt > new Date() - 1000 * 60 * 60 * 24 * 7 // 1 week ago
@@ -120,7 +119,6 @@ export function TaskProvider({ children }) {
 	};
 
 	const toggleTask = async (taskId, taskData) => {
-		console.log('toggleTask', taskId, taskData);
 		setTasks(
 			tasks.map((task) =>
 				task.id === taskId ? { ...task, ...taskData } : task

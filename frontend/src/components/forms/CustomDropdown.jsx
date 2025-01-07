@@ -11,10 +11,6 @@ const CustomDropdown = ({ options, selected, onChange }) => {
 	};
 
 	useEffect(() => {
-		console.log(selected);
-	}, [selected]);
-
-	useEffect(() => {
 		const handleClickOutside = (event) => {
 			if (isOpen && !event.target.closest('.dropdown-container')) {
 				setIsOpen(false);

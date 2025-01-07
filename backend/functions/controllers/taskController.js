@@ -42,12 +42,8 @@ async function getTasks(userId, res) {
  * @returns {Promise<void>}
  */
 async function updateTask(taskId, newTaskData) {
-	console.log('taskId', taskId);
-	console.log('newTaskData', newTaskData);
-
 	try {
 		await db.collection('tasks').doc(taskId).update(newTaskData);
-		console.log('Task updated successfully.');
 	} catch (error) {
 		console.error('Error updating task:', error);
 	}
@@ -61,7 +57,6 @@ async function updateTask(taskId, newTaskData) {
 async function deleteTask(taskId) {
 	try {
 		await db.collection('tasks').doc(taskId).delete();
-		console.log('Task deleted successfully.');
 	} catch (error) {
 		console.error('Error deleting task:', error);
 	}
@@ -81,7 +76,6 @@ async function deleteAllTasks(userId) {
 			.get();
 
 		if (querySnapshot.empty) {
-			console.log('No tasks found to delete.');
 			return;
 		}
 
@@ -89,8 +83,6 @@ async function deleteAllTasks(userId) {
 			doc.ref.delete()
 		);
 		await Promise.all(deletePromises);
-
-		console.log('All tasks deleted successfully.');
 	} catch (error) {
 		console.error('Error deleting all tasks:', error);
 	}

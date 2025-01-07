@@ -65,7 +65,6 @@ router.get('/biometric/check-device/:deviceId/:userId', async (req, res) => {
 
 router.get('/getUsersByUserIds', async (req, res) => {
 	const userIds = req.query.userIds;
-	console.log('userIds', userIds);
 	await getUsersByUserIds(userIds, res);
 });
 
@@ -82,7 +81,6 @@ router.put('/:userId', async (req, res) => {
 router.put('/:userId/preferences', async (req, res) => {
 	const userId = req.params.userId;
 	const preferences = req.body;
-	console.log('preferences', preferences);
 	await updateUserPreferences(userId, preferences, res);
 });
 

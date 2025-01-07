@@ -10,7 +10,6 @@ const DeleteModal = ({ open, onClose, itemType, item, title, message }) => {
 	const { userData } = useUser();
 
 	const filterTasksByItem = (item) => {
-		console.log(item);
 		if (itemType === 'list') {
 			return tasks.filter((task) => item.tasks?.includes(task.id));
 		} else if (itemType === 'sharedList') {

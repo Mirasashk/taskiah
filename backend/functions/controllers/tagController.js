@@ -12,7 +12,6 @@ const Tag = require('../models/tagModel');
  * @returns {Promise<Object>} The tag data
  */
 const addTag = async (tag, res) => {
-	console.log('tag', tag);
 	const tagId = await Tag.createTag(tag);
 	res.status(200).json({
 		message: 'Tag added successfully',
@@ -28,7 +27,6 @@ const addTag = async (tag, res) => {
  */
 const getTags = async (id, res) => {
 	const tags = await Tag.getTagsByOwnerId(id);
-	console.log('tags', tags);
 	res.status(200).json(tags);
 };
 

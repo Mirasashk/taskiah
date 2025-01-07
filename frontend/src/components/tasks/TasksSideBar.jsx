@@ -31,7 +31,6 @@ const TasksSidebar = ({ onFilterTasks }) => {
 	const today = new Date();
 
 	useEffect(() => {
-		//console.log('Selected filter changed:', selectedFilter);
 		filterTasks(tasks, selectedFilter);
 	}, [selectedFilter, tasks]);
 

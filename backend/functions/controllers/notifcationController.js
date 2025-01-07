@@ -14,7 +14,6 @@ const { updateTask } = require('./taskController');
  * @returns {Promise<Object>} The notification data
  */
 const addNotification = async (req, res) => {
-	console.log('req.body', req.body);
 	const notificationData = {
 		message: req.body.notification.message,
 		type: req.body.notification.type,
@@ -36,7 +35,6 @@ const addNotification = async (req, res) => {
 			},
 		});
 
-		console.log(`Notification added for task ${req.params.taskId}`);
 		res.status(200).json({
 			message: 'Notification added successfully',
 			notification: notificationObject,
@@ -53,7 +51,6 @@ const addNotification = async (req, res) => {
  * @returns {Promise<Array<Object>>} The notifications data
  */
 const getNotifications = async (req, res) => {
-	console.log('taskId', req.params.taskId);
 	const notifications = await db
 		.collection('tasks')
 		.doc(req.params.taskId)

@@ -34,7 +34,6 @@ const SideBarItem = ({
 		if (itemType === 'list') {
 			return tasks.filter((task) => item.tasks?.includes(task.id));
 		} else if (itemType === 'sharedList') {
-			console.log('item.sharedWith', item);
 			return tasks.filter((task) => item.tasks?.includes(task.id));
 		} else if (itemType === 'tag') {
 			return tasks.filter((task) => task.tagIds?.includes(item.id));

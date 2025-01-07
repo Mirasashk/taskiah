@@ -148,10 +148,6 @@ class List {
 			.collection('lists')
 			.where('sharedWith', 'array-contains', email);
 		const lists = await listsRef.get();
-		console.log(
-			'Lists:',
-			lists.docs.map((doc) => doc.data())
-		);
 		return lists.docs.map((doc) => ({
 			id: doc.id,
 			...doc.data(),
