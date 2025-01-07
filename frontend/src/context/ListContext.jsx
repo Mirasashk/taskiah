@@ -42,7 +42,7 @@ export function ListProvider({ children }) {
 
 	const refreshContext = async () => {
 		await getLists(userData.id);
-		await getSharedLists(userData.email);
+		await getSharedLists(userData.id);
 		await getTags(userData.id);
 	};
 

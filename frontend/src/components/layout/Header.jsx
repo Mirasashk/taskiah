@@ -12,7 +12,7 @@ import { GoMoon } from 'react-icons/go';
 
 export default function Header() {
 	const navigate = useNavigate();
-	const { isDarkMode, toggleTheme } = useTheme();
+	const { theme, updateTheme } = useTheme();
 	const { user, logout } = useAuth();
 	const { userData, userImage, clearUserData } = useUser();
 	const [showUserMenu, setShowUserMenu] = useState(false);
@@ -45,6 +45,10 @@ export default function Header() {
 		} catch (error) {
 			console.error('Failed to logout:', error);
 		}
+	};
+
+	const toggleTheme = () => {
+		updateTheme({ mode: theme.mode === 'dark' ? 'light' : 'dark' });
 	};
 
 	const userMenuDisplay = showUserMenu ? (
@@ -167,7 +171,7 @@ export default function Header() {
 								</Link>
 								<Link
 									to='/signup'
-									className='px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700'
+									className='px-4 py-2 bg-primary text-white rounded-lg hover:bg-opacity-90'
 								>
 									Sign Up
 								</Link>
@@ -179,7 +183,7 @@ export default function Header() {
 							onClick={toggleTheme}
 							className='p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
 						>
-							{isDarkMode ? (
+							{theme.mode === 'dark' ? (
 								<GoSun className='h-6 w-6' />
 							) : (
 								<GoMoon className='h-6 w-6' />

@@ -59,7 +59,7 @@ class List {
 	/**
 	 * Creates a new list in the database
 	 * @param {Object} listData - The list data
-	 * @returns {Promise<string>} The ID of the created list
+	 * @returns {Promise<Object>} The created list data
 	 */
 	static async createList(listData) {
 		const list = new List(listData);
@@ -77,21 +77,40 @@ class List {
 	static async getList(listId) {
 		const listRef = db.collection('lists').doc(listId);
 		const list = await listRef.get();
-		return list.data();
+		return {
+			id: list.id,
+			...list.data(),
+		};
 	}
 
 	/**
 	 * Updates a list in the database
 	 * @param {string} listId - The ID of the list to update
 	 * @param {Object} listData - The updated list data
-	 * @returns {Promise<void>}
+	 * @returns {Promise<Object>} The updated list data
 	 */
 	static async updateList(listId, listData) {
 		const list = new List(listData);
 		await list.validate();
 		const listRef = db.collection('lists').doc(listId);
-		await listRef.update(list.toJSON());
-		return listRef.id;
+
+		return await db.runTransaction(async (transaction) => {
+			const listDoc = await transaction.get(listRef);
+			if (!listDoc.exists) {
+				throw new Error('List not found');
+			}
+
+			const updatedData = {
+				...list.toJSON(),
+				updatedAt: new Date().toISOString(),
+			};
+
+			transaction.update(listRef, updatedData);
+			return {
+				id: listId,
+				...updatedData,
+			};
+		});
 	}
 
 	/**

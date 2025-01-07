@@ -17,30 +17,15 @@ const TaskDetailSideBar = ({ task, onClose, onSave, isEditing, onEdit }) => {
 	if (!task) return null;
 
 	useEffect(() => {
-		console.log('selectedTags', selectedTags);
-	}, [selectedTags]);
-
-	useEffect(() => {
 		setEditedTask(task);
-		console.log('Task:', task);
-		console.log('Tags:', tags);
-		console.log('Task.tagIds:', task.tagIds);
 
 		if (tags && task.tagIds) {
 			const tagsArray =
 				typeof task.tagIds === 'string' ? [task.tagIds] : task.tagIds;
-			console.log('TagsArray:', tagsArray);
 
 			const filteredTags = tags.filter((tag) => {
-				console.log(
-					'Checking tag:',
-					tag.id,
-					'against tagsArray:',
-					tagsArray
-				);
 				return tagsArray.includes(tag.id);
 			});
-			console.log('Filtered Tags:', filteredTags);
 
 			setSelectedTags(filteredTags);
 		} else {

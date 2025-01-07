@@ -120,18 +120,28 @@ class Task {
 			notification: notification.toJSON(),
 		};
 		await task.validate();
+
 		const taskRef = db.collection('tasks').doc();
-		await taskRef.set(task.toJSON());
-		const taskDoc = await taskRef.get();
-
-		// Add the task to the list of tasks
 		const listRef = db.collection('lists').doc(taskData.listId);
-		const list = await listRef.get();
-		const listData = list.data();
-		listData.tasks = [...listData.tasks, taskDoc.id];
-		await listRef.update(listData);
 
-		return taskDoc.data();
+		return await db.runTransaction(async (transaction) => {
+			// Get the list data
+			const listDoc = await transaction.get(listRef);
+			const listData = listDoc.data();
+
+			// Create task
+			const taskData = task.toJSON();
+			transaction.set(taskRef, taskData);
+
+			// Update list with new task ID
+			const updatedTasks = [...listData.tasks, taskRef.id];
+			transaction.update(listRef, { tasks: updatedTasks });
+
+			return {
+				id: taskRef.id,
+				...taskData,
+			};
+		});
 	}
 
 	/**
@@ -155,7 +165,24 @@ class Task {
 		const task = new Task(taskData);
 		await task.validate();
 		const taskRef = db.collection('tasks').doc(taskId);
-		await taskRef.update(task.toJSON());
+
+		return await db.runTransaction(async (transaction) => {
+			const taskDoc = await transaction.get(taskRef);
+			if (!taskDoc.exists) {
+				throw new Error('Task not found');
+			}
+
+			const updatedData = {
+				...task.toJSON(),
+				updatedAt: new Date().toISOString(),
+			};
+
+			transaction.update(taskRef, updatedData);
+			return {
+				id: taskId,
+				...updatedData,
+			};
+		});
 	}
 
 	/**

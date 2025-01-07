@@ -3,22 +3,39 @@ import Input from '../forms/Input';
 import UserSearch from '../common/UserSearch';
 import { listService } from '../../services/listApi';
 import { useUser } from '../../context/UserContext';
-const CreateListForm = ({ onClose }) => {
+import { useListContext } from '../../context/ListContext';
+import { userService } from '../../services/userApi';
+const CreateListForm = ({ onClose, list }) => {
 	const [formData, setFormData] = useState({
 		name: '',
 		ownerId: '',
 	});
 	const [selectedUsers, setSelectedUsers] = useState([]);
 	const { userData } = useUser();
+	const { refreshContext } = useListContext();
 
 	useEffect(() => {
-		setFormData((prevFormData) => {
-			const newFormData = {
-				...prevFormData,
-				ownerId: userData.id,
-			};
-			return newFormData;
-		});
+		if (list) {
+			setFormData(list);
+			console.log(list);
+			if (list.sharedWith.length > 0) {
+				const fetchUsers = async () => {
+					const users = await userService.getUsersByUserIds(
+						list.sharedWith
+					);
+					setSelectedUsers(users.data);
+				};
+				fetchUsers();
+			}
+		} else {
+			setFormData((prevFormData) => {
+				const newFormData = {
+					...prevFormData,
+					ownerId: userData.id,
+				};
+				return newFormData;
+			});
+		}
 	}, [userData.id]);
 
 	const handleSubmit = async (e) => {
@@ -34,6 +51,7 @@ const CreateListForm = ({ onClose }) => {
 				status: 'pending',
 			});
 		});
+		await refreshContext();
 		onClose();
 	};
 
@@ -61,7 +79,7 @@ const CreateListForm = ({ onClose }) => {
 						type='submit'
 						className='bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition-colors duration-300 w-1/2'
 					>
-						Create
+						{list ? 'Update' : 'Create'}
 					</button>
 				</div>
 			</div>
