@@ -140,20 +140,23 @@ const DashboardPage = () => {
 					<h2 className='text-lg font-semibold text-gray-900 dark:text-white mb-4'>
 						Notifications
 					</h2>
-					{notifications.map((notification) => {
-						const newNotification = Object.values(notification)[0];
-						const thisNotification = {
-							...newNotification,
-						};
+					{notifications
+						.slice(0, 8) // Limit to 8 notifications
+						.map((notification) => {
+							const newNotification =
+								Object.values(notification)[0];
+							const thisNotification = {
+								...newNotification,
+							};
 
-						return (
-							<NotificationCard
-								key={thisNotification.createdAt}
-								notification={thisNotification}
-								onDismiss={handleDismissNotification}
-							/>
-						);
-					})}
+							return (
+								<NotificationCard
+									key={thisNotification.createdAt}
+									notification={thisNotification}
+									onDismiss={handleDismissNotification}
+								/>
+							);
+						})}
 				</div>
 			</div>
 		</div>
