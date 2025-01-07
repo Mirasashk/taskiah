@@ -1,4 +1,3 @@
-const { jest } = require('@jest/globals');
 const Task = require('../../models/taskModel');
 
 // Mock Firebase
@@ -6,17 +5,36 @@ jest.mock('../../config/firebase', () => ({
 	db: {
 		collection: jest.fn(() => ({
 			doc: jest.fn(() => ({
-				set: jest.fn(),
-				get: jest.fn(),
-				update: jest.fn(),
-				delete: jest.fn(),
+				set: jest.fn().mockResolvedValue(),
+				get: jest.fn().mockResolvedValue({
+					id: 'task123',
+					data: () => ({ title: 'Test Task' }),
+				}),
+				update: jest.fn().mockResolvedValue(),
+				delete: jest.fn().mockResolvedValue(),
 			})),
 			where: jest.fn(() => ({
-				get: jest.fn(() => ({
-					docs: [{ data: () => ({ title: 'Test Task' }) }],
-				})),
+				get: jest.fn().mockResolvedValue({
+					docs: [
+						{
+							id: 'task123',
+							data: () => ({ title: 'Test Task' }),
+						},
+					],
+				}),
 			})),
 		})),
+		runTransaction: jest.fn(async (callback) => {
+			const mockTransaction = {
+				get: jest.fn().mockResolvedValue({
+					exists: true,
+					data: () => ({ tasks: [] }),
+				}),
+				update: jest.fn(),
+				set: jest.fn(),
+			};
+			return callback(mockTransaction);
+		}),
 	},
 }));
 
@@ -28,6 +46,15 @@ describe('Task Model', () => {
 		priority: 'medium',
 		ownerId: 'user123',
 		dueDate: '2024-03-20T00:00:00.000Z',
+		notifications: {
+			reminder: {
+				message: 'Test Message',
+				type: 'reminder',
+				status: 'unread',
+				notifyOn: '2024-03-20T00:00:00.000Z',
+			},
+		},
+		listId: 'list123',
 	};
 
 	describe('Constructor and Validation', () => {

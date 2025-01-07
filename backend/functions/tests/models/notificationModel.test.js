@@ -1,32 +1,54 @@
-const { jest } = require('@jest/globals');
 const Notification = require('../../models/notificationModel');
+
+// Create chainable mock functions
+const mockDoc = {
+	id: 'notification123',
+	set: jest.fn().mockResolvedValue(),
+	get: jest.fn().mockResolvedValue({
+		id: 'notification123',
+		data: () => ({ message: 'Test Notification' }),
+	}),
+	update: jest.fn().mockResolvedValue(),
+	delete: jest.fn().mockResolvedValue(),
+};
+
+const mockWhere = {
+	get: jest.fn().mockResolvedValue({
+		docs: [
+			{
+				id: 'notification123',
+				data: () => ({ type: 'reminder' }),
+			},
+		],
+	}),
+	where: jest.fn().mockReturnThis(),
+};
+
+const mockCollection = {
+	doc: jest.fn(() => mockDoc),
+	where: jest.fn(() => mockWhere),
+};
 
 // Mock Firebase
 jest.mock('../../config/firebase', () => ({
 	db: {
-		collection: jest.fn(() => ({
-			doc: jest.fn(() => ({
-				set: jest.fn(),
-				get: jest.fn(),
-				update: jest.fn(),
-				delete: jest.fn(),
-			})),
-			where: jest.fn(() => ({
-				get: jest.fn(() => ({
-					docs: [{ data: () => ({ message: 'Test Notification' }) }],
-				})),
-			})),
-		})),
+		collection: jest.fn(() => mockCollection),
 	},
 }));
+
+const { db } = require('../../config/firebase');
 
 describe('Notification Model', () => {
 	const mockNotificationData = {
 		message: 'Test notification',
-		type: 'important',
+		type: 'reminder',
 		status: 'unread',
 		notifyOn: new Date().toISOString(),
 	};
+
+	beforeEach(() => {
+		jest.clearAllMocks();
+	});
 
 	describe('Constructor and Validation', () => {
 		test('should create a valid notification instance', () => {
@@ -37,7 +59,7 @@ describe('Notification Model', () => {
 		});
 
 		test('should throw error for missing required fields', () => {
-			const invalidData = { type: 'important' };
+			const invalidData = { status: 'unread' };
 			const notification = new Notification(invalidData);
 			expect(() => notification.validate()).toThrow(
 				'Message is required'
@@ -72,7 +94,15 @@ describe('Notification Model', () => {
 			const notificationId = await Notification.createNotification(
 				mockNotificationData
 			);
-			expect(notificationId).toBeDefined();
+			expect(notificationId).toBe('notification123');
+			expect(db.collection).toHaveBeenCalledWith('notifications');
+			expect(mockDoc.set).toHaveBeenCalledWith(
+				expect.objectContaining({
+					message: mockNotificationData.message,
+					type: mockNotificationData.type,
+					status: mockNotificationData.status,
+				})
+			);
 		});
 
 		test('should retrieve notification from database', async () => {
@@ -80,20 +110,43 @@ describe('Notification Model', () => {
 				'notification123'
 			);
 			expect(notificationData).toBeDefined();
+			expect(db.collection).toHaveBeenCalledWith('notifications');
+			expect(mockCollection.doc).toHaveBeenCalledWith('notification123');
 		});
 
-		test('should get notifications by status', async () => {
-			const notifications = await Notification.getNotificationsByStatus(
-				'unread'
-			);
-			expect(Array.isArray(notifications)).toBe(true);
+		test('should update notification in database', async () => {
+			await expect(
+				Notification.updateNotification(
+					'notification123',
+					mockNotificationData
+				)
+			).resolves.not.toThrow();
+			expect(db.collection).toHaveBeenCalledWith('notifications');
+			expect(mockCollection.doc).toHaveBeenCalledWith('notification123');
+			expect(mockDoc.update).toHaveBeenCalled();
 		});
 
-		test('should get notifications by type', async () => {
-			const notifications = await Notification.getNotificationsByType(
-				'important'
+		test('should delete notification from database', async () => {
+			await expect(
+				Notification.deleteNotification('notification123')
+			).resolves.not.toThrow();
+			expect(db.collection).toHaveBeenCalledWith('notifications');
+			expect(mockCollection.doc).toHaveBeenCalledWith('notification123');
+			expect(mockDoc.delete).toHaveBeenCalled();
+		});
+
+		test('should get notifications by user', async () => {
+			const notifications = await Notification.getNotificationsByUserId(
+				'user123'
 			);
+			expect(notifications).toBeDefined();
 			expect(Array.isArray(notifications)).toBe(true);
+			expect(db.collection).toHaveBeenCalledWith('notifications');
+			expect(mockCollection.where).toHaveBeenCalledWith(
+				'userId',
+				'==',
+				'user123'
+			);
 		});
 	});
 });

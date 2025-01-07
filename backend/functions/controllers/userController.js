@@ -16,8 +16,13 @@ const crypto = require('crypto');
  * @returns {Promise<Object>} The user data
  */
 async function addUser(user, res) {
-	const userId = await User.createUser(user);
-	return res.json({ id: userId });
+	try {
+		const userId = await User.createUser(user);
+		return res.json({ id: userId });
+	} catch (error) {
+		console.error('Error adding user:', error);
+		return res.status(500).json({ error: 'Failed to add user' });
+	}
 }
 
 /**
@@ -27,8 +32,13 @@ async function addUser(user, res) {
  * @returns {Promise<Object>} The user data
  */
 async function getUser(userId, res) {
-	const userData = await User.getUser(userId);
-	return res.json(userData);
+	try {
+		const userData = await User.getUser(userId);
+		return res.json(userData);
+	} catch (error) {
+		console.error('Error getting user:', error);
+		return res.status(500).json({ error: 'Failed to get user' });
+	}
 }
 
 /**
@@ -261,10 +271,27 @@ async function getUsersByUserIds(userIds, res) {
 	return res.json(users);
 }
 
+/**
+ * Deletes a user from the database
+ * @param {string} userId - The ID of the user to delete
+ * @param {Object} res - The response object
+ * @returns {Promise<Object>} The response
+ */
+async function deleteUser(userId, res) {
+	try {
+		await db.collection('users').doc(userId).delete();
+		return res.json({ message: 'User deleted successfully' });
+	} catch (error) {
+		console.error('Error deleting user:', error);
+		return res.status(500).json({ error: 'Failed to delete user' });
+	}
+}
+
 module.exports = {
 	addUser,
 	getUser,
 	updateUser,
+	deleteUser,
 	updateUserPublicKey,
 	getBiometricChallenge,
 	verifyBiometricPublicKey,

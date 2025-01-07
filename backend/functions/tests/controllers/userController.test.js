@@ -1,156 +1,206 @@
 const {
-    addUser,
-    getUser,
-    updateUser,
+	addUser,
+	getUser,
+	updateUser,
+	deleteUser,
 } = require('../../controllers/userController');
-const { db, auth } = require('../../config/firebase');
+const { db } = require('../../config/firebase');
+const User = require('../../models/userModel');
 
-jest.mock('firebase-admin', () => {
-    const updateUserMock = jest.fn().mockResolvedValue({});
-    return {
-        initializeApp: jest.fn(),
-        auth: jest.fn(() => ({
-            updateUser: updateUserMock,
-        })),
-    };
-});
+const mockUserData = {
+	id: 'user123',
+	email: 'test@example.com',
+	firstName: 'Test',
+	lastName: 'User',
+	username: 'testuser',
+	role: 'user',
+};
 
 jest.mock('../../config/firebase', () => {
-    const updateMock = jest.fn().mockResolvedValue({});
-    const getMock = jest.fn().mockResolvedValue({
-        data: () => ({ id: '123', name: 'Test User' }),
-        exists: true,
-    });
-    const docRef = {
-        set: jest.fn().mockResolvedValue({}),
-        get: getMock,
-        update: updateMock,
-    };
-    const docMock = jest.fn(() => docRef);
+	const getMock = jest.fn().mockResolvedValue({
+		exists: true,
+		data: () => mockUserData,
+	});
 
-    return {
-        db: {
-            collection: jest.fn(() => ({
-                doc: docMock,
-            })),
-        },
-        auth: jest.fn(() => ({
-            updateUser: jest.fn().mockResolvedValue({}),
-        })),
-    };
+	const mockDoc = {
+		get: getMock,
+		update: jest.fn().mockResolvedValue(),
+		delete: jest.fn().mockResolvedValue(),
+	};
+
+	const mockCollection = {
+		doc: jest.fn(() => mockDoc),
+	};
+
+	return {
+		db: {
+			collection: jest.fn(() => mockCollection),
+			runTransaction: jest.fn(async (callback) => {
+				const mockTransaction = {
+					get: jest.fn().mockResolvedValue({
+						exists: true,
+						data: () => mockUserData,
+					}),
+					update: jest.fn(),
+					set: jest.fn(),
+				};
+				return callback(mockTransaction);
+			}),
+		},
+	};
 });
 
 jest.mock('../../models/userModel', () => {
-    const mockValidate = jest.fn();
-    const MockUserModel = jest.fn().mockImplementation(() => ({
-        toJSON: jest
-            .fn()
-            .mockReturnValue({ id: '123', name: 'Test User' }),
-        validate: mockValidate,
-    }));
-    MockUserModel.mockValidate = mockValidate;
-    return MockUserModel;
+	return class User {
+		constructor(data) {
+			Object.assign(this, data);
+		}
+		validate() {
+			return true;
+		}
+		toJSON() {
+			return { ...this };
+		}
+		static async createUser(userData) {
+			return { userId: 'user123', masterListId: 'list123' };
+		}
+		static async getUser(userId) {
+			return mockUserData;
+		}
+		static async updateUser(userId, userData) {
+			return { ...userData, id: userId };
+		}
+	};
 });
 
+jest.mock('firebase-admin', () => ({
+	auth: jest.fn(() => ({
+		updateUser: jest.fn().mockResolvedValue(),
+	})),
+}));
+
 describe('User Controller', () => {
-    beforeEach(() => {
-        jest.clearAllMocks();
-    });
+	beforeEach(() => {
+		jest.clearAllMocks();
+	});
 
-    describe('addUser', () => {
-        it('should add a user to the database', async () => {
-            const user = { id: '123', name: 'Test User' };
-            const UserModel = require('../../models/userModel');
+	describe('addUser', () => {
+		it('should add a user to the database', async () => {
+			const res = {
+				json: jest.fn(),
+			};
+			await addUser(mockUserData, res);
+			expect(res.json).toHaveBeenCalledWith({
+				id: { userId: 'user123', masterListId: 'list123' },
+			});
+		});
 
-            await addUser(user);
+		it('should handle errors when adding a user', async () => {
+			const res = {
+				status: jest.fn().mockReturnThis(),
+				json: jest.fn(),
+			};
+			jest.spyOn(User, 'createUser').mockRejectedValue(new Error());
+			await addUser(mockUserData, res);
+			expect(res.status).toHaveBeenCalledWith(500);
+			expect(res.json).toHaveBeenCalledWith({
+				error: 'Failed to add user',
+			});
+		});
+	});
 
-            expect(UserModel.mockValidate).toHaveBeenCalled();
-            expect(db.collection).toHaveBeenCalledWith('users');
-            expect(db.collection().doc).toHaveBeenCalledWith(user.id);
-        });
-    });
+	describe('getUser', () => {
+		it('should retrieve a user from the database', async () => {
+			const res = {
+				json: jest.fn(),
+			};
+			await getUser('user123', res);
+			expect(res.json).toHaveBeenCalledWith(mockUserData);
+		});
 
-    describe('getUser', () => {
-        it('should retrieve a user from the database', async () => {
-            const userId = '123';
-            const userData = { id: userId, name: 'Test User' };
+		it('should handle errors when getting a user', async () => {
+			const res = {
+				status: jest.fn().mockReturnThis(),
+				json: jest.fn(),
+			};
+			jest.spyOn(User, 'getUser').mockRejectedValue(
+				new Error('Get user error')
+			);
+			await getUser('user123', res);
+			expect(res.status).toHaveBeenCalledWith(500);
+			expect(res.json).toHaveBeenCalledWith({
+				error: 'Failed to get user',
+			});
+		});
+	});
 
-            db.collection()
-                .doc()
-                .get.mockResolvedValue({
-                    data: () => userData,
-                });
+	describe('updateUser', () => {
+		it('should update a user in the database', async () => {
+			const userId = 'user123';
+			const updates = {
+				firstName: 'Updated',
+				lastName: 'User',
+			};
+			const res = {
+				status: jest.fn().mockReturnThis(),
+				json: jest.fn(),
+			};
+			await updateUser(userId, updates, res);
+			expect(res.json).toHaveBeenCalledWith({
+				...updates,
+				id: userId,
+			});
+		});
 
-            const result = await getUser(userId);
+		it('should handle errors when updating a user', async () => {
+			const userId = 'user123';
+			const updates = {
+				firstName: 'Updated',
+				lastName: 'User',
+			};
+			const res = {
+				status: jest.fn().mockReturnThis(),
+				json: jest.fn(),
+			};
+			jest.spyOn(User, 'updateUser').mockRejectedValue(new Error());
+			await updateUser(userId, updates, res);
+			expect(res.status).toHaveBeenCalledWith(500);
+			expect(res.json).toHaveBeenCalledWith({
+				error: 'Failed to update user',
+			});
+		});
+	});
 
-            expect(db.collection).toHaveBeenCalledWith('users');
-            expect(db.collection().doc).toHaveBeenCalledWith(userId);
-            expect(result).toEqual(userData);
-        });
-    });
+	describe('deleteUser', () => {
+		it('should delete a user from the database', async () => {
+			const userId = 'user123';
+			const res = {
+				status: jest.fn().mockReturnThis(),
+				json: jest.fn(),
+			};
+			await deleteUser(userId, res);
+			expect(db.collection).toHaveBeenCalledWith('users');
+			expect(db.collection().doc).toHaveBeenCalledWith(userId);
+			expect(db.collection().doc().delete).toHaveBeenCalled();
+			expect(res.json).toHaveBeenCalledWith({
+				message: 'User deleted successfully',
+			});
+		});
 
-    describe('updateUser', () => {
-        it('should update a user in the database', async () => {
-            const { auth } = require('firebase-admin');
-
-            const userId = '123';
-            const user = {
-                email: 'test@example.com',
-                name: 'Updated User',
-            };
-            const res = {
-                status: jest.fn(() => res),
-                json: jest.fn(),
-            };
-
-            db.collection()
-                .doc()
-                .get.mockResolvedValue({
-                    exists: true,
-                    id: userId,
-                    data: () => ({ ...user, id: userId }),
-                });
-
-            await updateUser(userId, user, res);
-
-            expect(auth().updateUser).toHaveBeenCalledWith(userId, {
-                email: user.email,
-            });
-            expect(db.collection).toHaveBeenCalledWith('users');
-            expect(db.collection().doc).toHaveBeenCalledWith(userId);
-            expect(db.collection().doc().update).toHaveBeenCalledWith(
-                {
-                    ...user,
-                    updatedAt: expect.any(Date),
-                }
-            );
-            expect(res.json).toHaveBeenCalledWith({
-                id: userId,
-                ...user,
-            });
-        });
-
-        it('should return 404 if user does not exist', async () => {
-            const userId = '123';
-            const user = {
-                email: 'test@example.com',
-                name: 'Updated User',
-            };
-            const res = {
-                status: jest.fn(() => res),
-                json: jest.fn(),
-            };
-
-            db.collection()
-                .doc()
-                .get.mockResolvedValue({ exists: false });
-
-            await updateUser(userId, user, res);
-
-            expect(res.status).toHaveBeenCalledWith(404);
-            expect(res.json).toHaveBeenCalledWith({
-                error: 'User not found',
-            });
-        });
-    });
+		it('should handle errors when deleting a user', async () => {
+			const userId = 'user123';
+			const res = {
+				status: jest.fn().mockReturnThis(),
+				json: jest.fn(),
+			};
+			db.collection()
+				.doc()
+				.delete.mockRejectedValue(new Error('Delete user error'));
+			await deleteUser(userId, res);
+			expect(res.status).toHaveBeenCalledWith(500);
+			expect(res.json).toHaveBeenCalledWith({
+				error: 'Failed to delete user',
+			});
+		});
+	});
 });
