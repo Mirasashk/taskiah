@@ -99,64 +99,67 @@ const DashboardPage = () => {
 	};
 
 	return (
-		<div className='container mx-auto p-6'>
-			<h1 className='text-2xl font-bold text-gray-900 dark:text-white mb-6'>
+		<div className='container mx-auto px-4 sm:px-6 py-4 sm:py-6'>
+			<h1 className='text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6'>
 				Dashboard
 			</h1>
 
 			{/* Stats Section */}
-			<div className='grid grid-cols-1 md:grid-cols-3 gap-6 mb-6'>
+			<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-4 sm:mb-6'>
 				<StatsCard
 					title='Active Tasks'
 					value={activeTasks.length}
-					icon={<FiClock className='h-6 w-6 text-blue-500' />}
+					icon={
+						<FiClock className='h-5 w-5 sm:h-6 sm:w-6 text-blue-500' />
+					}
 					trend={activeTrendData.trend}
 					trendValue={activeTrendData.value}
 				/>
 				<StatsCard
 					title='Completed This Week'
 					value={currentWeekCompletedTasks.length}
-					icon={<FiCheckSquare className='h-6 w-6 text-green-500' />}
+					icon={
+						<FiCheckSquare className='h-5 w-5 sm:h-6 sm:w-6 text-green-500' />
+					}
 					trend={completedTrendData.trend}
 					trendValue={completedTrendData.value}
 				/>
 				<StatsCard
 					title='Overdue Tasks'
 					value={currentOverdueTasks}
-					icon={<FiAlertTriangle className='h-6 w-6 text-red-500' />}
+					icon={
+						<FiAlertTriangle className='h-5 w-5 sm:h-6 sm:w-6 text-red-500' />
+					}
 					trend={overdueTrendData.trend}
 					trendValue={overdueTrendData.value}
 				/>
 			</div>
 
-			<div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
+			<div className='grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6'>
 				{/* Calendar Section */}
-				<div className='lg:col-span-2'>
+				<div className='lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 sm:p-4'>
 					<TaskCalendar tasks={tasks} />
 				</div>
 
 				{/* Notifications Section */}
-				<div className='space-y-4'>
-					<h2 className='text-lg font-semibold text-gray-900 dark:text-white mb-4'>
+				<div className='space-y-3 sm:space-y-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 sm:p-4'>
+					<h2 className='text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4'>
 						Notifications
 					</h2>
-					{notifications
-						.slice(0, 8) // Limit to 8 notifications
-						.map((notification) => {
-							const newNotification =
-								Object.values(notification)[0];
-							const thisNotification = {
-								...newNotification,
-							};
+					{notifications.slice(0, 8).map((notification) => {
+						const newNotification = Object.values(notification)[0];
+						const thisNotification = {
+							...newNotification,
+						};
 
-							return (
-								<NotificationCard
-									key={thisNotification.createdAt}
-									notification={thisNotification}
-									onDismiss={handleDismissNotification}
-								/>
-							);
-						})}
+						return (
+							<NotificationCard
+								key={thisNotification.createdAt}
+								notification={thisNotification}
+								onDismiss={handleDismissNotification}
+							/>
+						);
+					})}
 				</div>
 			</div>
 		</div>
