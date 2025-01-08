@@ -63,6 +63,7 @@ const CreateTagForm = ({ onClose, existingTag = null }) => {
 				value={tagName}
 				onChange={(e) => setTagName(e.target.value)}
 				error={error}
+				wrapperClassName='text-nowrap'
 			/>
 
 			<div className='space-y-2'>

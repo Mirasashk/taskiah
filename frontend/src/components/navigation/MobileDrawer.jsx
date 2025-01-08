@@ -12,7 +12,7 @@ const MobileDrawer = ({ isOpen, onClose }) => {
 	];
 
 	const privateRoutes = [
-		{ name: 'Home', path: '/dashboard' },
+		{ name: 'Home', path: '/' },
 		{ name: 'Tasks', path: '/tasks' },
 		{ name: 'Notes', path: '/notes' },
 	];

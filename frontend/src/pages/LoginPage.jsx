@@ -30,7 +30,7 @@ export default function LoginPage() {
 			setLoading(true);
 			const auth = await login(formData.email, formData.password);
 			await updateUserData(auth.user.uid);
-			navigate('/dashboard');
+			navigate('/');
 		} catch (err) {
 			setError('Failed to sign in: ' + err.message);
 		} finally {
@@ -44,7 +44,7 @@ export default function LoginPage() {
 			setLoading(true);
 			const auth = await socialMethod();
 			await updateUserData(auth.user.uid);
-			navigate('/dashboard');
+			navigate('/');
 		} catch (err) {
 			setError('Failed to sign in: ' + err.message);
 		} finally {

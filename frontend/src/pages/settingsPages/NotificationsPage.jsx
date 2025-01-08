@@ -61,23 +61,24 @@ const NotificationsPage = () => {
 	};
 
 	return (
-		<div className='container mx-auto px-6'>
-			<div className='flex justify-between items-center mb-6'>
-				<h1 className='text-2xl font-bold text-gray-900 dark:text-white'>
+		<div className='container mx-auto px-4 sm:px-6'>
+			<div className='flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6'>
+				<h1 className='text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-0'>
 					Notification Preferences
 				</h1>
 			</div>
 
-			<div className='bg-white dark:bg-gray-800 rounded-lg shadow p-6 space-y-6'>
+			<div className='bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6 space-y-4 sm:space-y-6'>
 				{/* Delivery Methods Section */}
 				<div>
-					<h2 className='text-lg font-semibold text-gray-900 dark:text-white mb-4'>
+					<h2 className='text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4'>
 						Delivery Methods
 					</h2>
-					<div className='space-y-3'>
+					<div className='space-y-4'>
 						<label className='flex items-center space-x-3'>
 							<input
 								type='checkbox'
+								className='form-checkbox h-5 w-5'
 								checked={preferences.deliveryMethods.email}
 								onChange={(e) =>
 									setPreferences({
@@ -88,7 +89,6 @@ const NotificationsPage = () => {
 										},
 									})
 								}
-								className='form-checkbox h-5 w-5 text-blue-600'
 							/>
 							<span className='text-gray-700 dark:text-gray-300'>
 								Email Notifications
@@ -98,6 +98,7 @@ const NotificationsPage = () => {
 						<label className='flex items-center space-x-3'>
 							<input
 								type='checkbox'
+								className='form-checkbox h-5 w-5'
 								checked={preferences.deliveryMethods.inApp}
 								onChange={(e) =>
 									setPreferences({
@@ -108,7 +109,6 @@ const NotificationsPage = () => {
 										},
 									})
 								}
-								className='form-checkbox h-5 w-5 text-blue-600'
 							/>
 							<span className='text-gray-700 dark:text-gray-300'>
 								In-App Notifications
@@ -119,13 +119,14 @@ const NotificationsPage = () => {
 
 				{/* Notification Types Section */}
 				<div>
-					<h2 className='text-lg font-semibold text-gray-900 dark:text-white mb-4'>
+					<h2 className='text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4'>
 						Notification Types
 					</h2>
-					<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+					<div className='flex flex-col space-y-4'>
 						<label className='flex items-center space-x-3'>
 							<input
 								type='checkbox'
+								className='form-checkbox h-5 w-5'
 								checked={
 									preferences.notificationTypes
 										.listInvitations
@@ -139,7 +140,6 @@ const NotificationsPage = () => {
 										},
 									})
 								}
-								className='form-checkbox h-5 w-5 text-blue-600'
 							/>
 							<span className='text-gray-700 dark:text-gray-300'>
 								List Invitations
@@ -149,6 +149,7 @@ const NotificationsPage = () => {
 						<label className='flex items-center space-x-3'>
 							<input
 								type='checkbox'
+								className='form-checkbox h-5 w-5'
 								checked={
 									preferences.notificationTypes.inviteAccepted
 								}
@@ -161,7 +162,6 @@ const NotificationsPage = () => {
 										},
 									})
 								}
-								className='form-checkbox h-5 w-5 text-blue-600'
 							/>
 							<span className='text-gray-700 dark:text-gray-300'>
 								Invite Accepted
@@ -171,6 +171,7 @@ const NotificationsPage = () => {
 						<label className='flex items-center space-x-3'>
 							<input
 								type='checkbox'
+								className='form-checkbox h-5 w-5'
 								checked={
 									preferences.notificationTypes.taskDueDate
 								}
@@ -183,7 +184,6 @@ const NotificationsPage = () => {
 										},
 									})
 								}
-								className='form-checkbox h-5 w-5 text-blue-600'
 							/>
 							<span className='text-gray-700 dark:text-gray-300'>
 								Task Due Date Reminders
@@ -193,6 +193,7 @@ const NotificationsPage = () => {
 						<label className='flex items-center space-x-3'>
 							<input
 								type='checkbox'
+								className='form-checkbox h-5 w-5'
 								checked={
 									preferences.notificationTypes.taskOverdue
 								}
@@ -205,7 +206,6 @@ const NotificationsPage = () => {
 										},
 									})
 								}
-								className='form-checkbox h-5 w-5 text-blue-600'
 							/>
 							<span className='text-gray-700 dark:text-gray-300'>
 								Task Overdue Alerts
@@ -215,6 +215,7 @@ const NotificationsPage = () => {
 						<label className='flex items-center space-x-3'>
 							<input
 								type='checkbox'
+								className='form-checkbox h-5 w-5'
 								checked={
 									preferences.notificationTypes.taskAssigned
 								}
@@ -227,7 +228,6 @@ const NotificationsPage = () => {
 										},
 									})
 								}
-								className='form-checkbox h-5 w-5 text-blue-600'
 							/>
 							<span className='text-gray-700 dark:text-gray-300'>
 								Task Assignments
@@ -237,6 +237,7 @@ const NotificationsPage = () => {
 						<label className='flex items-center space-x-3'>
 							<input
 								type='checkbox'
+								className='form-checkbox h-5 w-5'
 								checked={
 									preferences.notificationTypes.taskCompleted
 								}
@@ -249,7 +250,6 @@ const NotificationsPage = () => {
 										},
 									})
 								}
-								className='form-checkbox h-5 w-5 text-blue-600'
 							/>
 							<span className='text-gray-700 dark:text-gray-300'>
 								Task Completions
@@ -259,6 +259,7 @@ const NotificationsPage = () => {
 						<label className='flex items-center space-x-3'>
 							<input
 								type='checkbox'
+								className='form-checkbox h-5 w-5'
 								checked={
 									preferences.notificationTypes.listShared
 								}
@@ -271,7 +272,6 @@ const NotificationsPage = () => {
 										},
 									})
 								}
-								className='form-checkbox h-5 w-5 text-blue-600'
 							/>
 							<span className='text-gray-700 dark:text-gray-300'>
 								List Sharing Updates
@@ -282,7 +282,7 @@ const NotificationsPage = () => {
 
 				{/* Reminder Timing Section */}
 				<div>
-					<h2 className='text-lg font-semibold text-gray-900 dark:text-white mb-4'>
+					<h2 className='text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4'>
 						Reminder Timing
 					</h2>
 					<FormField label='Send due date reminders'>
@@ -297,7 +297,7 @@ const NotificationsPage = () => {
 									},
 								})
 							}
-							className='mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md dark:bg-gray-700 dark:text-white bg-slate-200'
+							className='mt-1 block w-full px-3 py-3 sm:py-2 text-base border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-blue-500 focus:border-blue-500 rounded-md dark:bg-gray-700 dark:text-white bg-slate-200'
 						>
 							<option value='0'>On due date</option>
 							<option value='1'>1 day before</option>
@@ -309,19 +309,18 @@ const NotificationsPage = () => {
 				</div>
 
 				{/* Save Button */}
-				<div className='flex justify-end'>
+				<div className='flex justify-center sm:justify-end mt-6'>
 					<button
 						onClick={handleSave}
 						disabled={isSaving}
-						className={`px-4 py-2 bg-blue-600 text-white rounded-lg
-                            ${
-								isSaving
-									? 'opacity-50 cursor-not-allowed'
-									: 'hover:bg-blue-700'
-							}`}
+						className={`w-full sm:w-auto px-6 py-3 sm:py-2 bg-blue-600 text-white rounded-lg ${
+							isSaving
+								? 'opacity-50 cursor-not-allowed'
+								: 'hover:bg-blue-700'
+						}`}
 					>
 						{isSaving ? (
-							<div className='flex items-center gap-2'>
+							<div className='flex items-center justify-center gap-2'>
 								<div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white'></div>
 								Saving...
 							</div>

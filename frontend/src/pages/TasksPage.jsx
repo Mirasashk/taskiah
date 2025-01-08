@@ -16,36 +16,20 @@ const TasksPage = () => {
 
 	useEffect(() => {
 		setSelectedTask();
-		console.log(
-			'File: TasksPage.jsx, Line: 17, filteredTasks changed to ',
-			filteredTasks
-		);
 	}, [filteredTasks]);
 
 	useEffect(() => {
 		setIsEditing(false);
-		console.log(
-			'File: TasksPage.jsx, Line: 21, filter changed to ',
-			filter
-		);
 	}, [filter]);
 
 	const handleTaskSave = async (updatedTask) => {
 		await updateTask(updatedTask.id, updatedTask);
 		setSelectedTask(null);
-		console.log(
-			'File: TasksPage.jsx, Line: 28, selectedTask changed to ',
-			selectedTask
-		);
 	};
 
 	const handleOnClose = () => {
 		setSelectedTask(null);
 		setIsEditing(false);
-		console.log(
-			'File: TasksPage.jsx, Line: 34, selectedTask changed to ',
-			selectedTask
-		);
 	};
 
 	// Mobile Task Detail Modal

@@ -59,13 +59,13 @@ const SideBarItem = ({
 		return (
 			<button
 				onClick={onClick}
-				className={`flex flex-col items-center p-2 rounded-lg min-w-[80px] ${
+				className={`flex flex-col items-center p-2 rounded-lg min-w-[100px] ${
 					selected
 						? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'
 						: 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white'
 				}`}
 			>
-				<div className='flex items-center justify-center w-8 h-8 mb-1'>
+				<div className='flex items-center justify-center w-8 h-8 mb'>
 					{color ? (
 						<FaCircle
 							size={12}
@@ -75,14 +75,16 @@ const SideBarItem = ({
 						getIcon()
 					)}
 				</div>
-				<span className='text-xs font-medium truncate max-w-[70px]'>
-					{label}
+				<span className='flex flex-wrap justify-center gap-1 text-xs font-medium truncate max-w-[70px]'>
+					{label.slice(0, 10) + (label.length > 10 ? '...' : '')}
+					{count > 0 && (
+						<span className='text-xs text-gray-500 dark:text-gray-400'>
+							{'('}
+							{count}
+							{')'}
+						</span>
+					)}
 				</span>
-				{count > 0 && (
-					<span className='text-xs text-gray-500 dark:text-gray-400'>
-						{count}
-					</span>
-				)}
 			</button>
 		);
 	}
