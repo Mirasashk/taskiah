@@ -96,7 +96,7 @@ export default function Header() {
 		// Authenticated user links
 		<>
 			<Link
-				to='/dashboard'
+				to='/'
 				className='text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
 			>
 				Home

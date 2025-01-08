@@ -123,7 +123,7 @@ export default function SignupPage() {
 			try {
 				await userService.createUser(userData);
 				await updateUserData(auth.user.uid);
-				navigate('/dashboard');
+				navigate('/');
 			} catch (err) {
 				await auth.user.delete();
 				setError(

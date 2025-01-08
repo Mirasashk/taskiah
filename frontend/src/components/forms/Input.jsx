@@ -11,6 +11,7 @@ export default function Input({
 	label,
 	labelPosition = 'left',
 	error,
+	wrapperClassName,
 	...props
 }) {
 	const baseClasses = `appearance-none block w-full px-3 py-2 border-2 rounded-md shadow-sm 
@@ -30,7 +31,7 @@ export default function Input({
 		className
 	);
 
-	const wrapperClasses = classNames('flex gap-2', {
+	const wrapperClasses = classNames('flex gap-2', wrapperClassName, {
 		'flex-col': labelPosition === 'top' || labelPosition === 'bottom',
 		'flex-col-reverse': labelPosition === 'bottom',
 		'flex-row': labelPosition === 'left' || labelPosition === 'right',

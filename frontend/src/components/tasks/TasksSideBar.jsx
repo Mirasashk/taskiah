@@ -103,7 +103,7 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 			<Modal
 				isOpen={isTagModalOpen}
 				onClose={() => setIsTagModalOpen(false)}
-				title='Tag'
+				title='Create a Category Tag'
 			>
 				<CreateTagForm onClose={() => setIsTagModalOpen(false)} />
 			</Modal>

@@ -2,11 +2,14 @@ import { useRef, useState, useEffect } from 'react';
 import { TiDelete } from 'react-icons/ti';
 import SearchInput from './SearchInput';
 import UserInviteModal from './UserInviteModal';
+import { getUserPhotoURL } from '../../utils/UserPhoto';
+
 const UserSearch = ({ selectedUsers, onSelectUsers }) => {
 	const searchInputRef = useRef();
 	const [showSearchResults, setShowSearchResults] = useState(false);
 	const [searchResults, setSearchResults] = useState([]);
 	const [openUserInvite, setOpenUserInvite] = useState(false);
+	const [userPhotos, setUserPhotos] = useState({});
 
 	useEffect(() => {
 		if (
@@ -17,8 +20,29 @@ const UserSearch = ({ selectedUsers, onSelectUsers }) => {
 		}
 	}, [searchInputRef.current?.getCurrentSearchTerm()]);
 
+	useEffect(() => {
+		const loadUserPhotos = async () => {
+			const photos = {};
+			for (const user of searchResults) {
+				if (user.photoURL) {
+					const url = await getUserPhotoURL(user.photoURL);
+					photos[user.email] = url;
+				}
+			}
+			setUserPhotos(photos);
+		};
+
+		if (searchResults.length > 0) {
+			loadUserPhotos();
+		}
+	}, [searchResults]);
+
 	const handleSearchResults = (results) => {
 		if (results.length > 0) {
+			console.log(
+				'File: UserSearch.jsx, Line: 22, results changed to ',
+				results
+			);
 			setShowSearchResults(true);
 			setSearchResults(results);
 		} else {
@@ -29,7 +53,6 @@ const UserSearch = ({ selectedUsers, onSelectUsers }) => {
 
 	const clearSearch = () => {
 		setSearchResults([]);
-
 		searchInputRef.current?.clearSearch();
 	};
 
@@ -75,6 +98,7 @@ const UserSearch = ({ selectedUsers, onSelectUsers }) => {
 				</div>
 			);
 		}
+
 		return searchResults.map((user) => (
 			<div
 				className='hover:bg-gray-500 p-2 rounded-md'
@@ -84,7 +108,9 @@ const UserSearch = ({ selectedUsers, onSelectUsers }) => {
 				<div className='flex flex-row gap-2 items-center'>
 					<div className='flex-0'>
 						<img
-							src={user.photoURL}
+							src={
+								userPhotos[user.email] || '/default-avatar.png'
+							}
 							alt={`${user.firstName} ${user.lastName}`}
 							className='w-10 h-10 rounded-full'
 						/>
