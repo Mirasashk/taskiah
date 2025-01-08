@@ -4,7 +4,7 @@ import { useUser } from '../../context/UserContext';
 import FormField from '../../components/forms/FormField';
 import { userService } from '../../services/userApi';
 
-const PreferencesPage = () => {
+const ThemePreferencesPage = () => {
 	const { theme, updateTheme } = useTheme();
 	const { userData } = useUser();
 	const [isSaving, setIsSaving] = useState(false);
@@ -58,17 +58,17 @@ const PreferencesPage = () => {
 	};
 
 	return (
-		<div className='container mx-auto px-6'>
-			<div className='flex justify-between items-center mb-6'>
-				<h1 className='text-2xl font-bold text-gray-900 dark:text-white'>
+		<div className='container mx-auto px-4 sm:px-6'>
+			<div className='flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6'>
+				<h1 className='text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-0'>
 					Theme Preferences
 				</h1>
 			</div>
 
-			<div className='bg-white dark:bg-gray-800 rounded-lg shadow p-6 space-y-6'>
+			<div className='bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6 space-y-4 sm:space-y-6'>
 				{/* Theme Mode */}
 				<FormField label='Theme Mode'>
-					<div className='flex gap-4'>
+					<div className='flex flex-col sm:flex-row gap-3 sm:gap-4'>
 						<label className='inline-flex items-center'>
 							<input
 								type='radio'
@@ -105,8 +105,7 @@ const PreferencesPage = () => {
 				{/* Font Family */}
 				<FormField label='Font Family'>
 					<select
-						className='mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md dark:bg-gray-700 dark:text-white 
-						bg-slate-200'
+						className='mt-1 block w-full pl-3 pr-10 py-3 sm:py-2 text-base border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-blue-500 focus:border-blue-500 rounded-md dark:bg-gray-700 dark:text-white bg-slate-200'
 						value={theme.fontFamily}
 						onChange={(e) =>
 							updateTheme({ fontFamily: e.target.value })
@@ -125,7 +124,7 @@ const PreferencesPage = () => {
 
 				{/* Font Size */}
 				<FormField label='Font Size'>
-					<div className='flex gap-4'>
+					<div className='flex flex-col sm:flex-row gap-3 sm:gap-4'>
 						{fontSizes.map((size) => (
 							<label
 								key={size.value}
@@ -151,12 +150,15 @@ const PreferencesPage = () => {
 					</div>
 				</FormField>
 
-				<div className='flex justify-end'>
+				<div className='flex justify-center sm:justify-end mt-6'>
 					<button
 						onClick={handleSave}
 						disabled={isSaving}
-						className={`px-4 py-2 bg-blue-600 text-white rounded-lg
-								${isSaving ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'}`}
+						className={`w-full sm:w-auto px-6 py-3 sm:py-2 bg-blue-600 text-white rounded-lg ${
+							isSaving
+								? 'opacity-50 cursor-not-allowed'
+								: 'hover:bg-blue-700'
+						}`}
 					>
 						{isSaving ? (
 							<div className='flex items-center gap-2'>
@@ -185,4 +187,4 @@ const PreferencesPage = () => {
 	);
 };
 
-export default PreferencesPage;
+export default ThemePreferencesPage;

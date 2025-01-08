@@ -99,22 +99,22 @@ export default function ProfilePage() {
 	};
 
 	return (
-		<div className='max-w-full w-full mx-auto'>
-			<div className='bg-white dark:bg-gray-800 shadow rounded-lg p-6'>
-				<div className='flex items-center justify-between mb-8'>
-					<h1 className='text-2xl font-bold text-gray-900 dark:text-white'>
+		<div className='max-w-full w-full mx-auto px-4 sm:px-6'>
+			<div className='bg-white dark:bg-gray-800 shadow rounded-lg p-4 sm:p-6'>
+				<div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8'>
+					<h1 className='text-xl sm:text-2xl font-bold text-gray-900 dark:text-white'>
 						Profile Settings
 					</h1>
 					<button
 						onClick={() => setIsEditing(!isEditing)}
-						className='px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700'
+						className='w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700'
 					>
 						{isEditing ? 'Cancel' : 'Edit Profile'}
 					</button>
 				</div>
 
-				<div className='space-y-8'>
-					<div className='flex items-center space-x-6'>
+				<div className='space-y-6 sm:space-y-8'>
+					<div className='flex flex-col sm:flex-row items-center gap-4 sm:space-x-6'>
 						<div className='p-2'>
 							<div className='relative'>
 								<input
@@ -156,18 +156,18 @@ export default function ProfilePage() {
 							/>
 						</div>
 						<div>
-							<h2 className='text-xl font-semibold text-gray-900 dark:text-white'>
+							<h2 className='text-xl font-semibold text-gray-900 dark:text-white text-center sm:text-left'>
 								{userData?.username || userData?.email}
 							</h2>
-							<p className='text-gray-500 dark:text-gray-400'>
+							<p className='text-gray-500 dark:text-gray-400 text-center sm:text-left'>
 								{userData?.email}
 							</p>
 						</div>
 					</div>
-					<div className='grid grid-cols-3  space-x-6'>
-						<div className='grid col-span-2'>
+					<div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
+						<div className='lg:col-span-2'>
 							<div className='flex justify-between w-full bg-gray-200 dark:bg-gray-700 p-4 rounded-lg'>
-								<div className='grid grid-flow-row w-full grid-cols-1 gap-6'>
+								<div className='grid grid-flow-row w-full grid-cols-1 gap-4 sm:gap-6'>
 									<FormField label='First Name'>
 										<Input
 											name='firstName'
@@ -221,7 +221,7 @@ export default function ProfilePage() {
 									</FormField>
 
 									{isEditing && (
-										<div className='flex justify-end space-x-4 mt-4'>
+										<div className='flex flex-col sm:flex-row justify-end gap-4 mt-4'>
 											<button
 												onClick={() => {
 													setIsEditing(false);
@@ -240,13 +240,13 @@ export default function ProfilePage() {
 															'',
 													});
 												}}
-												className='px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-600 rounded-md hover:bg-gray-200 dark:hover:bg-gray-500'
+												className='w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-600 rounded-md hover:bg-gray-200 dark:hover:bg-gray-500'
 											>
 												Cancel
 											</button>
 											<button
 												onClick={handleSubmit}
-												className='px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700'
+												className='w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700'
 											>
 												Save Changes
 											</button>
@@ -255,8 +255,8 @@ export default function ProfilePage() {
 								</div>
 							</div>
 						</div>
-						<div className='grid col-span-1'>
-							<div className='grid grid-flow-row grid-cols-1 gap-6'>
+						<div className='lg:col-span-1'>
+							<div className='grid grid-cols-1 gap-4 sm:gap-6'>
 								<div className='flex items-center justify-between bg-gray-200 dark:bg-gray-700 p-4 rounded-lg'>
 									<h3 className='text-lg font-medium text-gray-900 dark:text-white'>
 										Tasks

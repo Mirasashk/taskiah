@@ -17,6 +17,7 @@ import {
 	HiPlus,
 } from 'react-icons/hi';
 import DeleteModal from '../../components/common/DeleteModal';
+
 const ListPreferencesPage = () => {
 	const { userData } = useUser();
 	const { myLists, sharedLists, refreshContext, tags } = useListContext();
@@ -32,6 +33,55 @@ const ListPreferencesPage = () => {
 	const [showLeaveListModal, setShowLeaveListModal] = useState(false);
 	const [showRemoveListModal, setShowRemoveListModal] = useState(false);
 	const [listOwners, setListOwners] = useState({});
+	const [preferences, setPreferences] = useState({
+		defaultView: 'grid',
+		sortBy: 'name',
+		autoSave: true,
+		showArchived: false,
+		defaultSharePermission: 'view',
+		notifyOnShare: true,
+	});
+
+	useEffect(() => {
+		if (userData?.preferences?.lists) {
+			setPreferences(userData.preferences.lists);
+		}
+	}, [userData]);
+
+	const handlePreferenceChange = (key, value) => {
+		setPreferences((prev) => ({
+			...prev,
+			[key]: value,
+		}));
+	};
+
+	const handleSave = async () => {
+		setIsSaving(true);
+		setSaveMessage({ type: '', text: '' });
+
+		try {
+			await userService.updateUserPreferences(userData.id, {
+				lists: preferences,
+			});
+
+			setSaveMessage({
+				type: 'success',
+				text: 'List preferences saved successfully!',
+			});
+
+			setTimeout(() => {
+				setSaveMessage({ type: '', text: '' });
+			}, 3000);
+		} catch (error) {
+			console.error('Error saving list preferences:', error);
+			setSaveMessage({
+				type: 'error',
+				text: 'Failed to save list preferences. Please try again.',
+			});
+		} finally {
+			setIsSaving(false);
+		}
+	};
 
 	useEffect(() => {
 		const fetchListOwners = async () => {
@@ -138,112 +188,178 @@ const ListPreferencesPage = () => {
 	};
 
 	return (
-		<div className='container mx-auto px-6'>
-			<div className='flex justify-between items-center mb-6'>
-				<h1 className='text-2xl font-bold text-gray-900 dark:text-white'>
+		<div className='container mx-auto px-4 sm:px-6'>
+			<div className='flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6'>
+				<h1 className='text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-0'>
 					List Preferences
 				</h1>
 			</div>
 
-			{saveMessage.text && (
-				<div
-					className={`mb-4 p-4 rounded-lg ${
-						saveMessage.type === 'success'
-							? 'bg-green-100 dark:bg-green-800 text-green-700 dark:text-green-200'
-							: 'bg-red-100 dark:bg-red-800 text-red-700 dark:text-red-200'
-					}`}
-				>
-					{saveMessage.text}
-				</div>
-			)}
-
-			<div className='flex gap-6'>
-				{/* My Lists Section */}
-				<div className='flex flex-col bg-white w-1/2 dark:bg-gray-800 rounded-lg shadow p-6'>
-					<div className='flex justify-between items-center mb-4'>
-						<h2 className='text-xl font-semibold text-gray-900 dark:text-white mb-4'>
-							My Lists
-						</h2>
-						<button
-							onClick={() => setShowCreateListModal(true)}
-							className='flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600'
-						>
-							<HiPlus className='w-5 h-5' />
-							Create List
-						</button>
-					</div>
-					<div className='space-y-4'>
-						{myLists.map((list) => (
-							<div
-								key={list.id}
-								className='flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg'
-							>
-								<div className='flex-1 flex items-center gap-2'>
-									<div className='text-gray-900 dark:text-white font-medium'>
-										{list.name}
-									</div>
-									<div className='text-sm text-gray-500 dark:text-gray-400'>
-										({list.tasks?.length || 0} tasks)
-									</div>
-								</div>
-								<div className='flex items-center space-x-2'>
-									<button
-										onClick={() => handleEditList(list)}
-										className='p-2 text-gray-600 hover:text-blue-600 dark:text-gray-300'
-									>
-										<HiPencil className='w-5 h-5' />
-									</button>
-
-									<button
-										onClick={() => {
-											setSelectedList(list);
-											setShowRemoveListModal(true);
-										}}
-										className='p-2 text-gray-600 hover:text-red-600 dark:text-gray-300'
-									>
-										<HiTrash className='w-5 h-5' />
-									</button>
-								</div>
-							</div>
-						))}
-					</div>
-				</div>
-
-				{/* Shared Lists Section */}
-				<div className='flex flex-col bg-white w-1/2 dark:bg-gray-800 rounded-lg shadow p-6'>
-					<h2 className='text-xl font-semibold text-gray-900 dark:text-white mb-4'>
-						Shared Lists
+			<div className='bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6 space-y-4 sm:space-y-6'>
+				{/* List Display Section */}
+				<div>
+					<h2 className='text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4'>
+						List Display
 					</h2>
 					<div className='space-y-4'>
-						{sharedLists.map((list) => (
-							<div
-								key={list.id}
-								className='flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg'
+						<FormField label='Default List View'>
+							<select
+								value={preferences.defaultView}
+								onChange={(e) =>
+									handlePreferenceChange(
+										'defaultView',
+										e.target.value
+									)
+								}
+								className='mt-1 block w-full px-3 py-3 sm:py-2 text-base border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-blue-500 focus:border-blue-500 rounded-md dark:bg-gray-700 dark:text-white bg-slate-200'
 							>
-								<div className='flex-1'>
-									<div className='flex items-center space-x-2'>
-										<span className='text-gray-900 dark:text-white font-medium'>
-											{list.name}
-										</span>
-										<span className='text-sm text-gray-500 dark:text-gray-400'>
-											({list.tasks?.length || 0} tasks)
-										</span>
-									</div>
-									<div className='text-sm text-gray-500 dark:text-gray-400'>
-										Shared by:{' '}
-										{listOwners[list.ownerId] || 'Unknown'}
-									</div>
-								</div>
-								<button
-									onClick={() => handleLeaveList(list)}
-									className='p-2 text-gray-600 hover:text-red-600 dark:text-gray-300'
-								>
-									<HiUserRemove className='w-5 h-5' />
-								</button>
-							</div>
-						))}
+								<option value='grid'>Grid View</option>
+								<option value='list'>List View</option>
+								<option value='compact'>Compact View</option>
+							</select>
+						</FormField>
+
+						<FormField label='Sort Lists By'>
+							<select
+								value={preferences.sortBy}
+								onChange={(e) =>
+									handlePreferenceChange(
+										'sortBy',
+										e.target.value
+									)
+								}
+								className='mt-1 block w-full px-3 py-3 sm:py-2 text-base border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-blue-500 focus:border-blue-500 rounded-md dark:bg-gray-700 dark:text-white bg-slate-200'
+							>
+								<option value='name'>Name</option>
+								<option value='createdAt'>Created Date</option>
+								<option value='lastModified'>
+									Last Modified
+								</option>
+							</select>
+						</FormField>
 					</div>
 				</div>
+
+				{/* List Behavior Section */}
+				<div>
+					<h2 className='text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4'>
+						List Behavior
+					</h2>
+					<div className='space-y-4'>
+						<div className='flex flex-col sm:flex-row gap-4'>
+							<label className='flex items-center space-x-3'>
+								<input
+									type='checkbox'
+									checked={preferences.autoSave}
+									onChange={(e) =>
+										handlePreferenceChange(
+											'autoSave',
+											e.target.checked
+										)
+									}
+									className='form-checkbox h-5 w-5'
+								/>
+								<span className='text-gray-700 dark:text-gray-300'>
+									Auto-save list changes
+								</span>
+							</label>
+							<label className='flex items-center space-x-3'>
+								<input
+									type='checkbox'
+									checked={preferences.showArchived}
+									onChange={(e) =>
+										handlePreferenceChange(
+											'showArchived',
+											e.target.checked
+										)
+									}
+									className='form-checkbox h-5 w-5'
+								/>
+								<span className='text-gray-700 dark:text-gray-300'>
+									Show archived lists
+								</span>
+							</label>
+						</div>
+					</div>
+				</div>
+
+				{/* Sharing Section */}
+				<div>
+					<h2 className='text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4'>
+						Sharing Preferences
+					</h2>
+					<div className='space-y-4'>
+						<FormField label='Default Share Permission'>
+							<select
+								value={preferences.defaultSharePermission}
+								onChange={(e) =>
+									handlePreferenceChange(
+										'defaultSharePermission',
+										e.target.value
+									)
+								}
+								className='mt-1 block w-full px-3 py-3 sm:py-2 text-base border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-blue-500 focus:border-blue-500 rounded-md dark:bg-gray-700 dark:text-white bg-slate-200'
+							>
+								<option value='view'>View Only</option>
+								<option value='edit'>Can Edit</option>
+								<option value='manage'>Can Manage</option>
+							</select>
+						</FormField>
+
+						<div className='flex flex-col sm:flex-row gap-4'>
+							<label className='flex items-center space-x-3'>
+								<input
+									type='checkbox'
+									checked={preferences.notifyOnShare}
+									onChange={(e) =>
+										handlePreferenceChange(
+											'notifyOnShare',
+											e.target.checked
+										)
+									}
+									className='form-checkbox h-5 w-5'
+								/>
+								<span className='text-gray-700 dark:text-gray-300'>
+									Notify me when someone shares a list
+								</span>
+							</label>
+						</div>
+					</div>
+				</div>
+
+				{/* Save Button */}
+				<div className='flex justify-center sm:justify-end mt-6'>
+					<button
+						onClick={handleSave}
+						disabled={isSaving}
+						className={`w-full sm:w-auto px-6 py-3 sm:py-2 bg-blue-600 text-white rounded-lg ${
+							isSaving
+								? 'opacity-50 cursor-not-allowed'
+								: 'hover:bg-blue-700'
+						}`}
+					>
+						{isSaving ? (
+							<div className='flex items-center justify-center gap-2'>
+								<div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white'></div>
+								Saving...
+							</div>
+						) : (
+							'Save Changes'
+						)}
+					</button>
+				</div>
+
+				{saveMessage.text && (
+					<div
+						className={`mt-4 p-4 rounded-lg ${
+							saveMessage.type === 'success'
+								? 'bg-green-100 dark:bg-green-800 text-green-700 dark:text-green-200'
+								: 'bg-red-100 dark:bg-red-800 text-red-700 dark:text-red-200'
+						}`}
+					>
+						{saveMessage.text}
+					</div>
+				)}
 			</div>
 
 			{/* Create List Modal */}

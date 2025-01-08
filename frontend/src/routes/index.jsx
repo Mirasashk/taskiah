@@ -9,7 +9,7 @@ import NotesPage from '../pages/NotesPage';
 import DashboardPage from '../pages/DashboardPage';
 import SettingsPage from '../pages/SettingsPage';
 import ProfilePage from '../pages/settingsPages/ProfilePage';
-import PreferencesPage from '../pages/settingsPages/PreferencesPage';
+import ThemePreferencesPage from '../pages/settingsPages/ThemePreferencesPage';
 import SecurityPage from '../pages/settingsPages/SecurityPage';
 import SharedWithMePage from '../pages/settingsPages/SharedWithMePage';
 import ListPreferencesPage from '../pages/settingsPages/ListPreferencesPage';
@@ -44,8 +44,8 @@ export default function AppRoutes() {
 								element={<ProfilePage />}
 							/>
 							<Route
-								path='/settings/preferences'
-								element={<PreferencesPage />}
+								path='/settings/theme-preferences'
+								element={<ThemePreferencesPage />}
 							/>
 							<Route
 								path='/settings/security'
