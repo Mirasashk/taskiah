@@ -19,10 +19,8 @@ export default function TaskItem({
 	const handleDelete = (e, task) => {
 		e.stopPropagation();
 		if (task.status === 'deleted') {
-			console.log('deleting permanently', task);
 			deleteTask(task);
 		} else {
-			console.log('deleting', task);
 			deleteTask(task);
 		}
 	};

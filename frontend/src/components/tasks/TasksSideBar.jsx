@@ -18,7 +18,8 @@ const TasksSidebar = ({ onFilterTasks }) => {
 	// Contexts
 	const { userData } = useUser();
 	const { sharedLists, myLists, tags } = useListContext();
-	const { tasks, filterTasks, filter, deletedTasks } = useTaskContext();
+	const { tasks, filterTasks, filter, deletedTasks, setSelectedTask } =
+		useTaskContext();
 
 	// States
 	const [selectedFilter, setSelectedFilter] = useState(filter);
@@ -32,11 +33,13 @@ const TasksSidebar = ({ onFilterTasks }) => {
 
 	useEffect(() => {
 		filterTasks(tasks, selectedFilter);
+		setSelectedTask(null);
 	}, [selectedFilter, tasks]);
 
 	// Functions
 	const todayTasks = tasks.filter((task) => {
 		const taskDate = new Date(task.dueDate);
+
 		return (
 			taskDate.toDateString() === today.toDateString() &&
 			task.status !== 'deleted'
