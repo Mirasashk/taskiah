@@ -138,17 +138,7 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 						<div className='flex items-center'>
 							<div className='h-8 w-px bg-gray-300 dark:bg-gray-600 mx-2'></div>
 						</div>
-						<button
-							onClick={() => setIsListModalOpen(true)}
-							className='flex flex-col items-center justify-center p-2 rounded-lg min-w-[80px] text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'
-						>
-							<div className='flex items-center justify-center w-8 h-8 mb-1'>
-								<FiList />
-							</div>
-							<span className='text-xs font-medium'>
-								Add List
-							</span>
-						</button>
+
 						{myLists.map((list) => (
 							<SideBarItem
 								key={list.id}
@@ -163,6 +153,19 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 								isMobile={true}
 							/>
 						))}
+						<div className='flex flex-col items-center justify-start p-2 rounded-lg min-w-[80px] text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'>
+							<button
+								onClick={() => setIsListModalOpen(true)}
+								className='flex flex-col items-center justify-start p-2 rounded-lg min-w-[80px] text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'
+							>
+								<div className='flex justify-center w-8 h-8 mb-1'>
+									<FiList />
+								</div>
+								<span className='text-xs font-medium'>
+									Add List
+								</span>
+							</button>
+						</div>
 					</div>
 
 					{/* Shared Lists Section */}
@@ -193,15 +196,7 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 						<div className='flex items-center'>
 							<div className='h-8 w-px bg-gray-300 dark:bg-gray-600 mx-2'></div>
 						</div>
-						<button
-							onClick={() => setIsTagModalOpen(true)}
-							className='flex flex-col items-center justify-center p-2 rounded-lg min-w-[80px] text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'
-						>
-							<div className='flex items-center justify-center w-8 h-8 mb-1'>
-								<FiTag />
-							</div>
-							<span className='text-xs font-medium'>Add Tag</span>
-						</button>
+
 						{tags.map((tag) => (
 							<SideBarItem
 								key={tag.id}
@@ -217,6 +212,19 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 								isMobile={true}
 							/>
 						))}
+						<div className='flex flex-col items-center justify-start p-2 rounded-lg min-w-[80px] text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'>
+							<button
+								onClick={() => setIsTagModalOpen(true)}
+								className='flex flex-col items-center justify-start p-2 rounded-lg min-w-[80px] text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'
+							>
+								<div className='flex justify-center w-8 h-8 mb-1'>
+									<FiTag />
+								</div>
+								<span className='text-xs font-medium'>
+									Add Tag
+								</span>
+							</button>
+						</div>
 					</div>
 
 					{/* Deleted Section */}
