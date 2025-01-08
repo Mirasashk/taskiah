@@ -12,7 +12,7 @@ const LandingPage = () => {
 	return (
 		<div className='min-h-screen rounded-lg dark:bg-gray-900'>
 			{/* Hero Section */}
-			<div className='container mx-auto px-4 py-8 md:py-16'>
+			<div className='container mx-auto px-4 md:py-16'>
 				<div className='flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12'>
 					<div className='w-full md:w-1/2 text-center md:text-left'>
 						<h1 className='text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-4 md:mb-6'>

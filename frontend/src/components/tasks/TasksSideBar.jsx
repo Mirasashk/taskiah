@@ -14,7 +14,7 @@ import CreateListForm from './CreateListForm';
 import CreateTagForm from './CreateTagForm';
 import { useListContext } from '../../context/ListContext';
 import SideBarItem from './SideBarItem';
-const TasksSidebar = ({ onFilterTasks }) => {
+const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 	// Contexts
 	const { userData } = useUser();
 	const { sharedLists, myLists, tags } = useListContext();
@@ -30,6 +30,18 @@ const TasksSidebar = ({ onFilterTasks }) => {
 
 	//variables
 	const today = new Date();
+
+	const filterTasksByItem = (tasks, item) => {
+		if (!tasks || !item) return [];
+		if (item.tasks) {
+			// For lists
+			return tasks.filter((task) => item.tasks.includes(task.id));
+		} else if (item.id) {
+			// For tags
+			return tasks.filter((task) => task.tagIds?.includes(item.id));
+		}
+		return [];
+	};
 
 	useEffect(() => {
 		filterTasks(tasks, selectedFilter);
@@ -97,8 +109,126 @@ const TasksSidebar = ({ onFilterTasks }) => {
 		);
 	};
 
+	if (isMobile) {
+		return (
+			<>
+				{/* Filter Options */}
+				<nav className='flex space-x-4'>
+					{/* Static Filters */}
+					<div className='flex space-x-4'>
+						{staticFilterOptions.map((option, index) => (
+							<SideBarItem
+								key={index}
+								icon={option.icon}
+								label={option.label}
+								count={option.count}
+								selected={selectedFilter === option.label}
+								onClick={() => setSelectedFilter(option.label)}
+								isMobile={true}
+							/>
+						))}
+					</div>
+
+					{/* My Lists Section */}
+					<div className='flex space-x-4'>
+						<div className='flex items-center'>
+							<div className='h-8 w-px bg-gray-300 dark:bg-gray-600 mx-2'></div>
+						</div>
+						<button
+							onClick={() => setIsListModalOpen(true)}
+							className='flex flex-col items-center justify-center p-2 rounded-lg min-w-[80px] text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'
+						>
+							<div className='flex items-center justify-center w-8 h-8 mb-1'>
+								<FiList />
+							</div>
+							<span className='text-xs font-medium'>
+								Add List
+							</span>
+						</button>
+						{myLists.map((list) => (
+							<SideBarItem
+								key={list.id}
+								icon='list'
+								label={list.name}
+								count={list.tasks?.length || 0}
+								selected={selectedFilter === list.name}
+								onClick={() => setSelectedFilter(list.name)}
+								isMobile={true}
+							/>
+						))}
+					</div>
+
+					{/* Shared Lists Section */}
+					{sharedLists.length > 0 && (
+						<div className='flex space-x-4'>
+							<div className='flex items-center'>
+								<div className='h-8 w-px bg-gray-300 dark:bg-gray-600 mx-2'></div>
+							</div>
+							{sharedLists.map((list) => (
+								<SideBarItem
+									key={list.id}
+									icon='share'
+									label={list.name}
+									count={list.tasks?.length || 0}
+									selected={selectedFilter === list.name}
+									onClick={() => setSelectedFilter(list.name)}
+									isMobile={true}
+								/>
+							))}
+						</div>
+					)}
+
+					{/* Tags Section */}
+					<div className='flex space-x-4'>
+						<div className='flex items-center'>
+							<div className='h-8 w-px bg-gray-300 dark:bg-gray-600 mx-2'></div>
+						</div>
+						<button
+							onClick={() => setIsTagModalOpen(true)}
+							className='flex flex-col items-center justify-center p-2 rounded-lg min-w-[80px] text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'
+						>
+							<div className='flex items-center justify-center w-8 h-8 mb-1'>
+								<FiTag />
+							</div>
+							<span className='text-xs font-medium'>Add Tag</span>
+						</button>
+						{tags.map((tag) => (
+							<SideBarItem
+								key={tag.id}
+								icon='tag'
+								label={tag.name}
+								color={tag.color}
+								count={filterTasksByItem(tasks, tag).length}
+								selected={selectedFilter === tag.name}
+								onClick={() => setSelectedFilter(tag.name)}
+								isMobile={true}
+							/>
+						))}
+					</div>
+
+					{/* Deleted Section */}
+					<div className='flex space-x-4'>
+						<div className='flex items-center'>
+							<div className='h-8 w-px bg-gray-300 dark:bg-gray-600 mx-2'></div>
+						</div>
+						<SideBarItem
+							icon='trash'
+							label='Deleted'
+							count={deletedTasks.length}
+							selected={selectedFilter === 'Deleted'}
+							onClick={() => setSelectedFilter('Deleted')}
+							isMobile={true}
+						/>
+					</div>
+				</nav>
+				{renderListModal()}
+				{renderTagModal()}
+			</>
+		);
+	}
+
 	return (
-		<aside className='w-64 bg-white rounded-lg dark:bg-gray-800  border-r border-gray-200 dark:border-gray-700'>
+		<aside className='w-64 bg-white rounded-lg dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700'>
 			<div className='p-4 space-y-2'>
 				{/* Filter Options */}
 				<nav className='space-y-2'>

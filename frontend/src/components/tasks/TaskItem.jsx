@@ -47,7 +47,7 @@ export default function TaskItem({
 			className='flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-lg shadow cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700'
 			onClick={() => onTaskSelect(task)}
 		>
-			<div className='flex items-center gap-6'>
+			<div className='flex items-center gap-2 md:gap-6'>
 				<div className='flex items-center gap-2'>
 					{showDelete && (
 						<input
@@ -72,10 +72,12 @@ export default function TaskItem({
 								: 'text-gray-900 dark:text-white'
 						}`}
 					>
-						<div className='flex gap-8'>
-							{task.title.substring(0, 23) +
-								(task.title.length > 23 ? '...' : '')}
-							<div className='flex gap-4'>
+						<div className='flex flex-col md:flex-row md:items-center md:gap-8'>
+							<div className='font-medium'>
+								{task.title.substring(0, 23) +
+									(task.title.length > 23 ? '...' : '')}
+							</div>
+							<div className='flex flex-wrap gap-2 md:gap-4 text-xs mt-2 md:mt-0'>
 								{task.priority == 'high' && (
 									<div className='flex items-center gap-2'>
 										<div className='flex gap-0'>
@@ -92,7 +94,7 @@ export default function TaskItem({
 								{task.dueDate && (
 									<div className='flex items-center gap-2'>
 										<label className='text-xs text-gray-500 dark:text-gray-400'>
-											Due Date:
+											Due:
 										</label>
 										<span className='text-xs text-gray-500 dark:text-gray-400'>
 											{task.dueDate}
@@ -133,7 +135,7 @@ export default function TaskItem({
 					</>
 				)}
 				{!showDelete && (
-					<div className='flex items-center gap-8'>
+					<div className='flex items-center gap-4 md:gap-8'>
 						<button
 							onClick={(e) => handleActivate(e, task)}
 							className='text-green-500 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300'

@@ -21,9 +21,16 @@ const UserMenu = ({
 	const { logout } = useAuth();
 	const navigate = useNavigate();
 
-	const handleLogout = () => {
-		clearUserData();
-		navigate('/');
+	const handleLogout = async (e) => {
+		e.stopPropagation();
+		try {
+			await logout();
+			clearUserData();
+			setShowUserMenu(false);
+			navigate('/');
+		} catch (error) {
+			console.error('Failed to logout:', error);
+		}
 	};
 
 	const handleInvitesClick = (e) => {
@@ -33,11 +40,18 @@ const UserMenu = ({
 		setShowUserMenu(false);
 	};
 
+	const handleMenuItemClick = (e) => {
+		e.stopPropagation();
+		setShowUserMenu(false);
+	};
+
 	return (
 		<div className='relative'>
 			<div
-				className='absolute right-0 top-12 w-72 rounded-md shadow-lg py-0 bg-white dark:bg-gray-600 ring-1 ring-black ring-opacity-5'
+				className='absolute z-40 right-0 top-12 w-72 rounded-md shadow-lg py-0 bg-white dark:bg-gray-600 ring-1 ring-black ring-opacity-5'
 				ref={menuRef}
+				data-menu-item
+				onClick={(e) => e.stopPropagation()}
 			>
 				<div className='ml-4 pt-6 pb-3'>
 					<div className='text-gray-600 text-2xl font-medium dark:text-gray-300 flex items-center space-x-2 cursor-pointer'>
@@ -55,6 +69,7 @@ const UserMenu = ({
 				{sharedListNotifications.length > 0 && (
 					<button
 						onClick={handleInvitesClick}
+						data-menu-item
 						className='block w-full px-4 py-2 text-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
 					>
 						<div className='flex justify-between items-center'>
@@ -70,7 +85,8 @@ const UserMenu = ({
 				)}
 				<Link
 					to='/settings/profile'
-					onClick={() => setShowUserMenu(false)}
+					onClick={handleMenuItemClick}
+					data-menu-item
 					className='block px-4 py-2 text-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
 				>
 					<div className='flex items-center space-x-2'>
@@ -80,7 +96,8 @@ const UserMenu = ({
 				</Link>
 				<Link
 					to='/settings/preferences'
-					onClick={() => setShowUserMenu(false)}
+					onClick={handleMenuItemClick}
+					data-menu-item
 					className='block px-4 py-2 text-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
 				>
 					<div className='flex items-center space-x-2'>
@@ -89,10 +106,8 @@ const UserMenu = ({
 					</div>
 				</Link>
 				<button
-					onClick={() => {
-						setShowUserMenu(false);
-						handleLogout();
-					}}
+					onClick={handleLogout}
+					data-menu-item
 					className='block w-full text-left px-4 py-2 text-lg rounded-b-md text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
 				>
 					<div className='flex items-center space-x-2'>

@@ -29,7 +29,8 @@ export default function Header() {
 			if (
 				menuRef.current &&
 				!menuRef.current.contains(event.target) &&
-				!event.target.closest('[data-user-display]')
+				!event.target.closest('[data-user-display]') &&
+				!event.target.closest('[data-menu-item]')
 			) {
 				setShowUserMenu(false);
 			}

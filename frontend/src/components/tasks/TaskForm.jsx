@@ -100,7 +100,7 @@ const TaskForm = () => {
 	 * @returns {JSX.Element} The expanded form section
 	 */
 	const renderExpandedForm = () => (
-		<div className='grid flex-col grid-cols-2 gap-4 pt-2 w-full bg-gray-700 rounded-lg p-4'>
+		<div className='grid flex-col grid-cols-1 md:grid-cols-2 gap-4 pt-2 w-full bg-gray-700 rounded-lg p-4'>
 			<div className='grid col-span-1 w-full gap-4'>
 				<div className='flex flex-col gap-2'>
 					<label className='text-white'>Description</label>
@@ -145,7 +145,7 @@ const TaskForm = () => {
 
 				<FormField
 					label='List'
-					className='w-48'
+					className='w-full md:w-48'
 				>
 					<select
 						name='listId'
@@ -168,7 +168,7 @@ const TaskForm = () => {
 
 				<FormField
 					label='Due Date'
-					className='w-48'
+					className='w-full md:w-48'
 				>
 					<Input
 						type='date'
@@ -202,7 +202,7 @@ const TaskForm = () => {
 			className='mb-4 w-full'
 		>
 			<div className='flex flex-col gap-3'>
-				<div className='flex gap-2 w-full'>
+				<div className='flex flex-col md:flex-row gap-2 w-full'>
 					<input
 						type='text'
 						value={formData.title}

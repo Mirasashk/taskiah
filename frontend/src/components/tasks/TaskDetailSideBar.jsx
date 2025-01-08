@@ -100,9 +100,9 @@ const TaskDetailSideBar = ({ task, onClose, onSave, isEditing, onEdit }) => {
 	const isSharedList = sharedLists.some((list) => list.id === task.listId);
 
 	return (
-		<aside className='w-full bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg max-h-[calc(100vh-2rem)] overflow-y-auto'>
-			<div className='flex justify-between items-center mb-6'>
-				<h2 className='text-xl font-semibold text-gray-900 dark:text-white'>
+		<aside className='w-full bg-white dark:bg-gray-800 rounded-lg p-3 md:p-6 shadow-lg max-h-[calc(100vh-2rem)] overflow-y-auto'>
+			<div className='flex justify-between items-center mb-4 md:mb-6'>
+				<h2 className='text-lg md:text-xl font-semibold text-gray-900 dark:text-white'>
 					Task Details
 				</h2>
 				<button
@@ -113,7 +113,7 @@ const TaskDetailSideBar = ({ task, onClose, onSave, isEditing, onEdit }) => {
 				</button>
 			</div>
 
-			<div className='space-y-6'>
+			<div className='space-y-4 md:space-y-6'>
 				{/* Title */}
 				<div>
 					<label className='block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1'>
@@ -128,7 +128,7 @@ const TaskDetailSideBar = ({ task, onClose, onSave, isEditing, onEdit }) => {
 							className='flex-1 w-full p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border-gray-300 dark:border-gray-700'
 						/>
 					) : (
-						<p className='text-gray-900 dark:text-white'>
+						<p className='text-gray-900 dark:text-white break-words'>
 							{task.title}
 						</p>
 					)}
@@ -141,7 +141,7 @@ const TaskDetailSideBar = ({ task, onClose, onSave, isEditing, onEdit }) => {
 							Description
 						</label>
 						<textarea
-							className='p-2 w-full h-40 max-h-[30rem] border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border-gray-300 dark:border-gray-700'
+							className='p-2 w-full h-32 md:h-40 max-h-[30rem] border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border-gray-300 dark:border-gray-700'
 							name='description'
 							value={editedTask.description}
 							onChange={handleInputChange}
@@ -154,7 +154,7 @@ const TaskDetailSideBar = ({ task, onClose, onSave, isEditing, onEdit }) => {
 							<label className='block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1'>
 								Description
 							</label>
-							<p className='text-gray-900 dark:text-white whitespace-pre-wrap'>
+							<p className='text-gray-900 dark:text-white whitespace-pre-wrap break-words'>
 								{task.description}
 							</p>
 						</div>
@@ -308,7 +308,7 @@ const TaskDetailSideBar = ({ task, onClose, onSave, isEditing, onEdit }) => {
 						Due Date
 					</label>
 					{isEditing ? (
-						<div className='flex gap-2'>
+						<div className='flex flex-col md:flex-row gap-2'>
 							<input
 								type='date'
 								name='dueDate'
@@ -337,7 +337,7 @@ const TaskDetailSideBar = ({ task, onClose, onSave, isEditing, onEdit }) => {
 											},
 										});
 									}}
-									className='w-32 p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 [color-scheme:light] dark:[color-scheme:dark]'
+									className='w-full md:w-32 p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 [color-scheme:light] dark:[color-scheme:dark]'
 								/>
 							)}
 						</div>
@@ -351,12 +351,14 @@ const TaskDetailSideBar = ({ task, onClose, onSave, isEditing, onEdit }) => {
 				</div>
 
 				{isEditing && (
-					<button
-						onClick={handleSave}
-						className='bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700'
-					>
-						Save
-					</button>
+					<div className='flex gap-2 justify-end mt-4'>
+						<button
+							onClick={handleSave}
+							className='w-full md:w-auto px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700'
+						>
+							Save
+						</button>
+					</div>
 				)}
 			</div>
 		</aside>
