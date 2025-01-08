@@ -11,11 +11,12 @@ const { addTag, getTags, deleteTag } = require('../controllers/tagController');
  * Routes
  * @type {import('express').Router}
  */
-router.post('/add', async (req, res) => {
+router.post('/', async (req, res) => {
 	await addTag(req.body, res);
 });
-router.get('/:userId', async (req, res) => {
-	await getTags(req.params.userId, res);
+
+router.get('/', async (req, res) => {
+	await getTags(req.query.userId, res);
 });
 
 router.delete('/:id', async (req, res) => {

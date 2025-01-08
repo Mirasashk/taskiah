@@ -217,6 +217,18 @@ class Task {
 			...doc.data(),
 		}));
 
+		console.log('ownerTasks', ownerTasksData);
+		console.log('sharedTasks', sharedTasksData);
+		console.log('sharedListsTasks', sharedListsTasks);
+
+		//Combine all tasks
+		const allTasks = [
+			...ownerTasksData,
+			...sharedTasksData,
+			...sharedListsTasks,
+		];
+
+		console.log('allTasks', allTasks);
 		//Combine and remove duplicates
 		return [
 			...ownerTasksData,
@@ -238,19 +250,34 @@ class Task {
 	 * @returns {Promise<Array<Object>>} The tasks data
 	 */
 	static async getAllSharedListsTasks(userId) {
-		const sharedLists = await db
-			.collection('lists')
+		const listsRef = db.collection('lists');
+		const myLists = await listsRef.where('ownerId', '==', userId).get();
+		const sharedLists = await listsRef
 			.where('sharedWith', 'array-contains', userId)
 			.get();
 
+		//combine all lists
+		const allLists = [...myLists.docs, ...sharedLists.docs];
+
+		console.log(
+			'myLists',
+			myLists.docs.map((doc) => doc.data())
+		);
+		console.log(
+			'sharedLists',
+			sharedLists.docs.map((doc) => doc.data())
+		);
+
 		// Collect all task IDs from all shared lists
 		const allTaskIds = [];
-		for (const list of sharedLists.docs) {
+		for (const list of allLists) {
 			const listData = list.data();
 			if (listData.tasks && listData.tasks.length) {
 				allTaskIds.push(...listData.tasks);
 			}
 		}
+
+		console.log('allTaskIds', allTaskIds);
 
 		// If no tasks found, return empty array
 		if (allTaskIds.length === 0) {

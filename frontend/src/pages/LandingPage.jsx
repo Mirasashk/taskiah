@@ -10,7 +10,7 @@ const LandingPage = () => {
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
 	return (
-		<div className='min-h-screen rounded-lg dark:bg-gray-900'>
+		<div className='min-h-screen pt-4 md:pt-0 rounded-lg dark:bg-gray-900'>
 			{/* Hero Section */}
 			<div className='container mx-auto px-4 md:py-16'>
 				<div className='flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12'>

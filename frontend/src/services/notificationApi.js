@@ -2,11 +2,14 @@ import axiosInstance from '../config/axios';
 
 export const notificationService = {
 	addNotification: (notification, taskId, task) =>
-		axiosInstance.post(`/notifications/add/${taskId}`, {
+		axiosInstance.post(`/tasks/${taskId}/notifications`, {
 			notification,
 			task,
 		}),
-	getNotifications: (taskId) => axiosInstance.get(`/notifications/${taskId}`),
+
+	getNotifications: (taskId) =>
+		axiosInstance.get(`/tasks/${taskId}/notifications`),
+
 	deleteNotification: (taskId) =>
-		axiosInstance.delete(`/notifications/${taskId}`),
+		axiosInstance.delete(`/tasks/${taskId}/notifications`),
 };

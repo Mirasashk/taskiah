@@ -14,12 +14,7 @@ const TaskList = ({ setIsEditing }) => {
 		setSelectedTask,
 	} = useTaskContext();
 
-	const { userData } = useUser();
 	const [localTasks, setLocalTasks] = useState([]);
-
-	useEffect(() => {
-		getTasks(userData?.id);
-	}, []);
 
 	useEffect(() => {
 		setLocalTasks(filteredTasks);

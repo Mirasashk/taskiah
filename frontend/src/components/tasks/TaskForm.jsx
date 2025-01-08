@@ -36,7 +36,8 @@ const TaskForm = () => {
 	const { addTask } = useTaskContext();
 	const { addNotification } = useNotificationContext();
 	const { userData } = useUser();
-	const { tags, lists, myLists, myTasksList } = useListContext();
+	const { tags, lists, myLists, myTasksList, selectedList } =
+		useListContext();
 
 	const [showNewTaskSubForm, setShowNewTaskSubForm] = useState(false);
 	const [selectedTag, setSelectedTag] = useState(tags[0]);
@@ -44,15 +45,15 @@ const TaskForm = () => {
 		...DEFAULT_FORM_STATE,
 		tags: [tags[0]?.id].filter(Boolean),
 		ownerId: userData?.id,
-		listId: myTasksList?.id,
+		listId: selectedList?.id || myTasksList?.id,
 	});
 
 	useEffect(() => {
 		setFormData((prevFormData) => ({
 			...prevFormData,
-			listId: myTasksList?.id,
+			listId: selectedList?.id || myTasksList?.id,
 		}));
-	}, [myTasksList]);
+	}, [selectedList]);
 
 	useEffect(() => {
 		setShowNewTaskSubForm(formData.title.trim() !== '');

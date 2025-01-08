@@ -14,7 +14,7 @@ const {
  * Routes
  * @type {import('express').Router}
  */
-router.post('/add/:taskId', addNotification);
-router.get('/:taskId', getNotifications);
+router.post('/tasks/:taskId/notifications', addNotification);
+router.get('/tasks/:taskId/notifications', getNotifications);
 
 module.exports = router;

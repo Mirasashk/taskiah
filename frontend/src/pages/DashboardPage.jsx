@@ -6,7 +6,7 @@ import TaskCalendar from '../components/dashboard/TaskCalendar';
 import { useTaskContext } from '../context/TaskContext';
 import { useUser } from '../context/UserContext';
 import { useNotificationContext } from '../context/NotificationContext';
-
+import { useNavigate } from 'react-router-dom';
 const DashboardPage = () => {
 	const { tasks } = useTaskContext();
 	const { userData } = useUser();
@@ -16,7 +16,7 @@ const DashboardPage = () => {
 		getNotifications,
 		sharedListNotifications,
 	} = useNotificationContext();
-
+	const navigate = useNavigate();
 	useEffect(() => {
 		getNotifications();
 	}, [tasks]);
@@ -112,6 +112,7 @@ const DashboardPage = () => {
 					icon={
 						<FiClock className='h-5 w-5 sm:h-6 sm:w-6 text-blue-500' />
 					}
+					onClick={() => navigate('/tasks')}
 					trend={activeTrendData.trend}
 					trendValue={activeTrendData.value}
 				/>

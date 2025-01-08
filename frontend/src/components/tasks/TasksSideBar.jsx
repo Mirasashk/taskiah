@@ -17,7 +17,8 @@ import SideBarItem from './SideBarItem';
 const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 	// Contexts
 	const { userData } = useUser();
-	const { sharedLists, myLists, tags } = useListContext();
+	const { sharedLists, myLists, tags, selectedList, setSelectedList } =
+		useListContext();
 	const { tasks, filterTasks, filter, deletedTasks, setSelectedTask } =
 		useTaskContext();
 
@@ -123,7 +124,10 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 								label={option.label}
 								count={option.count}
 								selected={selectedFilter === option.label}
-								onClick={() => setSelectedFilter(option.label)}
+								onClick={() => {
+									setSelectedFilter(option.label);
+									setSelectedList(null);
+								}}
 								isMobile={true}
 							/>
 						))}
@@ -152,7 +156,10 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 								label={list.name}
 								count={list.tasks?.length || 0}
 								selected={selectedFilter === list.name}
-								onClick={() => setSelectedFilter(list.name)}
+								onClick={() => {
+									setSelectedList(list);
+									setSelectedFilter(list.name);
+								}}
 								isMobile={true}
 							/>
 						))}
@@ -171,7 +178,10 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 									label={list.name}
 									count={list.tasks?.length || 0}
 									selected={selectedFilter === list.name}
-									onClick={() => setSelectedFilter(list.name)}
+									onClick={() => {
+										setSelectedList(list);
+										setSelectedFilter(list.name);
+									}}
 									isMobile={true}
 								/>
 							))}
@@ -200,7 +210,10 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 								color={tag.color}
 								count={filterTasksByItem(tasks, tag).length}
 								selected={selectedFilter === tag.name}
-								onClick={() => setSelectedFilter(tag.name)}
+								onClick={() => {
+									setSelectedFilter(tag.name);
+									setSelectedList(null);
+								}}
 								isMobile={true}
 							/>
 						))}
@@ -216,7 +229,10 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 							label='Deleted'
 							count={deletedTasks.length}
 							selected={selectedFilter === 'Deleted'}
-							onClick={() => setSelectedFilter('Deleted')}
+							onClick={() => {
+								setSelectedFilter('Deleted');
+								setSelectedList(null);
+							}}
 							isMobile={true}
 						/>
 					</div>
@@ -239,7 +255,10 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 							label={option.label}
 							count={option.count}
 							selected={selectedFilter === option.label}
-							onClick={() => setSelectedFilter(option.label)}
+							onClick={() => {
+								setSelectedFilter(option.label);
+								setSelectedList(null);
+							}}
 						/>
 					))}
 				</nav>
@@ -252,12 +271,13 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 					items={myLists}
 					selected={selectedFilter}
 					onSelectedFilter={setSelectedFilter}
-				>
-					<AddNewBtn
-						onClick={() => setIsListModalOpen(true)}
-						title='List'
-					/>
-				</SideBarGroup>
+					children={
+						<AddNewBtn
+							onClick={() => setIsListModalOpen(true)}
+							title='List'
+						/>
+					}
+				/>
 
 				<SideBarGroup
 					title='Shared with me'
@@ -288,7 +308,10 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 					label='Deleted'
 					count={deletedTasks.length}
 					selected={selectedFilter === 'Deleted'}
-					onClick={() => setSelectedFilter('Deleted')}
+					onClick={() => {
+						setSelectedFilter('Deleted');
+						setSelectedList(null);
+					}}
 				/>
 			</div>
 			{renderListModal()}

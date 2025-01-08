@@ -21,36 +21,36 @@ const {
  * Routes
  * @type {import('express').Router}
  */
-router.post('/add', async (req, res) => {
+router.post('/', async (req, res) => {
 	await addList(req.body, res);
 });
 
-router.get('/:ownerId', async (req, res) => {
-	await getListByOwnerId(req.params.ownerId, res);
+router.get('/', async (req, res) => {
+	await getListByOwnerId(req.query.ownerId, res);
 });
 
-router.get('/shared/:userId', async (req, res) => {
-	await getSharedWithListsByUserId(req.params.userId, res);
+router.get('/shared', async (req, res) => {
+	await getSharedWithListsByUserId(req.query.userId, res);
 });
 
-router.post('/invite', async (req, res) => {
+router.post('/:id/invites', async (req, res) => {
 	await inviteToList(req.body, res);
 });
 
-router.get('/invite/:email', async (req, res) => {
-	await getListInviteByEmail(req.params.email, res);
+router.get('/invites', async (req, res) => {
+	await getListInviteByEmail(req.query.email, res);
 });
 
-router.put('/invite/:id/accept', async (req, res) => {
+router.put('/invites/:id/accept', async (req, res) => {
 	const body = req.body;
 	await acceptListInvite(req.params.id, body.listId, body.userId, res);
 });
 
-router.put('/invite/:id/reject', async (req, res) => {
+router.put('/invites/:id/reject', async (req, res) => {
 	await rejectListInvite(req.params.id, res);
 });
 
-router.put('/:id/update', async (req, res) => {
+router.put('/:id', async (req, res) => {
 	await updateList(req.params.id, req.body, res);
 });
 

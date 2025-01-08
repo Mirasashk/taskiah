@@ -23,7 +23,7 @@ const {
  * Routes
  * @type {import('express').Router}
  */
-router.post('/add', async (req, res) => {
+router.post('/', async (req, res) => {
 	await addUser(req.body, res);
 });
 
@@ -32,14 +32,14 @@ router.get('/search', async (req, res) => {
 	await searchUsers(query, res);
 });
 
-router.post('/invite', async (req, res) => {
+router.post('/invites', async (req, res) => {
 	const email = req.body.email;
 	const message = req.body.message;
 	await inviteUser(email, message, res);
 });
 
-router.post('/biometric/public-key', async (req, res) => {
-	const userId = req.body.userId;
+router.post('/:id/biometric/keys', async (req, res) => {
+	const userId = req.params.id;
 	const deviceId = req.body.deviceId;
 	const publicKey = req.body.publicKey;
 	const userAgent = req.headers['user-agent'];
@@ -57,29 +57,29 @@ router.get('/biometric/challenge', async (req, res) => {
 	await getBiometricChallenge(res);
 });
 
-router.get('/biometric/check-device/:deviceId/:userId', async (req, res) => {
+router.get('/:id/devices/:deviceId', async (req, res) => {
 	const deviceId = req.params.deviceId;
-	const userId = req.params.userId;
+	const userId = req.params.id;
 	await checkDevice(deviceId, userId, res);
 });
 
-router.get('/getUsersByUserIds', async (req, res) => {
-	const userIds = req.query.userIds;
+router.get('/', async (req, res) => {
+	const userIds = req.query.ids;
 	await getUsersByUserIds(userIds, res);
 });
 
-router.get('/:userId', async (req, res) => {
-	await getUser(req.params.userId, res);
+router.get('/:id', async (req, res) => {
+	await getUser(req.params.id, res);
 });
 
-router.put('/:userId', async (req, res) => {
-	const userId = req.params.userId;
+router.put('/:id', async (req, res) => {
+	const userId = req.params.id;
 	const user = req.body;
 	await updateUser(userId, user, res);
 });
 
-router.put('/:userId/preferences', async (req, res) => {
-	const userId = req.params.userId;
+router.put('/:id/preferences', async (req, res) => {
+	const userId = req.params.id;
 	const preferences = req.body;
 	await updateUserPreferences(userId, preferences, res);
 });

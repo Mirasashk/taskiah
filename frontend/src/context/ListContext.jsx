@@ -11,6 +11,7 @@ export function ListProvider({ children }) {
 	const [sharedLists, setSharedLists] = useState([]); // Shared lists
 	const [tags, setTags] = useState([]); // Tags
 	const { userData } = useUser();
+	const [selectedList, setSelectedList] = useState(null);
 
 	useEffect(() => {
 		if (userData) {
@@ -52,6 +53,8 @@ export function ListProvider({ children }) {
 		sharedLists,
 		myTasksList,
 		tags,
+		selectedList,
+		setSelectedList,
 		getTags,
 		getLists,
 		getSharedLists,

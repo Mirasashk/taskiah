@@ -4,30 +4,48 @@ import TaskForm from '../components/tasks/TaskForm';
 import TasksSideBar from '../components/tasks/TasksSideBar';
 import TaskDetailSideBar from '../components/tasks/TaskDetailSideBar';
 import { useTaskContext } from '../context/TaskContext';
+import { useListContext } from '../context/ListContext';
 import Modal from '../components/common/Modal';
 
 const TasksPage = () => {
 	const [filteredTasks, setFilteredTasks] = useState();
 	const { selectedTask, setSelectedTask, filter, updateTask } =
 		useTaskContext();
+	const { setSelectedList } = useListContext();
 	const [isEditing, setIsEditing] = useState(false);
 
 	useEffect(() => {
 		setSelectedTask();
+		console.log(
+			'File: TasksPage.jsx, Line: 17, filteredTasks changed to ',
+			filteredTasks
+		);
 	}, [filteredTasks]);
 
 	useEffect(() => {
 		setIsEditing(false);
+		console.log(
+			'File: TasksPage.jsx, Line: 21, filter changed to ',
+			filter
+		);
 	}, [filter]);
 
 	const handleTaskSave = async (updatedTask) => {
 		await updateTask(updatedTask.id, updatedTask);
 		setSelectedTask(null);
+		console.log(
+			'File: TasksPage.jsx, Line: 28, selectedTask changed to ',
+			selectedTask
+		);
 	};
 
 	const handleOnClose = () => {
 		setSelectedTask(null);
 		setIsEditing(false);
+		console.log(
+			'File: TasksPage.jsx, Line: 34, selectedTask changed to ',
+			selectedTask
+		);
 	};
 
 	// Mobile Task Detail Modal
