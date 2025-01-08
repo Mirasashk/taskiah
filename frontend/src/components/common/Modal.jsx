@@ -7,6 +7,7 @@ const Modal = ({
 	onClose,
 	children,
 	closeButton = true,
+	cardView = true,
 	title,
 	className = '',
 }) => {
@@ -47,9 +48,9 @@ const Modal = ({
 			<div
 				className={`
 					relative z-40 w-full max-w-md transform overflow-visible 
-					bg-white dark:bg-gray-800 rounded-lg shadow-xl
+					${cardView ? 'bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 m-4' : 'p-4'}
 					transition-all duration-300 ease-in-out
-					p-6 m-4
+					
 					${className}
 				`}
 			>

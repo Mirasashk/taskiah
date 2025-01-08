@@ -78,11 +78,13 @@ export default function Header() {
 				}}
 				className='text-gray-600 dark:text-gray-300 flex items-center gap-2 cursor-pointer'
 			>
-				<img
-					src={userImage || userData?.photoURL}
-					alt='avatar'
-					className='w-8 h-8 rounded-full'
-				/>
+				<div className='flex w-20 justify-end'>
+					<img
+						src={userImage || userData?.photoURL}
+						alt='avatar'
+						className='w-8 h-8 rounded-full'
+					/>
+				</div>
 				<span className='hidden md:inline'>
 					{userData.username || userData.email}
 				</span>
@@ -163,12 +165,14 @@ export default function Header() {
 				{user ? (
 					userDisplay
 				) : (
-					<Link
-						to='/login'
-						className='px-4 py-2 w-20 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
-					>
-						Login
-					</Link>
+					<div className='w-20'>
+						<Link
+							to='/login'
+							className='px-4 py-2 w-20 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+						>
+							Login
+						</Link>
+					</div>
 				)}
 			</div>
 		</div>

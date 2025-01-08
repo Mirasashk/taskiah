@@ -4,6 +4,7 @@ import TaskForm from '../components/tasks/TaskForm';
 import TasksSideBar from '../components/tasks/TasksSideBar';
 import TaskDetailSideBar from '../components/tasks/TaskDetailSideBar';
 import { useTaskContext } from '../context/TaskContext';
+import Modal from '../components/common/Modal';
 
 const TasksPage = () => {
 	const [filteredTasks, setFilteredTasks] = useState();
@@ -27,6 +28,29 @@ const TasksPage = () => {
 	const handleOnClose = () => {
 		setSelectedTask(null);
 		setIsEditing(false);
+	};
+
+	// Mobile Task Detail Modal
+	const renderMobileTaskDetail = () => {
+		if (!selectedTask) return null;
+
+		return (
+			<Modal
+				isOpen={!!selectedTask}
+				onClose={handleOnClose}
+				closeButton={false}
+				cardView={false}
+				className='md:hidden'
+			>
+				<TaskDetailSideBar
+					task={selectedTask}
+					onClose={handleOnClose}
+					onSave={handleTaskSave}
+					isEditing={isEditing}
+					onEdit={setIsEditing}
+				/>
+			</Modal>
+		);
 	};
 
 	return (
@@ -66,14 +90,9 @@ const TasksPage = () => {
 									setIsEditing={setIsEditing}
 								/>
 							</div>
+							{/* Desktop Task Detail */}
 							{selectedTask && (
-								<div
-									className={`w-full md:w-2/5 ${
-										filter === 'All tasks'
-											? 'mt-4'
-											: 'mt-10'
-									}`}
-								>
+								<div className='hidden md:block md:w-2/5'>
 									<div className='container mx-auto'>
 										<div className='sticky top-4'>
 											<TaskDetailSideBar
@@ -91,6 +110,8 @@ const TasksPage = () => {
 					</div>
 				</div>
 			</div>
+			{/* Mobile Task Detail Modal */}
+			{renderMobileTaskDetail()}
 		</div>
 	);
 };
