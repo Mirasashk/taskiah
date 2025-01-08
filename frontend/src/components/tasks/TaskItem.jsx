@@ -72,7 +72,7 @@ export default function TaskItem({
 								: 'text-gray-900 dark:text-white'
 						}`}
 					>
-						<div className='flex flex-col md:flex-row md:items-center md:gap-8'>
+						<div className='flex flex-col items-center pt-2 md:pt-0 md:flex-row md:items-center md:gap-8'>
 							<div className='font-medium'>
 								{task.title.substring(0, 23) +
 									(task.title.length > 23 ? '...' : '')}
@@ -98,16 +98,6 @@ export default function TaskItem({
 										</label>
 										<span className='text-xs text-gray-500 dark:text-gray-400'>
 											{task.dueDate}
-										</span>
-									</div>
-								)}
-								{task.category && (
-									<div className='flex items-center gap-2'>
-										<label className='text-xs text-gray-500 dark:text-gray-400'>
-											Category:
-										</label>
-										<span className='text-xs text-gray-500 dark:text-gray-400'>
-											{task.category}
 										</span>
 									</div>
 								)}

@@ -54,13 +54,21 @@ const UserMenu = ({
 				onClick={(e) => e.stopPropagation()}
 			>
 				<div className='ml-4 pt-6 pb-3'>
-					<div className='text-gray-600 text-2xl font-medium dark:text-gray-300 flex items-center space-x-2 cursor-pointer'>
+					<div className='text-gray-600 text-xl font-medium dark:text-gray-300 flex items-center space-x-2 cursor-pointer'>
 						<img
 							src={userImage || userData?.photoURL}
 							alt='avatar'
 							className='w-12 h-12 rounded-full mr-4'
 						/>
-						{userData.username || userData.email}
+						<div className='flex flex-col'>
+							{userData.firstName.charAt(0).toUpperCase() +
+								userData.firstName.slice(1)}{' '}
+							{userData.lastName.charAt(0).toUpperCase() +
+								userData.lastName.slice(1)}
+							<span className='text-gray-400 text-sm'>
+								{userData.email || userData.username}
+							</span>
+						</div>
 					</div>
 				</div>
 				<div className='text-gray-600 text-sm dark:text-gray-300 flex items-center space-x-2 cursor-pointer mb-2'>
