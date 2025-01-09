@@ -33,6 +33,7 @@ class Task {
 	 * @param {string} [data.category] - The category of the task
 	 * @param {('low'|'medium'|'high')} data.priority - The priority level of the task
 	 * @param {string} [data.dueDate] - The due date of the task in ISO string format
+	 * @param {string} data.listId - The ID of the list the task belongs to
 	 * @param {string} data.ownerId - The ID of the task owner
 	 * @param {string[]} [data.sharedWith=[]] - Array of user IDs the task is shared with
 	 * @param {Object} [data.notifications={}] - Notification settings for the task
@@ -45,6 +46,7 @@ class Task {
 		this.category = data.category;
 		this.priority = data.priority;
 		this.dueDate = data.dueDate;
+		this.listId = data.listId;
 		this.tagIds = data.tags || [];
 		this.createdAt = data.createdAt || new Date().toISOString();
 		this.updatedAt = data.updatedAt || new Date().toISOString();
@@ -75,6 +77,10 @@ class Task {
 			throw new Error('Invalid priority value');
 		}
 
+		if (!this.listId) {
+			throw new Error('List ID is required');
+		}
+
 		// Validate sharedWith array
 		if (!Array.isArray(this.sharedWith)) {
 			throw new Error('sharedWith must be an array');
@@ -95,6 +101,7 @@ class Task {
 			category: this.category,
 			priority: this.priority,
 			dueDate: this.dueDate,
+			listId: this.listId,
 			createdAt: this.createdAt,
 			updatedAt: this.updatedAt,
 			tagIds: this.tagIds,
@@ -217,18 +224,12 @@ class Task {
 			...doc.data(),
 		}));
 
-		console.log('ownerTasks', ownerTasksData);
-		console.log('sharedTasks', sharedTasksData);
-		console.log('sharedListsTasks', sharedListsTasks);
-
 		//Combine all tasks
 		const allTasks = [
 			...ownerTasksData,
 			...sharedTasksData,
 			...sharedListsTasks,
 		];
-
-		console.log('allTasks', allTasks);
 		//Combine and remove duplicates
 		return [
 			...ownerTasksData,
@@ -259,15 +260,6 @@ class Task {
 		//combine all lists
 		const allLists = [...myLists.docs, ...sharedLists.docs];
 
-		console.log(
-			'myLists',
-			myLists.docs.map((doc) => doc.data())
-		);
-		console.log(
-			'sharedLists',
-			sharedLists.docs.map((doc) => doc.data())
-		);
-
 		// Collect all task IDs from all shared lists
 		const allTaskIds = [];
 		for (const list of allLists) {
@@ -276,8 +268,6 @@ class Task {
 				allTaskIds.push(...listData.tasks);
 			}
 		}
-
-		console.log('allTaskIds', allTaskIds);
 
 		// If no tasks found, return empty array
 		if (allTaskIds.length === 0) {

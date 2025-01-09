@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useTaskContext } from '../../context/TaskContext';
 import { useUser } from '../../context/UserContext';
+import { useListContext } from '../../context/ListContext';
 import TaskItem from './TaskItem';
 import TaskDetailSideBar from './TaskDetailSideBar';
 import { GrSort } from 'react-icons/gr';
@@ -8,20 +9,23 @@ import Modal from '../common/Modal';
 import SortListModalContent from './SortListModalContent';
 import { useSortTasks } from '../../hooks/useSortTasks';
 import { BsArrowUp, BsArrowDown } from 'react-icons/bs';
+
 const TaskList = ({ setIsEditing }) => {
 	const {
-		getTasks,
-		tasks,
 		filteredTasks,
 		filter,
 		deletedTasks,
 		setSelectedTask,
+		isLoading,
+		error,
 	} = useTaskContext();
+	const { selectedList } = useListContext();
 
 	const [localTasks, setLocalTasks] = useState([]);
 	const [sortKey, setSortKey] = useState('createdAt');
-	const [sortDirection, setSortDirection] = useState(true);
+	const [sortDirection, setSortDirection] = useState(false);
 	const [showSortModal, setShowSortModal] = useState(false);
+	const sortedTasks = useSortTasks(localTasks, sortKey, sortDirection);
 
 	useEffect(() => {
 		if (filter === 'Deleted') {
@@ -29,31 +33,52 @@ const TaskList = ({ setIsEditing }) => {
 		} else {
 			setLocalTasks(filteredTasks);
 		}
-	}, [filteredTasks, deletedTasks, filter]);
+	}, [deletedTasks, filter, filteredTasks]);
 
-	const options = [
-		{ label: 'Created date', value: 'createdAt' },
-		{ label: 'Due date', value: 'dueDate' },
-		{ label: 'Priority', value: 'priority' },
-		{ label: 'Status', value: 'status' },
-	];
+	const options = useMemo(
+		() => [
+			{ label: 'Created date', value: 'createdAt' },
+			{ label: 'Due date', value: 'dueDate' },
+			{ label: 'Priority', value: 'priority' },
+			{ label: 'Status', value: 'status' },
+		],
+		[]
+	);
 
-	useEffect(() => {
-		setLocalTasks(tasks);
-	}, [tasks]);
+	const displayTasks = useMemo(() => {
+		return sortedTasks;
+	}, [sortedTasks]);
 
-	const sortedTasks = useSortTasks(localTasks, sortKey, sortDirection);
+	const handleTaskSelect = useCallback(
+		(task) => {
+			setSelectedTask(task);
+		},
+		[setSelectedTask]
+	);
 
-	const handleTaskSelect = (task) => {
-		setSelectedTask(task);
-	};
+	const handleTaskEdit = useCallback(
+		(task) => {
+			setSelectedTask(task);
+			setIsEditing(true);
+		},
+		[setSelectedTask, setIsEditing]
+	);
 
-	const handleTaskEdit = (task) => {
-		setSelectedTask(task);
-		setIsEditing(true);
-	};
+	const toggleSortDirection = useCallback(() => {
+		setSortDirection((prev) => !prev);
+	}, []);
 
-	const displayTasks = sortedTasks || [];
+	const toggleSortModal = useCallback(() => {
+		setShowSortModal((prev) => !prev);
+	}, []);
+
+	if (error) {
+		return (
+			<div className='text-red-500 dark:text-red-400 p-4'>
+				Error loading tasks: {error}
+			</div>
+		);
+	}
 
 	return (
 		<div className='flex gap-4'>
@@ -75,10 +100,8 @@ const TaskList = ({ setIsEditing }) => {
 						<div className='flex items-center justify-center gap-4'>
 							<label className='text-md text-gray-500 dark:text-gray-400'>
 								<div
-									className='flex items-center gap-1 text-sm'
-									onClick={() =>
-										setSortDirection(!sortDirection)
-									}
+									className='flex items-center gap-1 text-sm cursor-pointer'
+									onClick={toggleSortDirection}
 								>
 									{
 										options.find(
@@ -94,14 +117,18 @@ const TaskList = ({ setIsEditing }) => {
 							</label>
 							<button
 								className='text-gray-500 dark:text-gray-400'
-								onClick={() => setShowSortModal(true)}
+								onClick={toggleSortModal}
 							>
 								<GrSort className='text-xl text-white' />
 							</button>
 						</div>
 					)}
 				</div>
-				{displayTasks.length === 0 ? (
+				{isLoading ? (
+					<div className='flex items-center justify-center p-4'>
+						<div className='animate-spin rounded-full h-8 w-8 border-b-2 border-white'></div>
+					</div>
+				) : displayTasks.length === 0 ? (
 					<p className='text-gray-500 dark:text-gray-400'>
 						No tasks yet!
 					</p>
@@ -119,7 +146,7 @@ const TaskList = ({ setIsEditing }) => {
 			</div>
 			<Modal
 				isOpen={showSortModal}
-				onClose={() => setShowSortModal(false)}
+				onClose={toggleSortModal}
 				title='Sort Tasks'
 				className='w-fit'
 			>

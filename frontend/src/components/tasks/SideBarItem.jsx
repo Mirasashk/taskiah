@@ -8,6 +8,7 @@ import {
 	FiList,
 	FiShare,
 	FiTrash2,
+	FiUser,
 } from 'react-icons/fi';
 import { Icons } from '../common/Icons';
 import Modal from '../common/Modal';
@@ -50,6 +51,8 @@ const SideBarItem = ({
 				return <FiShare />;
 			case 'trash':
 				return <FiTrash2 />;
+			case 'person':
+				return <FiUser />;
 			default:
 				return null;
 		}

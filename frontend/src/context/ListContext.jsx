@@ -9,9 +9,9 @@ export function ListProvider({ children }) {
 	const [myTasksList, setMyTasksList] = useState(null); // My Tasks list
 	const [myLists, setMyLists] = useState([]); // My lists (not including My Tasks list)
 	const [sharedLists, setSharedLists] = useState([]); // Shared lists
-	const [tags, setTags] = useState([]); // Tags
-	const { userData } = useUser();
+	const [tags, setTags] = useState([]);
 	const [selectedList, setSelectedList] = useState(null);
+	const { userData } = useUser();
 
 	useEffect(() => {
 		if (userData) {
@@ -20,6 +20,12 @@ export function ListProvider({ children }) {
 		}
 	}, [userData]);
 
+	useEffect(() => {
+		if (!selectedList) {
+			setSelectedList(myTasksList);
+		}
+	}, [myTasksList, selectedList]);
+
 	const getLists = async (userId) => {
 		const response = await listService.getListsByUserId(userId);
 
@@ -27,7 +33,14 @@ export function ListProvider({ children }) {
 		setLists(response.data);
 		setMyLists(response.data.filter((list) => list.name !== 'My Tasks'));
 		setMyTasksList(response.data.find((list) => list.name === 'My Tasks'));
-		getSharedLists(userData.id);
+		getSharedLists(userId);
+
+		if (selectedList) {
+			const updatedList = response.data.find(
+				(list) => list.id === selectedList.id
+			);
+			setSelectedList(updatedList);
+		}
 	};
 
 	const getSharedLists = async (userId) => {
@@ -41,10 +54,22 @@ export function ListProvider({ children }) {
 		setTags(response.data);
 	};
 
-	const refreshContext = async () => {
-		await getLists(userData.id);
-		await getSharedLists(userData.id);
-		await getTags(userData.id);
+	const refreshListContext = async () => {
+		if (userData) {
+			await getLists(userData.id);
+			await getSharedLists(userData.id);
+			await getTags(userData.id);
+
+			// Update selectedList with fresh data if it exists
+			if (selectedList) {
+				const updatedList = lists.find(
+					(list) => list.id === selectedList.id
+				);
+				setSelectedList(updatedList || myTasksList);
+			} else {
+				setSelectedList(myTasksList);
+			}
+		}
 	};
 
 	const value = {
@@ -58,7 +83,7 @@ export function ListProvider({ children }) {
 		getTags,
 		getLists,
 		getSharedLists,
-		refreshContext,
+		refreshListContext,
 	};
 
 	return (

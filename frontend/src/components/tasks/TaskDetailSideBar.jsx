@@ -22,25 +22,13 @@ const TaskDetailSideBar = ({ task, onClose, onSave, isEditing, onEdit }) => {
 
 	useEffect(() => {
 		setEditedTask(task);
-		console.log('Task:', task);
-		console.log('Tags:', tags);
-		console.log('Task.tagIds:', task.tagIds);
 
 		if (tags && task.tagIds) {
 			const tagsArray =
 				typeof task.tagIds === 'string' ? [task.tagIds] : task.tagIds;
-			console.log('TagsArray:', tagsArray);
-
 			const filteredTags = tags.filter((tag) => {
-				console.log(
-					'Checking tag:',
-					tag.id,
-					'against tagsArray:',
-					tagsArray
-				);
 				return tagsArray.includes(tag.id);
 			});
-			console.log('Filtered Tags:', filteredTags);
 
 			setSelectedTags(filteredTags);
 		} else {
@@ -184,7 +172,7 @@ const TaskDetailSideBar = ({ task, onClose, onSave, isEditing, onEdit }) => {
 						</select>
 					) : (
 						<p className='text-gray-900 dark:text-white'>
-							{lists.find((list) => list.tasks.includes(task.id))
+							{lists.find((list) => list.id === task.listId)
 								?.name || 'Unknown List'}
 						</p>
 					)}

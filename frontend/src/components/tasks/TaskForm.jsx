@@ -23,7 +23,6 @@ const DEFAULT_FORM_STATE = {
 	dueDate: '',
 	listId: '',
 	tags: [],
-	createdAt: new Date(),
 	ownerId: '',
 };
 
@@ -67,7 +66,7 @@ const TaskForm = () => {
 			...DEFAULT_FORM_STATE,
 			tags: [tags[0]?.id].filter(Boolean),
 			ownerId: userData.id,
-			listId: myTasksList?.id,
+			listId: selectedList?.id || myTasksList?.id,
 		});
 		setShowNewTaskSubForm(false);
 	};
@@ -101,7 +100,7 @@ const TaskForm = () => {
 	 * @returns {JSX.Element} The expanded form section
 	 */
 	const renderExpandedForm = () => (
-		<div className='grid flex-col grid-cols-1 md:grid-cols-2 gap-4 pt-2 w-full bg-gray-700 rounded-lg p-4'>
+		<div className='grid flex-col grid-cols-1 lg:grid-cols-2 gap-4 pt-2 w-full bg-gray-700 rounded-lg p-4'>
 			<div className='grid col-span-1 w-full gap-4'>
 				<div className='flex flex-col gap-2'>
 					<label className='text-white'>Description</label>

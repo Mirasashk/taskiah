@@ -7,6 +7,29 @@ import { ThemeProvider } from './context/ThemeContext';
 import { UserProvider } from './context/UserContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { ListProvider } from './context/ListContext';
+import { LoadingProvider } from './context/LoadingContext';
+import LoadingScreen from './components/common/LoadingScreen';
+import { useLoading } from './context/LoadingContext';
+
+function AppContent() {
+	const { isLoading, error } = useLoading();
+
+	if (isLoading || error) {
+		return <LoadingScreen error={error} />;
+	}
+
+	return (
+		<BrowserRouter
+			future={{
+				v7_startTransition: true,
+				v7_relativeSplatPath: true,
+			}}
+		>
+			<AppRoutes />
+		</BrowserRouter>
+	);
+}
+
 function App() {
 	return (
 		<AuthProvider>
@@ -15,14 +38,9 @@ function App() {
 					<ListProvider>
 						<TaskProvider>
 							<NotificationProvider>
-								<BrowserRouter
-									future={{
-										v7_startTransition: true,
-										v7_relativeSplatPath: true,
-									}}
-								>
-									<AppRoutes />
-								</BrowserRouter>
+								<LoadingProvider>
+									<AppContent />
+								</LoadingProvider>
 							</NotificationProvider>
 						</TaskProvider>
 					</ListProvider>

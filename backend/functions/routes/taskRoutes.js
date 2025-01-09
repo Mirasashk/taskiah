@@ -19,7 +19,9 @@ const {
  * @type {import('express').Router}
  */
 router.post('/', async (req, res) => {
-	await addTask(req.body, res);
+	console.log('taskData', req.body);
+	const taskData = req.body;
+	await addTask(taskData, res);
 });
 
 router.get('/', async (req, res) => {

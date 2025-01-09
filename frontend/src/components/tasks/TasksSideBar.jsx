@@ -14,18 +14,25 @@ import CreateListForm from './CreateListForm';
 import CreateTagForm from './CreateTagForm';
 import { useListContext } from '../../context/ListContext';
 import SideBarItem from './SideBarItem';
+import { useLoading } from '../../context/LoadingContext';
+
 const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 	// Contexts
 	const { userData } = useUser();
-	const { sharedLists, myLists, tags, selectedList, setSelectedList } =
-		useListContext();
+	const {
+		sharedLists,
+		myLists,
+		tags,
+		myTasksList,
+		selectedList,
+		setSelectedList,
+	} = useListContext();
 	const { tasks, filterTasks, filter, deletedTasks, setSelectedTask } =
 		useTaskContext();
+	const { isLoading } = useLoading();
 
 	// States
 	const [selectedFilter, setSelectedFilter] = useState(filter);
-
-	// const [selectedTag, setSelectedTag] = useState(null);
 	const [isListModalOpen, setIsListModalOpen] = useState(false);
 	const [isTagModalOpen, setIsTagModalOpen] = useState(false);
 
@@ -50,39 +57,53 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 	}, [selectedFilter, tasks]);
 
 	// Functions
-	const todayTasks = tasks.filter((task) => {
-		const taskDate = new Date(task.dueDate);
+	const todayTasks =
+		tasks?.filter((task) => {
+			const taskDate = new Date(task.dueDate);
+			return (
+				taskDate.toDateString() === today.toDateString() &&
+				task.status !== 'deleted'
+			);
+		}) || [];
 
-		return (
-			taskDate.toDateString() === today.toDateString() &&
-			task.status !== 'deleted'
-		);
-	});
-
-	const importantTasks = tasks.filter(
-		(task) =>
-			task.priority === 'high' &&
-			task.ownerId === userData.id &&
-			task.status !== 'deleted'
-	);
+	const importantTasks =
+		tasks?.filter(
+			(task) =>
+				task.priority === 'high' &&
+				task.ownerId === userData?.id &&
+				task.status !== 'deleted'
+		) || [];
 
 	const staticFilterOptions = [
 		{
 			icon: 'inbox',
 			label: 'All tasks',
-			count: tasks.filter((task) => task.status !== 'deleted').length,
+			count:
+				tasks?.filter((task) => task.status !== 'deleted')?.length || 0,
+		},
+		{
+			icon: 'person',
+			label: 'My tasks',
+			count:
+				tasks?.filter(
+					(task) =>
+						task.status !== 'deleted' &&
+						myTasksList?.tasks?.includes(task.id)
+				)?.length || 0,
 		},
 		{
 			icon: 'calendar',
 			label: 'Today',
-			count: todayTasks.filter((task) => task.status !== 'deleted')
-				.length,
+			count:
+				todayTasks?.filter((task) => task.status !== 'deleted')
+					?.length || 0,
 		},
 		{
 			icon: 'star',
 			label: 'Important',
-			count: importantTasks.filter((task) => task.status !== 'deleted')
-				.length,
+			count:
+				importantTasks?.filter((task) => task.status !== 'deleted')
+					?.length || 0,
 		},
 	];
 
@@ -110,6 +131,19 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 		);
 	};
 
+	if (isLoading) {
+		return (
+			<div className='w-64 bg-white rounded-lg dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 p-4'>
+				<div className='animate-pulse space-y-4'>
+					<div className='h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4'></div>
+					<div className='h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/2'></div>
+					<div className='h-6 bg-gray-200 dark:bg-gray-700 rounded w-2/3'></div>
+					<div className='h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/2'></div>
+				</div>
+			</div>
+		);
+	}
+
 	if (isMobile) {
 		return (
 			<>
@@ -126,7 +160,7 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 								selected={selectedFilter === option.label}
 								onClick={() => {
 									setSelectedFilter(option.label);
-									setSelectedList(null);
+									setSelectedList(myTasksList);
 								}}
 								isMobile={true}
 							/>
@@ -139,7 +173,7 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 							<div className='h-8 w-px bg-gray-300 dark:bg-gray-600 mx-2'></div>
 						</div>
 
-						{myLists.map((list) => (
+						{myLists?.map((list) => (
 							<SideBarItem
 								key={list.id}
 								icon='list'
@@ -169,7 +203,7 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 					</div>
 
 					{/* Shared Lists Section */}
-					{sharedLists.length > 0 && (
+					{sharedLists?.length > 0 && (
 						<div className='flex space-x-4'>
 							<div className='flex items-center'>
 								<div className='h-8 w-px bg-gray-300 dark:bg-gray-600 mx-2'></div>
@@ -197,17 +231,19 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 							<div className='h-8 w-px bg-gray-300 dark:bg-gray-600 mx-2'></div>
 						</div>
 
-						{tags.map((tag) => (
+						{tags?.map((tag) => (
 							<SideBarItem
 								key={tag.id}
 								icon='tag'
 								label={tag.name}
 								color={tag.color}
-								count={filterTasksByItem(tasks, tag).length}
+								count={
+									filterTasksByItem(tasks, tag)?.length || 0
+								}
 								selected={selectedFilter === tag.name}
 								onClick={() => {
 									setSelectedFilter(tag.name);
-									setSelectedList(null);
+									setSelectedList(myTasksList);
 								}}
 								isMobile={true}
 							/>
@@ -235,11 +271,11 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 						<SideBarItem
 							icon='trash'
 							label='Deleted'
-							count={deletedTasks.length}
+							count={deletedTasks?.length || 0}
 							selected={selectedFilter === 'Deleted'}
 							onClick={() => {
 								setSelectedFilter('Deleted');
-								setSelectedList(null);
+								setSelectedList(myTasksList);
 							}}
 							isMobile={true}
 						/>
@@ -265,7 +301,7 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 							selected={selectedFilter === option.label}
 							onClick={() => {
 								setSelectedFilter(option.label);
-								setSelectedList(null);
+								setSelectedList(myTasksList);
 							}}
 						/>
 					))}
@@ -276,7 +312,7 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 				<SideBarGroup
 					title='My Lists'
 					icon={<FiList />}
-					items={myLists}
+					items={myLists || []}
 					selected={selectedFilter}
 					onSelectedFilter={setSelectedFilter}
 					children={
@@ -290,7 +326,7 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 				<SideBarGroup
 					title='Shared with me'
 					icon={<FiShare />}
-					items={sharedLists}
+					items={sharedLists || []}
 					selected={selectedFilter}
 					onSelectedFilter={setSelectedFilter}
 				/>
@@ -298,7 +334,7 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 				<SideBarGroup
 					title='Tags'
 					icon={<FiTag />}
-					items={tags}
+					items={tags || []}
 					selected={selectedFilter}
 					onSelectedFilter={setSelectedFilter}
 					children={
@@ -314,11 +350,11 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 				<SideBarItem
 					icon='trash'
 					label='Deleted'
-					count={deletedTasks.length}
+					count={deletedTasks?.length || 0}
 					selected={selectedFilter === 'Deleted'}
 					onClick={() => {
 						setSelectedFilter('Deleted');
-						setSelectedList(null);
+						setSelectedList(myTasksList);
 					}}
 				/>
 			</div>

@@ -44,7 +44,7 @@ export default function TaskItem({
 
 	return (
 		<div
-			className='flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-lg shadow cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700'
+			className='flex items-center justify-between px-4 py-2 bg-white dark:bg-gray-800 rounded-lg shadow cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700'
 			onClick={() => onTaskSelect(task)}
 		>
 			<div className='flex items-center gap-2 md:gap-6'>
@@ -72,12 +72,12 @@ export default function TaskItem({
 								: 'text-gray-900 dark:text-white'
 						}`}
 					>
-						<div className='flex flex-col items-center pt-2 md:pt-0 md:flex-row md:items-center md:gap-8'>
+						<div className='flex flex-col items-center  md:pt-0 md:flex-row md:items-center md:gap-8'>
 							<div className='font-medium'>
 								{task.title.substring(0, 23) +
 									(task.title.length > 23 ? '...' : '')}
 							</div>
-							<div className='flex flex-wrap gap-2 md:gap-4 text-xs mt-2 md:mt-0'>
+							<div className='flex flex-wrap gap-2 md:gap-4 text-xs md:mt-0'>
 								{task.priority == 'high' && (
 									<div className='flex items-center gap-2'>
 										<div className='flex gap-0'>
