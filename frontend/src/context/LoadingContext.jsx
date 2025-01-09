@@ -10,21 +10,30 @@ export function LoadingProvider({ children }) {
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState(null);
 
-	const { loading: authLoading } = useAuth();
+	const { loading: authLoading, user } = useAuth();
 	const { userData } = useUser();
 	const { isLoading: taskLoading, error: taskError } = useTaskContext();
 	const { isLoading: listLoading, error: listError } = useListContext();
 
 	useEffect(() => {
-		const loadingStates = [
-			authLoading,
-			!userData,
-			taskLoading,
-			listLoading,
-		];
+		// If user is null (logged out) and auth is not loading, don't show loading screen
+		if (!user && !authLoading) {
+			setIsLoading(false);
+			return;
+		}
 
-		// If any context is still loading, keep global loading state true
-		setIsLoading(loadingStates.some((state) => state === true));
+		// If user is logged in, check all loading states
+		if (user) {
+			const loadingStates = [
+				authLoading,
+				!userData,
+				taskLoading,
+				listLoading,
+			];
+
+			// If any context is still loading, keep global loading state true
+			setIsLoading(loadingStates.some((state) => state === true));
+		}
 
 		// Collect errors from all contexts
 		const errors = [taskError, listError].filter(Boolean);
@@ -33,7 +42,15 @@ export function LoadingProvider({ children }) {
 		} else {
 			setError(null);
 		}
-	}, [authLoading, userData, taskLoading, listLoading, taskError, listError]);
+	}, [
+		authLoading,
+		user,
+		userData,
+		taskLoading,
+		listLoading,
+		taskError,
+		listError,
+	]);
 
 	const value = {
 		isLoading,
