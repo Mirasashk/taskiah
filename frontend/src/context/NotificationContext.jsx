@@ -22,7 +22,7 @@ export const NotificationProvider = ({ children }) => {
 
 	const getNotifications = async () => {
 		const notifications = [];
-		tasks.forEach((task) => {
+		tasks?.forEach((task) => {
 			if (task.notifications) {
 				notifications.push(task.notifications);
 			}

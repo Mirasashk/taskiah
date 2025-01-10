@@ -32,7 +32,7 @@ const DEFAULT_FORM_STATE = {
  * @returns {JSX.Element} A form component for creating tasks
  */
 const TaskForm = () => {
-	const { addTask } = useTaskContext();
+	const { addTask, addTaskToFirestore } = useTaskContext();
 	const { addNotification } = useNotificationContext();
 	const { userData } = useUser();
 	const { tags, lists, myLists, myTasksList, selectedList } =
@@ -62,6 +62,7 @@ const TaskForm = () => {
 	 * Resets the form to its initial state
 	 */
 	const resetForm = () => {
+		console.log('File TaskForm.jsx, Line 67, resetForm');
 		setFormData({
 			...DEFAULT_FORM_STATE,
 			tags: [tags[0]?.id].filter(Boolean),
@@ -76,10 +77,11 @@ const TaskForm = () => {
 	 * @param {React.FormEvent<HTMLFormElement>} e - The form submission event
 	 */
 	const handleSubmit = async (e) => {
+		console.log('File TaskForm.jsx, Line 84, handleSubmit', formData);
 		e.preventDefault();
 		if (!formData.title.trim()) return;
 
-		await addTask(formData);
+		await addTaskToFirestore(formData);
 		resetForm();
 	};
 

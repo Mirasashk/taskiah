@@ -1,39 +1,22 @@
-import { useEffect, useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useTaskContext } from '../../context/TaskContext';
-import { useUser } from '../../context/UserContext';
-import { useListContext } from '../../context/ListContext';
+
 import TaskItem from './TaskItem';
-import TaskDetailSideBar from './TaskDetailSideBar';
+
 import { GrSort } from 'react-icons/gr';
 import Modal from '../common/Modal';
 import SortListModalContent from './SortListModalContent';
 import { useSortTasks } from '../../hooks/useSortTasks';
 import { BsArrowUp, BsArrowDown } from 'react-icons/bs';
-
+import { useFilterTasks } from '../../hooks/useFilterTasks';
 const TaskList = ({ setIsEditing }) => {
-	const {
-		filteredTasks,
-		filter,
-		deletedTasks,
-		setSelectedTask,
-		isLoading,
-		error,
-	} = useTaskContext();
-	const { selectedList } = useListContext();
-
-	const [localTasks, setLocalTasks] = useState([]);
+	const { isLoading, error, tasks, setSelectedTask } = useTaskContext();
+	const { selectedFilter, selectedList } = useTaskContext();
 	const [sortKey, setSortKey] = useState('createdAt');
 	const [sortDirection, setSortDirection] = useState(false);
 	const [showSortModal, setShowSortModal] = useState(false);
-	const sortedTasks = useSortTasks(localTasks, sortKey, sortDirection);
-
-	useEffect(() => {
-		if (filter === 'Deleted') {
-			setLocalTasks(deletedTasks);
-		} else {
-			setLocalTasks(filteredTasks);
-		}
-	}, [deletedTasks, filter, filteredTasks]);
+	const filteredTasks = useFilterTasks(tasks, selectedFilter, selectedList);
+	const sortedTasks = useSortTasks(filteredTasks, sortKey, sortDirection);
 
 	const options = useMemo(
 		() => [
@@ -45,24 +28,18 @@ const TaskList = ({ setIsEditing }) => {
 		[]
 	);
 
-	const displayTasks = useMemo(() => {
-		return sortedTasks;
-	}, [sortedTasks]);
+	const handleTaskSelect = (task) => {
+		setSelectedTask(task);
+	};
 
-	const handleTaskSelect = useCallback(
-		(task) => {
-			setSelectedTask(task);
-		},
-		[setSelectedTask]
-	);
+	const handleTaskEdit = (task) => {
+		setSelectedTask(task);
+		setIsEditing(true);
+	};
 
-	const handleTaskEdit = useCallback(
-		(task) => {
-			setSelectedTask(task);
-			setIsEditing(true);
-		},
-		[setSelectedTask, setIsEditing]
-	);
+	const handleTaskDelete = (task) => {
+		setSelectedTask(task);
+	};
 
 	const toggleSortDirection = useCallback(() => {
 		setSortDirection((prev) => !prev);
@@ -85,18 +62,18 @@ const TaskList = ({ setIsEditing }) => {
 			<div className='flex-1 flex-col space-y-4'>
 				<div
 					className={`w-full ${
-						displayTasks.length > 0 && filter == 'All tasks'
+						sortedTasks?.length > 0
 							? 'flex justify-end'
-							: displayTasks.length > 0 && filter != 'All tasks'
+							: sortedTasks?.length > 0
 							? 'flex justify-between'
 							: 'flex justify-start'
 					} items-center gap-4 mr-2`}
 				>
-					<span className='text-gray-500 dark:text-gray-400 text-sm'>
+					{/* <span className='text-gray-500 dark:text-gray-400 text-sm'>
 						{filter != 'All tasks' && `Filtered by ${filter}`}
-					</span>
+					</span> */}
 
-					{displayTasks.length > 0 && (
+					{sortedTasks?.length > 0 && (
 						<div className='flex items-center justify-center gap-4'>
 							<label className='text-md text-gray-500 dark:text-gray-400'>
 								<div
@@ -128,18 +105,18 @@ const TaskList = ({ setIsEditing }) => {
 					<div className='flex items-center justify-center p-4'>
 						<div className='animate-spin rounded-full h-8 w-8 border-b-2 border-white'></div>
 					</div>
-				) : displayTasks.length === 0 ? (
+				) : sortedTasks?.length === 0 ? (
 					<p className='text-gray-500 dark:text-gray-400'>
 						No tasks yet!
 					</p>
 				) : (
-					displayTasks.map((task) => (
+					sortedTasks?.map((task) => (
 						<TaskItem
 							key={task.id}
 							task={task}
 							onTaskSelect={handleTaskSelect}
 							onTaskEdit={handleTaskEdit}
-							showDelete={filter === 'Deleted' ? false : true}
+							onTaskDelete={handleTaskDelete}
 						/>
 					))
 				)}
@@ -151,7 +128,7 @@ const TaskList = ({ setIsEditing }) => {
 				className='w-fit'
 			>
 				<SortListModalContent
-					tasks={localTasks}
+					tasks={sortedTasks}
 					sortKey={sortKey}
 					options={options}
 					setSortKey={setSortKey}

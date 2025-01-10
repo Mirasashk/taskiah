@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import SideBarItem from './SideBarItem';
 import { FiChevronDown, FiChevronRight } from 'react-icons/fi';
 import { useTaskContext } from '../../context/TaskContext';
-
+import { useListContext } from '../../context/ListContext';
 const SideBarGroup = ({
 	title,
 	icon,
@@ -13,8 +13,10 @@ const SideBarGroup = ({
 }) => {
 	const [showProjects, setShowProjects] = useState(false);
 	const { tasks } = useTaskContext();
+	const { selectedList, setSelectedList } = useListContext();
 
 	const handleOnClick = (item) => {
+		setSelectedList(item);
 		onSelectedFilter(item.name);
 	};
 
@@ -33,7 +35,7 @@ const SideBarGroup = ({
 
 	const getItemCount = (item) => {
 		if (!tasks) return 0;
-
+		console.log(item);
 		switch (getItemType()) {
 			case 'list':
 			case 'sharedList':

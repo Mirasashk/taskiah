@@ -1,0 +1,43 @@
+@startuml
+start
+:Initialize form state (DEFAULT_FORM_STATE);
+:Load contexts (TaskContext, UserContext, NotificationContext, ListContext);
+note right
+ - Fetch addTask, addNotification,
+   userData, tags, lists,
+   myLists, myTasksList, selectedList
+end note
+
+:Define state variables;
+:Effect: Update listId based on selectedList or myTasksList;
+note right
+  Dependencies: selectedList
+end note
+
+:Effect: Toggle showNewTaskSubForm based on formData.title;
+note right
+  Dependencies: formData.title
+end note
+
+if (User inputs title?) then (yes)
+  :Show expanded form;
+  :Handle form input changes;
+  note right
+    Updates formData dynamically
+  end note
+  if (User submits form?) then (yes)
+    if (Title is empty?) then (yes)
+      :Abort submission;
+      stop
+    else (no)
+      :Call addTask with formData;
+      :Reset form to DEFAULT_FORM_STATE;
+      stop
+    endif
+  else (no)
+    stop
+  endif
+else (no)
+  stop
+endif
+@enduml

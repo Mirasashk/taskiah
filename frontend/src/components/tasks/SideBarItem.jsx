@@ -32,7 +32,6 @@ const SideBarItem = ({
 	item,
 	isMobile = false,
 }) => {
-	const { tasks } = useTaskContext();
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
 
 	const getIcon = () => {
@@ -117,13 +116,10 @@ const SideBarItem = ({
 								(label.length > 15 ? '...' : '')}
 						</span>
 					</div>
-					{count > 0 && (
-						<span className='text-lg text-gray-500 dark:text-gray-400'>
-							{'('}
-							{count}
-							{')'}
-						</span>
-					)}
+
+					<span className='text-lg text-gray-500 dark:text-gray-400'>
+						{count}
+					</span>
 				</div>
 			</button>
 			{showDeleteModal && (

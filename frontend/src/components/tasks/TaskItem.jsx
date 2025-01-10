@@ -11,7 +11,7 @@ export default function TaskItem({
 	task,
 	onTaskSelect,
 	onTaskEdit,
-	showDelete,
+	showDelete = true,
 }) {
 	const { toggleTask, deleteTask } = useTaskContext();
 	const { userData } = useUser();

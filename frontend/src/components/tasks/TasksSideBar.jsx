@@ -26,36 +26,25 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 		myTasksList,
 		selectedList,
 		setSelectedList,
+		lists,
 	} = useListContext();
-	const { tasks, filterTasks, filter, deletedTasks, setSelectedTask } =
+
+	const { tasks, setSelectedTask, selectedFilter, setSelectedFilter } =
 		useTaskContext();
 	const { isLoading } = useLoading();
 
 	// States
-	const [selectedFilter, setSelectedFilter] = useState(filter);
 	const [isListModalOpen, setIsListModalOpen] = useState(false);
 	const [isTagModalOpen, setIsTagModalOpen] = useState(false);
 
 	//variables
 	const today = new Date();
 
-	const filterTasksByItem = (tasks, item) => {
-		if (!tasks || !item) return [];
-		if (item.tasks) {
-			// For lists
-			return tasks.filter((task) => item.tasks.includes(task.id));
-		} else if (item.id) {
-			// For tags
-			return tasks.filter((task) => task.tagIds?.includes(item.id));
-		}
-		return [];
-	};
-
 	useEffect(() => {
-		filterTasks(tasks, selectedFilter);
-		setSelectedTask(null);
-	}, [selectedFilter, tasks]);
+		console.log('selected filter', selectedFilter);
+	}, [selectedFilter]);
 
+	// Functions
 	// Functions
 	const todayTasks =
 		tasks?.filter((task) => {
@@ -74,6 +63,9 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 				task.status !== 'deleted'
 		) || [];
 
+	const myTasks =
+		tasks?.filter((task) => task.listId === myTasksList?.id) || [];
+
 	const staticFilterOptions = [
 		{
 			icon: 'inbox',
@@ -81,29 +73,22 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 			count:
 				tasks?.filter((task) => task.status !== 'deleted')?.length || 0,
 		},
+
 		{
 			icon: 'person',
 			label: 'My tasks',
-			count:
-				tasks?.filter(
-					(task) =>
-						task.status !== 'deleted' &&
-						myTasksList?.tasks?.includes(task.id)
-				)?.length || 0,
+			count: myTasks?.length || 0,
 		},
+
 		{
 			icon: 'calendar',
 			label: 'Today',
-			count:
-				todayTasks?.filter((task) => task.status !== 'deleted')
-					?.length || 0,
+			count: todayTasks?.length || 0,
 		},
 		{
 			icon: 'star',
 			label: 'Important',
-			count:
-				importantTasks?.filter((task) => task.status !== 'deleted')
-					?.length || 0,
+			count: importantTasks?.length || 0,
 		},
 	];
 
@@ -237,9 +222,7 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 								icon='tag'
 								label={tag.name}
 								color={tag.color}
-								count={
-									filterTasksByItem(tasks, tag)?.length || 0
-								}
+								count={0}
 								selected={selectedFilter === tag.name}
 								onClick={() => {
 									setSelectedFilter(tag.name);
@@ -271,10 +254,10 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 						<SideBarItem
 							icon='trash'
 							label='Deleted'
-							count={deletedTasks?.length || 0}
+							count={0} //deletedTasks?.length || 0}
 							selected={selectedFilter === 'Deleted'}
 							onClick={() => {
-								setSelectedFilter('Deleted');
+								//setSelectedFilter('Deleted');
 								setSelectedList(myTasksList);
 							}}
 							isMobile={true}
@@ -350,10 +333,10 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 				<SideBarItem
 					icon='trash'
 					label='Deleted'
-					count={deletedTasks?.length || 0}
+					count={0} //deletedTasks?.length || 0}
 					selected={selectedFilter === 'Deleted'}
 					onClick={() => {
-						setSelectedFilter('Deleted');
+						//setSelectedFilter('Deleted');
 						setSelectedList(myTasksList);
 					}}
 				/>
