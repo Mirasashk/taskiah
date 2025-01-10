@@ -18,6 +18,10 @@ function AppContent() {
 		return <LoadingScreen error={error} />;
 	}
 
+	return <AppRoutes />;
+}
+
+function App() {
 	return (
 		<BrowserRouter
 			future={{
@@ -25,28 +29,22 @@ function AppContent() {
 				v7_relativeSplatPath: true,
 			}}
 		>
-			<AppRoutes />
+			<AuthProvider>
+				<UserProvider>
+					<ThemeProvider>
+						<ListProvider>
+							<TaskProvider>
+								<NotificationProvider>
+									<LoadingProvider>
+										<AppContent />
+									</LoadingProvider>
+								</NotificationProvider>
+							</TaskProvider>
+						</ListProvider>
+					</ThemeProvider>
+				</UserProvider>
+			</AuthProvider>
 		</BrowserRouter>
-	);
-}
-
-function App() {
-	return (
-		<AuthProvider>
-			<UserProvider>
-				<ThemeProvider>
-					<ListProvider>
-						<TaskProvider>
-							<NotificationProvider>
-								<LoadingProvider>
-									<AppContent />
-								</LoadingProvider>
-							</NotificationProvider>
-						</TaskProvider>
-					</ListProvider>
-				</ThemeProvider>
-			</UserProvider>
-		</AuthProvider>
 	);
 }
 

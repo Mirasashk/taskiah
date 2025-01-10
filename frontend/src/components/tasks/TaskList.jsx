@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useTaskContext } from '../../context/TaskContext';
 
 import TaskItem from './TaskItem';
@@ -17,6 +17,14 @@ const TaskList = ({ setIsEditing }) => {
 	const [showSortModal, setShowSortModal] = useState(false);
 	const filteredTasks = useFilterTasks(tasks, selectedFilter, selectedList);
 	const sortedTasks = useSortTasks(filteredTasks, sortKey, sortDirection);
+
+	useEffect(() => {
+		console.log('Tasks updated:', {
+			contextTasks: tasks?.length,
+			filteredTasks: filteredTasks?.length,
+			sortedTasks: sortedTasks?.length,
+		});
+	}, [tasks, filteredTasks, sortedTasks]);
 
 	const options = useMemo(
 		() => [

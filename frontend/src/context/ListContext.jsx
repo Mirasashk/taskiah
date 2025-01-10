@@ -36,41 +36,45 @@ export function ListProvider({ children }) {
 		);
 
 		const unsub = onSnapshot(listsQuery, (querySnapshot) => {
-			const lists = [];
+			const newLists = [];
 			querySnapshot.forEach((doc) => {
-				lists.push({ id: doc.id, ...doc.data() });
+				newLists.push({ id: doc.id, ...doc.data() });
 			});
-			setLists(lists);
+			setLists(newLists);
 
+			// Update selectedList
 			if (selectedList) {
-				const updatedList = lists.find(
+				const updatedList = newLists.find(
 					(list) => list.id === selectedList.id
 				);
-				setSelectedList(updatedList);
+				if (updatedList) {
+					setSelectedList(updatedList);
+				}
 			} else {
-				setSelectedList(
-					lists.find(
-						(list) =>
-							list.name === 'My Tasks' &&
-							list.ownerId === userData.id
-					)
+				const myTasksList = newLists.find(
+					(list) =>
+						list.name === 'My Tasks' && list.ownerId === userData.id
 				);
+				setSelectedList(myTasksList);
 			}
 
-			setMyLists(lists.filter((list) => list.name !== 'My Tasks'));
-			setMyTasksList(lists.find((list) => list.name === 'My Tasks'));
-			setSharedLists(
-				lists.filter((list) => list.sharedWith.includes(userData.id))
+			// Update other list states
+			const newMyTasksList = newLists.find(
+				(list) => list.name === 'My Tasks'
 			);
+			const newMyLists = newLists.filter(
+				(list) => list.name !== 'My Tasks'
+			);
+			const newSharedLists = newLists.filter((list) =>
+				list.sharedWith.includes(userData.id)
+			);
+
+			setMyTasksList(newMyTasksList);
+			setMyLists(newMyLists);
+			setSharedLists(newSharedLists);
 		});
 		return () => unsub();
 	}, [userData]);
-
-	// useEffect(() => {
-	// 	if (!selectedList) {
-	// 		setSelectedList(myTasksList);
-	// 	}
-	// }, [myTasksList, selectedList]);
 
 	const getLists = async (userId) => {
 		const response = await listService.getListsByUserId(userId);
