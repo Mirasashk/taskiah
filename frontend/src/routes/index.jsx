@@ -72,6 +72,10 @@ export default function AppRoutes() {
 							path='/tasks'
 							element={<TasksPage />}
 						/>
+						<Route
+							path='/notes'
+							element={<NotesPage />}
+						/>
 					</>
 				)}
 				{!user && (
@@ -80,20 +84,17 @@ export default function AppRoutes() {
 							path='/'
 							element={<LandingPage />}
 						/>
-						<Route
-							path='/login'
-							element={<LoginPage />}
-						/>
+
 						<Route
 							path='/signup'
 							element={<SignupPage />}
 						/>
-						<Route
-							path='/notes'
-							element={<NotesPage />}
-						/>
 					</>
 				)}
+				<Route
+					path='/login'
+					element={<LoginPage />}
+				/>
 			</Route>
 		</Routes>
 	);

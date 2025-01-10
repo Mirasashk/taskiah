@@ -7,6 +7,10 @@ import { FiBell, FiLogOut, FiSettings, FiUser } from 'react-icons/fi';
 import { FaRegEnvelope } from 'react-icons/fa6';
 import { Link } from 'react-router-dom';
 import InvitesModal from './InvitesModal';
+import { useTheme } from '../../context/ThemeContext';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
+import { FiSun, FiMoon } from 'react-icons/fi';
+import { Switch } from '@headlessui/react';
 
 const UserMenu = ({
 	userData,
@@ -20,6 +24,8 @@ const UserMenu = ({
 	const { clearUserData } = useUser();
 	const { logout } = useAuth();
 	const navigate = useNavigate();
+	const { theme, updateTheme } = useTheme();
+	const isMobile = useMediaQuery('(max-width: 768px)');
 
 	const handleLogout = async (e) => {
 		e.stopPropagation();
@@ -54,13 +60,21 @@ const UserMenu = ({
 				onClick={(e) => e.stopPropagation()}
 			>
 				<div className='ml-4 pt-6 pb-3'>
-					<div className='text-gray-600 text-2xl font-medium dark:text-gray-300 flex items-center space-x-2 cursor-pointer'>
+					<div className='text-gray-600 text-xl font-medium dark:text-gray-300 flex items-center space-x-2 cursor-pointer'>
 						<img
 							src={userImage || userData?.photoURL}
 							alt='avatar'
 							className='w-12 h-12 rounded-full mr-4'
 						/>
-						{userData.username || userData.email}
+						<div className='flex flex-col'>
+							{userData.firstName.charAt(0).toUpperCase() +
+								userData.firstName.slice(1)}{' '}
+							{userData.lastName.charAt(0).toUpperCase() +
+								userData.lastName.slice(1)}
+							<span className='text-gray-400 text-sm'>
+								{userData.email || userData.username}
+							</span>
+						</div>
 					</div>
 				</div>
 				<div className='text-gray-600 text-sm dark:text-gray-300 flex items-center space-x-2 cursor-pointer mb-2'>
@@ -105,6 +119,54 @@ const UserMenu = ({
 						<div>Settings</div>
 					</div>
 				</Link>
+				{isMobile && (
+					// <button
+					// 	onClick={() => {
+					// 		updateTheme({
+					// 			mode: theme.mode === 'dark' ? 'light' : 'dark',
+					// 		});
+					// 		handleMenuItemClick();
+					// 	}}
+					// 	data-menu-item
+					// 	className='block w-full text-left px-4 py-2 text-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
+					// >
+					// 	<div className='flex items-center space-x-2'>
+					// 		{theme.mode === 'dark' ? (
+					// 			<FiSun className='w-4 h-4' />
+					// 		) : (
+					// 			<FiMoon className='w-4 h-4' />
+					// 		)}
+					// 		<div>Theme</div>
+					// 	</div>
+					// </button>
+					<div className='block w-full text-left px-4 py-2 text-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'>
+						<div className='flex items-center justify-between space-x-2'>
+							<div className='flex items-center space-x-2'>
+								{theme.mode === 'dark' ? (
+									<FiSun className='w-4 h-4' />
+								) : (
+									<FiMoon className='w-4 h-4' />
+								)}
+								<div>Theme</div>
+							</div>
+							<Switch
+								checked={theme.mode === 'dark' ? true : false}
+								onChange={() => {
+									updateTheme({
+										mode:
+											theme.mode === 'dark'
+												? 'light'
+												: 'dark',
+									});
+									handleMenuItemClick();
+								}}
+								className='group inline-flex h-6 w-11 items-center rounded-full bg-gray-400 transition data-[checked]:bg-blue-600 dark:bg-gray-700 dark:data-[checked]:bg-blue-600'
+							>
+								<span className='size-4 translate-x-1 rounded-full bg-white transition group-data-[checked]:translate-x-6' />
+							</Switch>
+						</div>
+					</div>
+				)}
 				<button
 					onClick={handleLogout}
 					data-menu-item

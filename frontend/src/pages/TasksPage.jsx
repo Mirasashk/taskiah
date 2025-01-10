@@ -9,25 +9,17 @@ import Modal from '../components/common/Modal';
 
 const TasksPage = () => {
 	const [filteredTasks, setFilteredTasks] = useState();
-	const { selectedTask, setSelectedTask, filter, updateTask } =
-		useTaskContext();
 	const { setSelectedList } = useListContext();
 	const [isEditing, setIsEditing] = useState(false);
-
-	useEffect(() => {
-		setSelectedTask();
-	}, [filteredTasks]);
-
-	useEffect(() => {
-		setIsEditing(false);
-	}, [filter]);
-
-	const handleTaskSave = async (updatedTask) => {
-		await updateTask(updatedTask.id, updatedTask);
-		setSelectedTask(null);
-	};
+	const { selectedTask, setSelectedTask, updateTask } = useTaskContext();
 
 	const handleOnClose = () => {
+		setSelectedTask(null);
+		setIsEditing(false);
+	};
+
+	const handleTaskSave = async (task) => {
+		await updateTask(task.id, task);
 		setSelectedTask(null);
 		setIsEditing(false);
 	};
@@ -38,29 +30,29 @@ const TasksPage = () => {
 
 		return (
 			<Modal
-				isOpen={!!selectedTask}
-				onClose={handleOnClose}
+				isOpen={false}
+				onClose={() => {}}
 				closeButton={false}
 				cardView={false}
 				className='md:hidden'
 			>
 				<TaskDetailSideBar
-					task={selectedTask}
-					onClose={handleOnClose}
-					onSave={handleTaskSave}
-					isEditing={isEditing}
-					onEdit={setIsEditing}
+					task={null}
+					onClose={() => {}}
+					onSave={() => {}}
+					isEditing={false}
+					onEdit={() => {}}
 				/>
 			</Modal>
 		);
 	};
 
 	return (
-		<div className='container mx-auto md:p-4'>
+		<div className='lg:px-4 lg:py-8'>
 			<div className='flex flex-col'>
 				{/* Mobile Horizontal Scrollable Sidebar */}
 				<div className='md:hidden sticky top-0 z-10 bg-white dark:bg-gray-800 shadow-sm mb-4'>
-					<div className='w-full overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 py-4'>
+					<div className='w-full overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 pb-4'>
 						<div className='inline-flex space-x-4 px-4'>
 							<TasksSideBar
 								onFilterTasks={setFilteredTasks}
@@ -83,7 +75,7 @@ const TasksPage = () => {
 					</div>
 
 					{/* Main Content */}
-					<div className='flex-1 md:pt-12 md:pl-6 md:pr-6'>
+					<div className='flex-1 md:mx-8 md:pt-12 md:pl-6 md:pr-6'>
 						<TaskForm />
 						<div className='flex flex-col md:flex-row gap-4'>
 							<div className='flex-1'>

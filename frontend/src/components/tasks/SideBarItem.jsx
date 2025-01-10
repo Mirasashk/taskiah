@@ -8,6 +8,7 @@ import {
 	FiList,
 	FiShare,
 	FiTrash2,
+	FiUser,
 } from 'react-icons/fi';
 import { Icons } from '../common/Icons';
 import Modal from '../common/Modal';
@@ -31,7 +32,6 @@ const SideBarItem = ({
 	item,
 	isMobile = false,
 }) => {
-	const { tasks } = useTaskContext();
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
 
 	const getIcon = () => {
@@ -50,6 +50,8 @@ const SideBarItem = ({
 				return <FiShare />;
 			case 'trash':
 				return <FiTrash2 />;
+			case 'person':
+				return <FiUser />;
 			default:
 				return null;
 		}
@@ -75,10 +77,10 @@ const SideBarItem = ({
 						getIcon()
 					)}
 				</div>
-				<span className='flex flex-wrap justify-center gap-1 text-xs font-medium truncate max-w-[70px]'>
+				<span className='flex flex-wrap justify-center gap-1 text-xs md:text-lg font-medium truncate max-w-[70px]'>
 					{label.slice(0, 10) + (label.length > 10 ? '...' : '')}
 					{count > 0 && (
-						<span className='text-xs text-gray-500 dark:text-gray-400'>
+						<span className='text-xs md:text-sm text-gray-500 dark:text-gray-400'>
 							{'('}
 							{count}
 							{')'}
@@ -99,24 +101,26 @@ const SideBarItem = ({
 						: 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white'
 				}`}
 			>
-				<div className='flex items-center gap-2'>
-					{color ? (
-						<FaCircle
-							size={12}
-							color={color}
-						/>
-					) : (
-						getIcon()
-					)}
-					<span className={`font-medium ${labelStyle || ''}`}>
-						{label}
-					</span>
-				</div>
-				{count > 0 && (
-					<span className='text-sm text-gray-500 dark:text-gray-400'>
+				<div className='flex w-full items-center justify-between gap-2'>
+					<div className='flex items-center gap-2'>
+						{color ? (
+							<FaCircle
+								size={12}
+								color={color}
+							/>
+						) : (
+							getIcon()
+						)}
+						<span className={`font-medium ${labelStyle || ''}`}>
+							{label.slice(0, 15) +
+								(label.length > 15 ? '...' : '')}
+						</span>
+					</div>
+
+					<span className='text-lg text-gray-500 dark:text-gray-400'>
 						{count}
 					</span>
-				)}
+				</div>
 			</button>
 			{showDeleteModal && (
 				<Modal

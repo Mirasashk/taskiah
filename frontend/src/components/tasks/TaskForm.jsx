@@ -23,7 +23,6 @@ const DEFAULT_FORM_STATE = {
 	dueDate: '',
 	listId: '',
 	tags: [],
-	createdAt: new Date(),
 	ownerId: '',
 };
 
@@ -33,7 +32,7 @@ const DEFAULT_FORM_STATE = {
  * @returns {JSX.Element} A form component for creating tasks
  */
 const TaskForm = () => {
-	const { addTask } = useTaskContext();
+	const { addTask, addTaskToFirestore } = useTaskContext();
 	const { addNotification } = useNotificationContext();
 	const { userData } = useUser();
 	const { tags, lists, myLists, myTasksList, selectedList } =
@@ -63,11 +62,12 @@ const TaskForm = () => {
 	 * Resets the form to its initial state
 	 */
 	const resetForm = () => {
+		console.log('File TaskForm.jsx, Line 67, resetForm');
 		setFormData({
 			...DEFAULT_FORM_STATE,
 			tags: [tags[0]?.id].filter(Boolean),
 			ownerId: userData.id,
-			listId: myTasksList?.id,
+			listId: selectedList?.id || myTasksList?.id,
 		});
 		setShowNewTaskSubForm(false);
 	};
@@ -77,10 +77,11 @@ const TaskForm = () => {
 	 * @param {React.FormEvent<HTMLFormElement>} e - The form submission event
 	 */
 	const handleSubmit = async (e) => {
+		console.log('File TaskForm.jsx, Line 84, handleSubmit', formData);
 		e.preventDefault();
 		if (!formData.title.trim()) return;
 
-		await addTask(formData);
+		await addTaskToFirestore(formData);
 		resetForm();
 	};
 
@@ -101,7 +102,7 @@ const TaskForm = () => {
 	 * @returns {JSX.Element} The expanded form section
 	 */
 	const renderExpandedForm = () => (
-		<div className='grid flex-col grid-cols-1 md:grid-cols-2 gap-4 pt-2 w-full bg-gray-700 rounded-lg p-4'>
+		<div className='grid flex-col grid-cols-1 lg:grid-cols-2 gap-4 pt-2 w-full bg-gray-700 rounded-lg p-4'>
 			<div className='grid col-span-1 w-full gap-4'>
 				<div className='flex flex-col gap-2'>
 					<label className='text-white'>Description</label>

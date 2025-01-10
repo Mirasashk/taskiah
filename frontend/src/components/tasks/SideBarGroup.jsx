@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import SideBarItem from './SideBarItem';
 import { FiChevronDown, FiChevronRight } from 'react-icons/fi';
-
+import { useTaskContext } from '../../context/TaskContext';
+import { useListContext } from '../../context/ListContext';
 const SideBarGroup = ({
 	title,
 	icon,
@@ -11,8 +12,11 @@ const SideBarGroup = ({
 	onSelectedFilter,
 }) => {
 	const [showProjects, setShowProjects] = useState(false);
+	const { tasks } = useTaskContext();
+	const { selectedList, setSelectedList } = useListContext();
 
 	const handleOnClick = (item) => {
+		setSelectedList(item);
 		onSelectedFilter(item.name);
 	};
 
@@ -26,6 +30,29 @@ const SideBarGroup = ({
 				return 'tag';
 			default:
 				return null;
+		}
+	};
+
+	const getItemCount = (item) => {
+		if (!tasks) return 0;
+		console.log(item);
+		switch (getItemType()) {
+			case 'list':
+				return (
+					tasks?.filter((task) => task.listId === item.id).length || 0
+				);
+			case 'sharedList':
+				return (
+					tasks?.filter((task) => task.listId === item.id).length || 0
+				);
+			case 'tag':
+				return tasks.filter(
+					(task) =>
+						task.tagIds?.includes(item.id) &&
+						task.status !== 'deleted'
+				).length;
+			default:
+				return 0;
 		}
 	};
 
@@ -50,7 +77,7 @@ const SideBarGroup = ({
 									key={item.id}
 									icon={item.icon}
 									label={item.name}
-									count={item.count}
+									count={getItemCount(item)}
 									selected={selected === item.name}
 									onClick={() => handleOnClick(item)}
 									color={item.color}
