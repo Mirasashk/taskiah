@@ -49,18 +49,12 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 	const todayTasks =
 		tasks?.filter((task) => {
 			const taskDate = new Date(task.dueDate);
-			return (
-				taskDate.toDateString() === today.toDateString() &&
-				task.status !== 'deleted'
-			);
+			return taskDate.toDateString() === today.toDateString();
 		}) || [];
 
 	const importantTasks =
 		tasks?.filter(
-			(task) =>
-				task.priority === 'high' &&
-				task.ownerId === userData?.id &&
-				task.status !== 'deleted'
+			(task) => task.priority === 'high' && task.ownerId === userData?.id
 		) || [];
 
 	const myTasks =
@@ -70,8 +64,7 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 		{
 			icon: 'inbox',
 			label: 'All tasks',
-			count:
-				tasks?.filter((task) => task.status !== 'deleted')?.length || 0,
+			count: tasks?.length || 0,
 		},
 
 		{
@@ -135,7 +128,7 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 				{/* Filter Options */}
 				<nav className='flex space-x-4'>
 					{/* Static Filters */}
-					<div className='flex space-x-4'>
+					<div className='flex space-x-4 items-end mt-2'>
 						{staticFilterOptions.map((option, index) => (
 							<SideBarItem
 								key={index}
@@ -155,62 +148,80 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 					{/* My Lists Section */}
 					<div className='flex space-x-4'>
 						<div className='flex items-center'>
-							<div className='h-8 w-px bg-gray-300 dark:bg-gray-600 mx-2'></div>
+							<div className='h-8 w-px mt-6 bg-gray-300 dark:bg-gray-600 mx-2'></div>
 						</div>
 
-						{myLists?.map((list) => (
-							<SideBarItem
-								key={list.id}
-								icon='list'
-								label={list.name}
-								count={list.tasks?.length || 0}
-								selected={selectedFilter === list.name}
-								onClick={() => {
-									setSelectedList(list);
-									setSelectedFilter(list.name);
-								}}
-								isMobile={true}
-							/>
-						))}
-						<div className='flex flex-col items-center justify-start p-2 rounded-lg min-w-[80px] text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'>
-							<button
-								onClick={() => setIsListModalOpen(true)}
-								className='flex flex-col items-center justify-start p-2 rounded-lg min-w-[80px] text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'
-							>
-								<div className='flex justify-center w-8 h-8 mb-1'>
-									<FiList />
+						<div className='flex flex-col items-center justify-start p-0 rounded-lg min-w-[80px]text-gray-600 dark:text-gray-300'>
+							My Lists
+							<div className='flex'>
+								{myLists?.map((list) => (
+									<SideBarItem
+										key={list.id}
+										icon='list'
+										label={list.name}
+										count={
+											tasks?.filter(
+												(task) =>
+													task.listId === list.id
+											).length || 0
+										}
+										selected={selectedFilter === list.name}
+										onClick={() => {
+											setSelectedList(list);
+											setSelectedFilter(list.name);
+										}}
+										isMobile={true}
+									/>
+								))}
+								<div className='flex flex-col items-center justify-start p-2 rounded-lg min-w-[80px] text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'>
+									<button
+										onClick={() => setIsListModalOpen(true)}
+										className='flex flex-col items-center justify-start rounded-lg min-w-[80px] text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'
+									>
+										<div className='flex justify-center w-8 h-8 p-1'>
+											<FiList />
+										</div>
+										<span className='text-xs font-medium'>
+											Add List
+										</span>
+									</button>
 								</div>
-								<span className='text-xs font-medium'>
-									Add List
-								</span>
-							</button>
+							</div>
 						</div>
 					</div>
 
 					{/* Shared Lists Section */}
 					{sharedLists?.length > 0 && (
-						<div className='flex space-x-4'>
-							<div className='flex items-center'>
-								<div className='h-8 w-px bg-gray-300 dark:bg-gray-600 mx-2'></div>
+						<div className='flex flex-col items-center justify-start p-0 rounded-lg min-w-[80px] text-gray-600 dark:text-gray-300'>
+							Shared Lists
+							<div className='flex space-x-4'>
+								<div className='flex items-center'>
+									<div className='h-8 w-px  bg-gray-300 dark:bg-gray-600 mx-2'></div>
+								</div>
+								{sharedLists.map((list) => (
+									<SideBarItem
+										key={list.id}
+										icon='share'
+										label={list.name}
+										count={
+											tasks?.filter(
+												(task) =>
+													task.listId === list.id
+											).length || 0
+										}
+										selected={selectedFilter === list.name}
+										onClick={() => {
+											setSelectedList(list);
+											setSelectedFilter(list.name);
+										}}
+										isMobile={true}
+									/>
+								))}
 							</div>
-							{sharedLists.map((list) => (
-								<SideBarItem
-									key={list.id}
-									icon='share'
-									label={list.name}
-									count={list.tasks?.length || 0}
-									selected={selectedFilter === list.name}
-									onClick={() => {
-										setSelectedList(list);
-										setSelectedFilter(list.name);
-									}}
-									isMobile={true}
-								/>
-							))}
 						</div>
 					)}
 
-					{/* Tags Section */}
+					{/* Tags Section
 					<div className='flex space-x-4'>
 						<div className='flex items-center'>
 							<div className='h-8 w-px bg-gray-300 dark:bg-gray-600 mx-2'></div>
@@ -244,25 +255,7 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 								</span>
 							</button>
 						</div>
-					</div>
-
-					{/* Deleted Section */}
-					<div className='flex space-x-4'>
-						<div className='flex items-center'>
-							<div className='h-8 w-px bg-gray-300 dark:bg-gray-600 mx-2'></div>
-						</div>
-						<SideBarItem
-							icon='trash'
-							label='Deleted'
-							count={0} //deletedTasks?.length || 0}
-							selected={selectedFilter === 'Deleted'}
-							onClick={() => {
-								//setSelectedFilter('Deleted');
-								setSelectedList(myTasksList);
-							}}
-							isMobile={true}
-						/>
-					</div>
+					</div> */}
 				</nav>
 				{renderListModal()}
 				{renderTagModal()}
@@ -314,7 +307,7 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 					onSelectedFilter={setSelectedFilter}
 				/>
 
-				<SideBarGroup
+				{/* <SideBarGroup
 					title='Tags'
 					icon={<FiTag />}
 					items={tags || []}
@@ -326,20 +319,7 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 							title='Tag'
 						/>
 					}
-				/>
-
-				<hr className='my-4 border-gray-200 dark:border-gray-700' />
-
-				<SideBarItem
-					icon='trash'
-					label='Deleted'
-					count={0} //deletedTasks?.length || 0}
-					selected={selectedFilter === 'Deleted'}
-					onClick={() => {
-						//setSelectedFilter('Deleted');
-						setSelectedList(myTasksList);
-					}}
-				/>
+				/> */}
 			</div>
 			{renderListModal()}
 			{renderTagModal()}

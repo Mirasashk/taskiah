@@ -18,11 +18,7 @@ export default function TaskItem({
 
 	const handleDelete = (e, task) => {
 		e.stopPropagation();
-		if (task.status === 'deleted') {
-			deleteTask(task);
-		} else {
-			deleteTask(task);
-		}
+		deleteTask(task);
 	};
 
 	const handleEdit = (e, task) => {

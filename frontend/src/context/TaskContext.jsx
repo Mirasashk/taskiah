@@ -28,7 +28,7 @@ const TaskContext = createContext(null);
 
 export function TaskProvider({ children }) {
 	const [tasks, setTasks] = useState([]);
-
+	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState(null);
 	const { userData } = useUser();
 	const { selectedList, lists } = useListContext();
@@ -37,8 +37,12 @@ export function TaskProvider({ children }) {
 
 	// Firestore Listener for getting tasks by listId
 	useEffect(() => {
-		if (!userData || !lists || lists.length === 0) return;
+		if (!userData || !lists || lists.length === 0) {
+			setIsLoading(false);
+			return;
+		}
 		if (userData && lists) {
+			setIsLoading(true);
 			const tasksQuery = query(
 				collection(db, 'tasks'),
 				and(
@@ -71,12 +75,15 @@ export function TaskProvider({ children }) {
 							tasks.push({ id: doc.id, ...data });
 						});
 						setTasks(tasks);
+						setIsLoading(false);
 					} catch (error) {
 						setError(error.message);
+						setIsLoading(false);
 					}
 				},
 				(error) => {
 					setError(error.message);
+					setIsLoading(false);
 				}
 			);
 			return () => unsub(); // Cleanup on listId change or unmount
@@ -222,40 +229,26 @@ export function TaskProvider({ children }) {
 	// 	[myLists, sharedLists, tags, filter, deletedTasks, selectedList]
 	// );
 
-	// const deleteTask = useCallback(
-	// 	async (task) => {
-	// 		try {
-	// 			setIsLoading(true);
-	// 			await taskService.updateTask(task.id, { status: 'deleted' });
-	// 			await refreshContext();
-	// 		} catch (error) {
-	// 			setError(error.message);
-	// 		} finally {
-	// 			setIsLoading(false);
-	// 		}
-	// 	},
-	// 	[refreshContext]
-	// );
+	const deleteTask = useCallback(async (task) => {
+		try {
+			await taskService.updateTask(task.id, { status: 'deleted' });
+		} catch (error) {
+			setError(error.message);
+		}
+	});
 
-	// const toggleTask = useCallback(
-	// 	async (taskId, taskData) => {
-	// 		try {
-	// 			setIsLoading(true);
-	// 			setTasks((prev) =>
-	// 				prev.map((task) =>
-	// 					task.id === taskId ? { ...task, ...taskData } : task
-	// 				)
-	// 			);
-	// 			await taskService.updateTask(taskId, taskData);
-	// 			await refreshContext();
-	// 		} catch (error) {
-	// 			setError(error.message);
-	// 		} finally {
-	// 			setIsLoading(false);
-	// 		}
-	// 	},
-	// 	[refreshContext]
-	// );
+	const toggleTask = useCallback(async (taskId, taskData) => {
+		try {
+			setTasks((prev) =>
+				prev.map((task) =>
+					task.id === taskId ? { ...task, ...taskData } : task
+				)
+			);
+			await taskService.updateTask(taskId, taskData);
+		} catch (error) {
+			setError(error.message);
+		}
+	});
 
 	// const getTasks = useCallback(async (userId) => {
 	// 	console.log('File TaskContext.jsx, Line 186, getTasks', userId);
@@ -301,33 +294,26 @@ export function TaskProvider({ children }) {
 	// 	[getTasks]
 	// );
 
-	// const updateTask = useCallback(
-	// 	async (taskId, newTaskData) => {
-	// 		console.log(
-	// 			'File TaskContext.jsx, Line 231, updateTask',
-	// 			taskId,
-	// 			newTaskData
-	// 		);
-	// 		try {
-	// 			setIsLoading(true);
-	// 			await taskService.updateTask(taskId, newTaskData);
-	// 			await getTasks(userData.id);
-	// 		} catch (error) {
-	// 			setError(error.message);
-	// 		} finally {
-	// 			setIsLoading(false);
-	// 		}
-	// 	},
-	// 	[getTasks, userData?.id]
-	// );
+	const updateTask = useCallback(async (taskId, newTaskData) => {
+		try {
+			await taskService.updateTask(taskId, newTaskData);
+		} catch (error) {
+			setError(error.message);
+		}
+	});
 
 	const value = {
 		tasks,
-		addTaskToFirestore,
+		isLoading,
+		error,
 		selectedTask,
 		setSelectedTask,
 		selectedFilter,
 		setSelectedFilter,
+		addTaskToFirestore,
+		deleteTask,
+		toggleTask,
+		updateTask,
 	};
 
 	if (error) {

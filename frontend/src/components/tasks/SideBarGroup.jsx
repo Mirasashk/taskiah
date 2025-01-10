@@ -38,8 +38,13 @@ const SideBarGroup = ({
 		console.log(item);
 		switch (getItemType()) {
 			case 'list':
+				return (
+					tasks?.filter((task) => task.listId === item.id).length || 0
+				);
 			case 'sharedList':
-				return item.tasks?.length || 0;
+				return (
+					tasks?.filter((task) => task.listId === item.id).length || 0
+				);
 			case 'tag':
 				return tasks.filter(
 					(task) =>

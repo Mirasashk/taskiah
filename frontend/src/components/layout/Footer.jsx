@@ -103,7 +103,7 @@ const Footer = () => {
 									onChange={handleChange}
 									placeholder='Your Name'
 									required
-									className='w-full px-3 py-2 dark:bg-gray-700 bg-gray-200 rounded
+									className='w-full px-3 py-2 dark:bg-gray-700 bg-gray-200 rounded-lg
 									text-gray-800 dark:text-white dark:placeholder-gray-200 placeholder-gray-800 
 									focus:outline-none focus:ring-2 focus:ring-blue-500'
 								/>
@@ -116,7 +116,7 @@ const Footer = () => {
 									onChange={handleChange}
 									placeholder='Your Email'
 									required
-									className='w-full px-3 py-2 dark:bg-gray-700 bg-gray-200 rounded
+									className='w-full px-3 py-2 dark:bg-gray-700 bg-gray-200 rounded-lg
 											text-gray-800 dark:text-white dark:placeholder-gray-200 placeholder-gray-800 
 											focus:outline-none focus:ring-2 focus:ring-blue-500'
 								/>
@@ -129,7 +129,7 @@ const Footer = () => {
 									placeholder='Your Message'
 									required
 									rows='3'
-									className='w-full px-3 py-2 dark:bg-gray-700 bg-gray-200 rounded
+									className='w-full px-3 py-2 dark:bg-gray-700 bg-gray-200 rounded-lg
 									text-gray-800 dark:text-white dark:placeholder-gray-200 placeholder-gray-800 
 									focus:outline-none focus:ring-2 focus:ring-blue-500'
 								/>
@@ -137,7 +137,7 @@ const Footer = () => {
 							<button
 								type='submit'
 								disabled={isSubmitting}
-								className='w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50'
+								className='w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50'
 							>
 								{isSubmitting ? 'Sending...' : 'Send Message'}
 							</button>

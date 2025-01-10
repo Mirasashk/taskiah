@@ -11,14 +11,15 @@ const TasksPage = () => {
 	const [filteredTasks, setFilteredTasks] = useState();
 	const { setSelectedList } = useListContext();
 	const [isEditing, setIsEditing] = useState(false);
-	const { selectedTask, setSelectedTask } = useTaskContext();
+	const { selectedTask, setSelectedTask, updateTask } = useTaskContext();
 
 	const handleOnClose = () => {
 		setSelectedTask(null);
 		setIsEditing(false);
 	};
 
-	const handleTaskSave = () => {
+	const handleTaskSave = async (task) => {
+		await updateTask(task.id, task);
 		setSelectedTask(null);
 		setIsEditing(false);
 	};
@@ -51,7 +52,7 @@ const TasksPage = () => {
 			<div className='flex flex-col'>
 				{/* Mobile Horizontal Scrollable Sidebar */}
 				<div className='md:hidden sticky top-0 z-10 bg-white dark:bg-gray-800 shadow-sm mb-4'>
-					<div className='w-full overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 py-4'>
+					<div className='w-full overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 pb-4'>
 						<div className='inline-flex space-x-4 px-4'>
 							<TasksSideBar
 								onFilterTasks={setFilteredTasks}

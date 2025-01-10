@@ -63,7 +63,8 @@ export function ListProvider({ children }) {
 				(list) => list.name === 'My Tasks'
 			);
 			const newMyLists = newLists.filter(
-				(list) => list.name !== 'My Tasks'
+				(list) =>
+					list.name !== 'My Tasks' && list.ownerId === userData.id
 			);
 			const newSharedLists = newLists.filter((list) =>
 				list.sharedWith.includes(userData.id)
