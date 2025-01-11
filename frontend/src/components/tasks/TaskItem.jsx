@@ -68,7 +68,7 @@ export default function TaskItem({
 								: 'text-gray-900 dark:text-white'
 						}`}
 					>
-						<div className='flex flex-col items-center  md:pt-0 md:flex-row md:items-center md:gap-8'>
+						<div className='flex flex-col justify-center md:pt-0 md:flex-row md:items-center md:gap-8'>
 							<div className='font-medium'>
 								{task.title.substring(0, 23) +
 									(task.title.length > 23 ? '...' : '')}
@@ -76,7 +76,7 @@ export default function TaskItem({
 							<div className='flex flex-wrap gap-2 md:gap-4 text-xs md:mt-0'>
 								{task.priority == 'high' && (
 									<div className='flex items-center gap-2'>
-										<div className='flex gap-0'>
+										<div className='flex items-center gap-1'>
 											<FiFlag className='text-red-500' />
 											<label className='text-xs text-gray-500 dark:text-gray-400'>
 												Priority:

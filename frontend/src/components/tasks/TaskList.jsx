@@ -253,7 +253,6 @@ const TaskList = ({ setIsEditing }) => {
 					setSortDirection={setSortDirection}
 				/>
 			</Modal>
-			{renderListModal()}
 		</div>
 	);
 };

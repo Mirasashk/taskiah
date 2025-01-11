@@ -30,9 +30,7 @@ export default function LoginPage() {
 			setLoading(true);
 			const auth = await login(formData.email, formData.password);
 			await updateUserData(auth.user.uid);
-			setTimeout(() => {
-				navigate('/', { replace: true });
-			}, 100);
+			navigate('/', { replace: true });
 		} catch (err) {
 			setError('Failed to sign in: ' + err.message);
 		} finally {
@@ -46,9 +44,7 @@ export default function LoginPage() {
 			setLoading(true);
 			const auth = await socialMethod();
 			await updateUserData(auth.user.uid);
-			setTimeout(() => {
-				navigate('/', { replace: true });
-			}, 100);
+			navigate('/', { replace: true });
 		} catch (err) {
 			setError('Failed to sign in: ' + err.message);
 		} finally {

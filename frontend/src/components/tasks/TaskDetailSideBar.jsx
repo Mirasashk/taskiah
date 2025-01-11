@@ -129,7 +129,7 @@ const TaskDetailSideBar = ({ task, onClose, onSave, isEditing, onEdit }) => {
 							Description
 						</label>
 						<textarea
-							className='p-2 w-full h-32 md:h-40 max-h-[30rem] border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border-gray-300 dark:border-gray-700'
+							className='p-2 w-full h-20 md:h-40 max-h-[30rem] border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border-gray-300 dark:border-gray-700'
 							name='description'
 							value={editedTask.description}
 							onChange={handleInputChange}

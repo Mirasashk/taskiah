@@ -30,18 +30,18 @@ const TasksPage = () => {
 
 		return (
 			<Modal
-				isOpen={false}
-				onClose={() => {}}
+				isOpen={selectedTask ? true : false}
+				onClose={handleOnClose}
 				closeButton={false}
 				cardView={false}
 				className='md:hidden'
 			>
 				<TaskDetailSideBar
-					task={null}
-					onClose={() => {}}
-					onSave={() => {}}
-					isEditing={false}
-					onEdit={() => {}}
+					task={selectedTask}
+					onClose={handleOnClose}
+					onSave={handleTaskSave}
+					isEditing={isEditing}
+					onEdit={setIsEditing}
 				/>
 			</Modal>
 		);
