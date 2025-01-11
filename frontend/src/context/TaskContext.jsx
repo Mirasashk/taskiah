@@ -33,29 +33,59 @@ export function TaskProvider({ children }) {
 	const { userData } = useUser();
 	const { selectedList, lists } = useListContext();
 	const [selectedTask, setSelectedTask] = useState(null);
-	const [selectedFilter, setSelectedFilter] = useState('All tasks');
+
+	const [selectedFilter, setSelectedFilter] = useState(() => {
+		const savedFilter = localStorage.getItem('selectedFilter');
+		return savedFilter || 'All Lists';
+	});
+
+	useEffect(() => {
+		if (selectedFilter) {
+			localStorage.setItem('selectedFilter', selectedFilter);
+		}
+	}, [selectedFilter]);
 
 	// Firestore Listener for getting tasks by listId
 	useEffect(() => {
-		if (!userData || !lists || lists.length === 0) {
+		// Reset tasks if no user data
+		if (!userData?.id) {
+			setTasks([]);
 			setIsLoading(false);
 			return;
 		}
-		if (userData && lists) {
+
+		// Wait for lists to be loaded
+		if (!lists) {
 			setIsLoading(true);
+			return;
+		}
+
+		try {
+			setIsLoading(true);
+			const validListIds = lists
+				.filter(
+					(list) =>
+						list &&
+						list.id &&
+						(list.ownerId === userData.id ||
+							(list.sharedWith &&
+								list.sharedWith.includes(userData.id)))
+				)
+				.map((list) => list.id);
+
+			const conditions = [
+				where('ownerId', '==', userData.id),
+				where('status', '!=', 'deleted'),
+			];
+
+			// Only add the listId condition if we have valid lists
+			if (validListIds.length > 0) {
+				conditions.push(where('listId', 'in', validListIds));
+			}
+
 			const tasksQuery = query(
 				collection(db, 'tasks'),
-				and(
-					or(
-						where('ownerId', '==', userData?.id),
-						where(
-							'listId',
-							'in',
-							lists?.map((list) => list.id)
-						)
-					),
-					where('status', '!=', 'deleted')
-				),
+				and(...conditions),
 				orderBy('createdAt', 'desc')
 			);
 
@@ -66,27 +96,42 @@ export function TaskProvider({ children }) {
 						const tasks = [];
 						querySnapshot.forEach((doc) => {
 							const data = doc.data();
-							if (!data.ownerId) {
+							// Validate task data before adding
+							if (!data.ownerId || !data.listId) {
 								console.warn(
-									`Task ${doc.id} is missing ownerId`
+									`Task ${doc.id} is missing required fields`
 								);
 								return;
 							}
-							tasks.push({ id: doc.id, ...data });
+							tasks.push({
+								id: doc.id,
+								...data,
+								// Ensure these fields are never null
+								status: data.status || 'active',
+								createdAt:
+									data.createdAt || new Date().toISOString(),
+							});
 						});
 						setTasks(tasks);
 						setIsLoading(false);
 					} catch (error) {
+						console.error('Error processing tasks:', error);
 						setError(error.message);
 						setIsLoading(false);
 					}
 				},
 				(error) => {
+					console.error('Error in tasks listener:', error);
 					setError(error.message);
 					setIsLoading(false);
 				}
 			);
-			return () => unsub(); // Cleanup on listId change or unmount
+
+			return () => unsub();
+		} catch (error) {
+			console.error('Error setting up tasks query:', error);
+			setError(error.message);
+			setIsLoading(false);
 		}
 	}, [userData?.id, lists]);
 

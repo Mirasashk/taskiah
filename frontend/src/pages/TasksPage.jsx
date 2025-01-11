@@ -79,10 +79,7 @@ const TasksPage = () => {
 						<TaskForm />
 						<div className='flex flex-col md:flex-row gap-4'>
 							<div className='flex-1'>
-								<TaskList
-									filteredTasks={filteredTasks}
-									setIsEditing={setIsEditing}
-								/>
+								<TaskList setIsEditing={setIsEditing} />
 							</div>
 							{/* Desktop Task Detail */}
 							{selectedTask && (
