@@ -14,6 +14,7 @@ export default function TaskItem({
 	onListSelect,
 	onListEdit,
 	isEditable = true,
+	listItemCount,
 }) {
 	const { toggleTask, deleteTask } = useTaskContext();
 	const { userData } = useUser();
@@ -58,7 +59,7 @@ export default function TaskItem({
 						<div className='flex justify-between lg:min-w-[300px] gap-4'>
 							<div className='text-gray-500 dark:text-gray-200 text-sm lg:min-w-[140px] text-nowrap'>
 								{isMobile ? 'Items: ' : 'Number of items: '}
-								{list.tasks.length}
+								{listItemCount}
 							</div>
 							{!isMobile && isEditable && (
 								<div className='flex text-gray-500 dark:text-gray-400 text-sm text-nowrap'>

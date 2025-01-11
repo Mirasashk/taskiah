@@ -60,6 +60,15 @@ export function TaskProvider({ children }) {
 			return;
 		}
 
+		const listsIds = lists.map((list) => list.id);
+
+		// If there are no lists, set empty tasks and return
+		if (listsIds.length === 0) {
+			setTasks([]);
+			setIsLoading(false);
+			return;
+		}
+
 		try {
 			setIsLoading(true);
 			const validListIds = lists
@@ -73,15 +82,17 @@ export function TaskProvider({ children }) {
 				)
 				.map((list) => list.id);
 
-			const conditions = [
-				where('ownerId', '==', userData.id),
-				where('status', '!=', 'deleted'),
-			];
-
-			// Only add the listId condition if we have valid lists
-			if (validListIds.length > 0) {
-				conditions.push(where('listId', 'in', validListIds));
+			// If there are no valid lists, return empty tasks
+			if (validListIds.length === 0) {
+				setTasks([]);
+				setIsLoading(false);
+				return;
 			}
+
+			const conditions = [
+				where('status', '!=', 'deleted'),
+				where('listId', 'in', validListIds),
+			];
 
 			const tasksQuery = query(
 				collection(db, 'tasks'),

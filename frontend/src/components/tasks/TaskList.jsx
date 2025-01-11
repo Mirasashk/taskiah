@@ -21,7 +21,7 @@ const TaskList = ({ setIsEditing }) => {
 	const { selectedFilter, selectedList } = useTaskContext();
 
 	const { userData } = useUser();
-	const { lists, setSelectedList } = useListContext();
+	const { lists, setSelectedList, sharedLists, myLists } = useListContext();
 	const [sortKey, setSortKey] = useState('createdAt');
 	const [sortDirection, setSortDirection] = useState(false);
 	const [showSortModal, setShowSortModal] = useState(false);
@@ -72,6 +72,10 @@ const TaskList = ({ setIsEditing }) => {
 
 	const handleListDelete = (list) => {
 		setSelectedList(list);
+	};
+
+	const getListItemCount = (list) => {
+		return tasks?.filter((task) => task.listId === list.id).length || 0;
 	};
 
 	const renderListModal = () => {
@@ -136,6 +140,9 @@ const TaskList = ({ setIsEditing }) => {
 											isEditable={
 												list.name !== 'My Tasks'
 											}
+											listItemCount={getListItemCount(
+												list
+											)}
 										/>
 									);
 								})}
@@ -143,7 +150,7 @@ const TaskList = ({ setIsEditing }) => {
 						<span className='flex flex-col items-start  gap-2 w-full text-gray-500 dark:text-gray-400 text-lg'>
 							Shared Lists
 							{lists
-								.filter((list) => list.ownerId !== userData.id)
+								.filter((list) => sharedLists.includes(list.id))
 								.map((list) => {
 									return (
 										<TaskListItem
@@ -153,6 +160,9 @@ const TaskList = ({ setIsEditing }) => {
 											onListEdit={handleListEdit}
 											onListDelete={handleListDelete}
 											isEditable={false}
+											listItemCount={getListItemCount(
+												list
+											)}
 										/>
 									);
 								})}
