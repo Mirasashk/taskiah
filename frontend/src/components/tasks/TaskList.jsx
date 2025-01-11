@@ -25,17 +25,10 @@ const TaskList = ({ setIsEditing }) => {
 	const [sortKey, setSortKey] = useState('createdAt');
 	const [sortDirection, setSortDirection] = useState(false);
 	const [showSortModal, setShowSortModal] = useState(false);
+
 	const filteredTasks = useFilterTasks(tasks, selectedFilter, selectedList);
 	const sortedTasks = useSortTasks(filteredTasks, sortKey, sortDirection);
 	const [isListModalOpen, setIsListModalOpen] = useState(false);
-
-	useEffect(() => {
-		console.log('Tasks updated:', {
-			contextTasks: tasks?.length,
-			filteredTasks: filteredTasks?.length,
-			sortedTasks: sortedTasks?.length,
-		});
-	}, [tasks, filteredTasks, sortedTasks]);
 
 	const options = useMemo(
 		() => [

@@ -360,7 +360,9 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 				<SideBarGroup
 					title='My Lists'
 					icon={<FiList />}
-					items={myLists || []}
+					items={
+						lists?.filter((list) => myLists.includes(list.id)) || []
+					}
 					selected={selectedFilter}
 					onSelectedFilter={setSelectedFilter}
 					children={
@@ -376,7 +378,7 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 					icon={<FiShare />}
 					items={
 						lists?.filter((list) =>
-							list.sharedWith.includes(userData.id)
+							sharedLists.includes(list.id)
 						) || []
 					}
 					selected={selectedFilter}

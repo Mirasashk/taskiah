@@ -57,7 +57,7 @@ export default function TaskItem({
 						</div>
 						<div className='flex justify-between lg:min-w-[300px] gap-4'>
 							<div className='text-gray-500 dark:text-gray-200 text-sm lg:min-w-[140px] text-nowrap'>
-								{isMobile ? 'Tasks: ' : 'Number of tasks: '}
+								{isMobile ? 'Items: ' : 'Number of items: '}
 								{list.tasks.length}
 							</div>
 							{!isMobile && isEditable && (
