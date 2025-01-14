@@ -15,6 +15,17 @@ export default function TaskItem({
 }) {
 	const { toggleTask, deleteTask } = useTaskContext();
 	const { userData } = useUser();
+	const [isCompleting, setIsCompleting] = useState(false);
+	const timeoutRef = useRef(null);
+
+	// Clear timeout on unmount
+	useEffect(() => {
+		return () => {
+			if (timeoutRef.current) {
+				clearTimeout(timeoutRef.current);
+			}
+		};
+	}, []);
 
 	const handleDelete = (e, task) => {
 		e.stopPropagation();
@@ -24,6 +35,32 @@ export default function TaskItem({
 	const handleEdit = (e, task) => {
 		e.stopPropagation();
 		onTaskEdit(task);
+	};
+
+	const handleToggle = (e, task) => {
+		e.stopPropagation();
+
+		if (task.status === 'active') {
+			// If already completing, cancel it
+			if (isCompleting) {
+				if (timeoutRef.current) {
+					clearTimeout(timeoutRef.current);
+					timeoutRef.current = null;
+				}
+				setIsCompleting(false);
+				return;
+			}
+
+			// Start completion process
+			setIsCompleting(true);
+			timeoutRef.current = setTimeout(() => {
+				toggleTask(task.id, { status: 'completed' });
+				setIsCompleting(false);
+				timeoutRef.current = null;
+			}, 1500);
+		} else {
+			toggleTask(task.id, { status: 'active' });
+		}
 	};
 
 	const handleActivate = (e, task) => {
@@ -39,28 +76,24 @@ export default function TaskItem({
 	if (!task) return null;
 
 	return (
-		<div className='flex items-center justify-between px-4 py-2 bg-white dark:bg-gray-800 rounded-lg shadow cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700'>
+		<div
+			className={`flex items-center justify-between px-4 py-2 bg-white dark:bg-gray-800 rounded-lg shadow cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-500`}
+		>
 			<div className='flex items-center gap-2 md:gap-6'>
 				<div className='flex items-center gap-2'>
 					{showDelete && (
 						<input
 							type='checkbox'
-							checked={task.completed}
-							onChange={(e) => {
-								e.stopPropagation();
-								toggleTask(task.id, {
-									status:
-										task.status == 'active'
-											? 'completed'
-											: 'active',
-								});
-							}}
+							checked={
+								isCompleting || task.status === 'completed'
+							}
+							onChange={(e) => handleToggle(e, task)}
 							className='w-4 h-4'
 						/>
 					)}
 					<span
-						className={`${
-							task.status == 'completed'
+						className={`transition-all duration-500 ${
+							isCompleting || task.status === 'completed'
 								? 'line-through text-gray-500 dark:text-gray-400'
 								: 'text-gray-900 dark:text-white'
 						}`}

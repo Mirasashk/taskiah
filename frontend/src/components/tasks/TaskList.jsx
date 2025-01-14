@@ -14,6 +14,7 @@ import { useUser } from '../../context/UserContext';
 import TaskListItem from './TaskListItem';
 import { FiPlus } from 'react-icons/fi';
 import CreateListForm from './CreateListForm';
+import CompletedAccordion from './CompletedAccordion';
 
 const TaskList = ({ setIsEditing }) => {
 	const { isLoading, error, tasks, setSelectedTask, setSelectedFilter } =
@@ -227,15 +228,25 @@ const TaskList = ({ setIsEditing }) => {
 						No tasks yet!
 					</p>
 				) : (
-					sortedTasks?.map((task) => (
-						<TaskItem
-							key={task.id}
-							task={task}
-							onTaskSelect={handleTaskSelect}
-							onTaskEdit={handleTaskEdit}
-							onTaskDelete={handleTaskDelete}
-						/>
-					))
+					<>
+						{sortedTasks?.map(
+							(task) =>
+								task.status !== 'completed' && (
+									<TaskItem
+										key={task.id}
+										task={task}
+										onTaskSelect={handleTaskSelect}
+										onTaskEdit={handleTaskEdit}
+										onTaskDelete={handleTaskDelete}
+									/>
+								)
+						)}
+						{sortedTasks.filter(
+							(task) => task.status === 'completed'
+						).length > 0 && (
+							<CompletedAccordion tasks={sortedTasks} />
+						)}
+					</>
 				)}
 			</div>
 			<Modal
