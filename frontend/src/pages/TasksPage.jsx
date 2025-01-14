@@ -19,9 +19,9 @@ const TasksPage = () => {
 	};
 
 	const handleTaskSave = async (task) => {
-		await updateTask(task.id, task);
 		setSelectedTask(null);
 		setIsEditing(false);
+		await updateTask(task.id, task);
 	};
 
 	// Mobile Task Detail Modal

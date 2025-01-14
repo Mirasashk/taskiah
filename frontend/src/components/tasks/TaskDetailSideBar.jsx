@@ -2,11 +2,7 @@ import { useState, useEffect } from 'react';
 import { FiX } from 'react-icons/fi';
 import { TiDelete } from 'react-icons/ti';
 import { FaCircle } from 'react-icons/fa';
-import { useUser } from '../../context/UserContext';
 import { useListContext } from '../../context/ListContext';
-
-import CustomDropdown from '../forms/CustomDropdown';
-import FormField from '../forms/FormField';
 
 const TaskDetailSideBar = ({ task, onClose, onSave, isEditing, onEdit }) => {
 	const { lists, sharedLists, tags } = useListContext();

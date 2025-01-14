@@ -12,7 +12,6 @@ const CreateListForm = ({ onClose, list }) => {
 	});
 	const [selectedUsers, setSelectedUsers] = useState([]);
 	const { userData } = useUser();
-	const { refreshContext } = useListContext();
 
 	useEffect(() => {
 		if (list) {
@@ -50,7 +49,6 @@ const CreateListForm = ({ onClose, list }) => {
 				status: 'pending',
 			});
 		});
-		await refreshContext();
 		onClose();
 	};
 

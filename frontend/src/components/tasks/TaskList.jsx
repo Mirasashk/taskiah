@@ -241,7 +241,7 @@ const TaskList = ({ setIsEditing }) => {
 			<Modal
 				isOpen={showSortModal}
 				onClose={toggleSortModal}
-				title='Sort Tasks'
+				title='Sort by'
 				className='w-fit'
 			>
 				<SortListModalContent
