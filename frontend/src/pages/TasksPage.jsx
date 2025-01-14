@@ -19,9 +19,9 @@ const TasksPage = () => {
 	};
 
 	const handleTaskSave = async (task) => {
-		await updateTask(task.id, task);
 		setSelectedTask(null);
 		setIsEditing(false);
+		await updateTask(task.id, task);
 	};
 
 	// Mobile Task Detail Modal
@@ -30,18 +30,18 @@ const TasksPage = () => {
 
 		return (
 			<Modal
-				isOpen={false}
-				onClose={() => {}}
+				isOpen={selectedTask ? true : false}
+				onClose={handleOnClose}
 				closeButton={false}
 				cardView={false}
 				className='md:hidden'
 			>
 				<TaskDetailSideBar
-					task={null}
-					onClose={() => {}}
-					onSave={() => {}}
-					isEditing={false}
-					onEdit={() => {}}
+					task={selectedTask}
+					onClose={handleOnClose}
+					onSave={handleTaskSave}
+					isEditing={isEditing}
+					onEdit={setIsEditing}
 				/>
 			</Modal>
 		);
@@ -79,10 +79,7 @@ const TasksPage = () => {
 						<TaskForm />
 						<div className='flex flex-col md:flex-row gap-4'>
 							<div className='flex-1'>
-								<TaskList
-									filteredTasks={filteredTasks}
-									setIsEditing={setIsEditing}
-								/>
+								<TaskList setIsEditing={setIsEditing} />
 							</div>
 							{/* Desktop Task Detail */}
 							{selectedTask && (

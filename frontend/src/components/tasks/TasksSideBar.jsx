@@ -1,5 +1,12 @@
-import { useState, useEffect } from 'react';
-import { FiInbox, FiCalendar, FiStar, FiTag, FiList } from 'react-icons/fi';
+import { useState, useEffect, useRef } from 'react';
+import {
+	FiInbox,
+	FiCalendar,
+	FiStar,
+	FiTag,
+	FiList,
+	FiPlus,
+} from 'react-icons/fi';
 import { useTaskContext } from '../../context/TaskContext';
 import { useUser } from '../../context/UserContext';
 import Input from '../forms/Input';
@@ -36,6 +43,7 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 	// States
 	const [isListModalOpen, setIsListModalOpen] = useState(false);
 	const [isTagModalOpen, setIsTagModalOpen] = useState(false);
+	const selectedItemRef = useRef(null);
 
 	//variables
 	const today = new Date();
@@ -43,6 +51,17 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 	useEffect(() => {
 		console.log('selected filter', selectedFilter);
 	}, [selectedFilter]);
+
+	useEffect(() => {
+		console.log('Scrolling to selected item');
+		if (selectedItemRef.current && isMobile) {
+			selectedItemRef.current.scrollIntoView({
+				behavior: 'smooth',
+				block: 'nearest',
+				inline: 'center',
+			});
+		}
+	}, [selectedFilter, selectedList, isMobile]);
 
 	// Functions
 	// Functions
@@ -61,12 +80,6 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 		tasks?.filter((task) => task.listId === myTasksList?.id) || [];
 
 	const staticFilterOptions = [
-		{
-			icon: 'inbox',
-			label: 'All tasks',
-			count: tasks?.length || 0,
-		},
-
 		{
 			icon: 'person',
 			label: 'My tasks',
@@ -127,15 +140,46 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 			<>
 				{/* Filter Options */}
 				<nav className='flex space-x-4'>
+					<div className='flex space-x-4 items-end mt-4'>
+						<SideBarItem
+							ref={
+								selectedFilter === 'All Lists'
+									? selectedItemRef
+									: null
+							}
+							icon='list'
+							label='All Lists'
+							count={lists?.length || 0}
+							selected={
+								selectedFilter?.toLowerCase() ===
+								'All Lists'.toLowerCase()
+							}
+							onClick={() => {
+								setSelectedFilter('All Lists');
+								setSelectedList(null);
+							}}
+							isMobile={true}
+						/>
+					</div>
+
 					{/* Static Filters */}
 					<div className='flex space-x-4 items-end mt-2'>
 						{staticFilterOptions.map((option, index) => (
 							<SideBarItem
 								key={index}
+								ref={
+									selectedFilter?.toLowerCase() ===
+									option.label.toLowerCase()
+										? selectedItemRef
+										: null
+								}
 								icon={option.icon}
 								label={option.label}
 								count={option.count}
-								selected={selectedFilter === option.label}
+								selected={
+									selectedFilter?.toLowerCase() ===
+									option.label.toLowerCase()
+								}
 								onClick={() => {
 									setSelectedFilter(option.label);
 									setSelectedList(myTasksList);
@@ -151,12 +195,24 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 							<div className='h-8 w-px mt-6 bg-gray-300 dark:bg-gray-600 mx-2'></div>
 						</div>
 
-						<div className='flex flex-col items-center justify-start p-0 rounded-lg min-w-[80px]text-gray-600 dark:text-gray-300'>
-							My Lists
-							<div className='flex'>
-								{myLists?.map((list) => (
+						<div className='flex space-x-4 items-end mt-2'>
+							{lists
+								.filter((list) => myLists.includes(list.id))
+								?.sort((a, b) => {
+									// My Tasks should always be first
+									if (a.name === 'My Tasks') return -1;
+									if (b.name === 'My Tasks') return 1;
+									// For other lists, sort by name
+									return a.name.localeCompare(b.name);
+								})
+								.map((list) => (
 									<SideBarItem
 										key={list.id}
+										ref={
+											selectedList?.id === list.id
+												? selectedItemRef
+												: null
+										}
 										icon='list'
 										label={list.name}
 										count={
@@ -165,7 +221,11 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 													task.listId === list.id
 											).length || 0
 										}
-										selected={selectedFilter === list.name}
+										selected={
+											selectedFilter?.toLowerCase() ===
+												list.name.toLowerCase() &&
+											selectedList?.id === list.id
+										}
 										onClick={() => {
 											setSelectedList(list);
 											setSelectedFilter(list.name);
@@ -173,34 +233,25 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 										isMobile={true}
 									/>
 								))}
-								<div className='flex flex-col items-center justify-start p-2 rounded-lg min-w-[80px] text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'>
-									<button
-										onClick={() => setIsListModalOpen(true)}
-										className='flex flex-col items-center justify-start rounded-lg min-w-[80px] text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'
-									>
-										<div className='flex justify-center w-8 h-8 p-1'>
-											<FiList />
-										</div>
-										<span className='text-xs font-medium'>
-											Add List
-										</span>
-									</button>
-								</div>
-							</div>
 						</div>
 					</div>
 
 					{/* Shared Lists Section */}
 					{sharedLists?.length > 0 && (
-						<div className='flex flex-col items-center justify-start p-0 rounded-lg min-w-[80px] text-gray-600 dark:text-gray-300'>
-							Shared Lists
-							<div className='flex space-x-4'>
-								<div className='flex items-center'>
-									<div className='h-8 w-px  bg-gray-300 dark:bg-gray-600 mx-2'></div>
-								</div>
-								{sharedLists.map((list) => (
+						<div className='flex space-x-4 items-end mt-2'>
+							<div className='flex items-center'>
+								<div className='h-8 w-px bg-gray-300 dark:bg-gray-600 mx-2'></div>
+							</div>
+							{lists
+								.filter((list) => sharedLists.includes(list.id))
+								.map((list) => (
 									<SideBarItem
 										key={list.id}
+										ref={
+											selectedList?.id === list.id
+												? selectedItemRef
+												: null
+										}
 										icon='share'
 										label={list.name}
 										count={
@@ -209,7 +260,11 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 													task.listId === list.id
 											).length || 0
 										}
-										selected={selectedFilter === list.name}
+										selected={
+											selectedFilter?.toLowerCase() ===
+												list.name.toLowerCase() &&
+											selectedList?.id === list.id
+										}
 										onClick={() => {
 											setSelectedList(list);
 											setSelectedFilter(list.name);
@@ -217,7 +272,6 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 										isMobile={true}
 									/>
 								))}
-							</div>
 						</div>
 					)}
 
@@ -266,6 +320,21 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 	return (
 		<aside className='w-64 bg-white rounded-lg dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700'>
 			<div className='p-4 space-y-2'>
+				<div className='flex space-x-4 items-end mt-2'>
+					<SideBarItem
+						icon='list'
+						label='All Lists'
+						count={lists?.length || 0}
+						selected={
+							selectedFilter?.toLowerCase() ===
+							'All Lists'.toLowerCase()
+						}
+						onClick={() => {
+							setSelectedFilter('All Lists');
+							setSelectedList(null);
+						}}
+					/>
+				</div>
 				{/* Filter Options */}
 				<nav className='space-y-2'>
 					{staticFilterOptions.map((option, index) => (
@@ -274,7 +343,10 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 							icon={option.icon}
 							label={option.label}
 							count={option.count}
-							selected={selectedFilter === option.label}
+							selected={
+								selectedFilter?.toLowerCase() ===
+								option.label.toLowerCase()
+							}
 							onClick={() => {
 								setSelectedFilter(option.label);
 								setSelectedList(myTasksList);
@@ -288,7 +360,9 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 				<SideBarGroup
 					title='My Lists'
 					icon={<FiList />}
-					items={myLists || []}
+					items={
+						lists?.filter((list) => myLists.includes(list.id)) || []
+					}
 					selected={selectedFilter}
 					onSelectedFilter={setSelectedFilter}
 					children={
@@ -302,7 +376,11 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 				<SideBarGroup
 					title='Shared with me'
 					icon={<FiShare />}
-					items={sharedLists || []}
+					items={
+						lists?.filter((list) =>
+							sharedLists.includes(list.id)
+						) || []
+					}
 					selected={selectedFilter}
 					onSelectedFilter={setSelectedFilter}
 				/>

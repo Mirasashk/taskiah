@@ -9,6 +9,7 @@ import {
 	onSnapshot,
 	updateDoc,
 	arrayUnion,
+	runTransaction,
 } from 'firebase/firestore';
 import Notification from './NotificationModel';
 
@@ -114,15 +115,26 @@ class Task {
 		const task = new Task(taskData);
 		await task.validate();
 
-		const docRef = await addDoc(collection(db, 'tasks'), task.toJSON());
-		// add task to list
-		const listRef = doc(db, 'lists', task.listId);
+		try {
+			const taskRef = doc(collection(db, 'tasks'));
+			const listRef = doc(db, 'lists', task.listId);
 
-		await updateDoc(listRef, {
-			tasks: arrayUnion(docRef.id),
-		});
+			await runTransaction(db, async (transaction) => {
+				// Create the task
+				transaction.set(taskRef, task.toJSON());
 
-		return docRef.id;
+				// Update the list's tasks array
+				transaction.update(listRef, {
+					tasks: arrayUnion(taskRef.id),
+					updatedAt: new Date().toISOString(),
+				});
+			});
+
+			return taskRef.id;
+		} catch (error) {
+			console.error('Error in createTask transaction:', error);
+			throw error;
+		}
 	}
 }
 

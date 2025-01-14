@@ -62,7 +62,6 @@ const TaskForm = () => {
 	 * Resets the form to its initial state
 	 */
 	const resetForm = () => {
-		console.log('File TaskForm.jsx, Line 67, resetForm');
 		setFormData({
 			...DEFAULT_FORM_STATE,
 			tags: [tags[0]?.id].filter(Boolean),
@@ -77,7 +76,6 @@ const TaskForm = () => {
 	 * @param {React.FormEvent<HTMLFormElement>} e - The form submission event
 	 */
 	const handleSubmit = async (e) => {
-		console.log('File TaskForm.jsx, Line 84, handleSubmit', formData);
 		e.preventDefault();
 		if (!formData.title.trim()) return;
 
@@ -210,7 +208,7 @@ const TaskForm = () => {
 						value={formData.title}
 						name='title'
 						onChange={handleFormChange}
-						placeholder='Add a new task'
+						placeholder='Add a new item'
 						className='flex-1 p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border-gray-300 dark:border-gray-700'
 					/>
 					<button
