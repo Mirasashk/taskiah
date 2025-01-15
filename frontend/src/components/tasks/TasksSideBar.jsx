@@ -201,7 +201,7 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 						</div>
 
 						{/* Static Filters */}
-						<div className='flex items-end mt-2 space-x-4 pr-4'>
+						<div className='flex items-end mt-2 space-x-2 pr-4'>
 							{staticFilterOptions.map((option, index) => (
 								<SideBarItem
 									key={index}
