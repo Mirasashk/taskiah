@@ -54,7 +54,6 @@ const DeleteModal = ({ open, onClose, itemType, item, title, message }) => {
 				// Delete the tag
 				await listService.deleteTag(item.id);
 			}
-			await refreshContext();
 			onClose();
 		} catch (error) {
 			console.error('Error deleting item:', error);

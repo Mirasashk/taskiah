@@ -9,12 +9,6 @@ export const useFilterTasks = () => {
 	return useMemo(() => {
 		if (!tasks) return [];
 
-		console.log('Filtering tasks', {
-			tasks: tasks,
-			selectedFilter,
-			selectedList,
-		});
-
 		// Special cases that should search across all tasks
 		if (
 			selectedFilter === 'Today' ||

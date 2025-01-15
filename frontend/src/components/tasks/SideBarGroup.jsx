@@ -35,15 +35,24 @@ const SideBarGroup = ({
 
 	const getItemCount = (item) => {
 		if (!tasks) return 0;
-		console.log(item);
+
 		switch (getItemType()) {
 			case 'list':
-				return (
-					tasks?.filter((task) => task.listId === item.id).length || 0
+				const filteredTasks = tasks?.filter(
+					(task) =>
+						task.listId === item.id &&
+						task.status !== 'deleted' &&
+						task.status !== 'completed'
 				);
+				return filteredTasks.length || 0;
 			case 'sharedList':
 				return (
-					tasks?.filter((task) => task.listId === item.id).length || 0
+					tasks?.filter(
+						(task) =>
+							task.listId === item.id &&
+							task.status !== 'deleted' &&
+							task.status !== 'completed'
+					).length || 0
 				);
 			case 'tag':
 				return tasks.filter(
