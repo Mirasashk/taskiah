@@ -8,6 +8,7 @@ import { FaPlus } from 'react-icons/fa';
 import { IoArchive } from 'react-icons/io5';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { IoMdShare } from 'react-icons/io';
+import DeleteModal from '../common/DeleteModal';
 
 export default function TaskItem({
 	list,
@@ -17,8 +18,8 @@ export default function TaskItem({
 	listItemCount,
 }) {
 	const { toggleTask, deleteTask } = useTaskContext();
-	const { userData } = useUser();
 	const isMobile = useMediaQuery('(max-width: 768px)');
+	const [showDeleteModal, setShowDeleteModal] = useState(false);
 
 	const handleListDelete = (e, list) => {
 		e.stopPropagation();
@@ -46,13 +47,13 @@ export default function TaskItem({
 	};
 
 	return (
-		<div
-			className='flex w-full items-center justify-between px-4 py-2 bg-white dark:bg-gray-800 rounded-lg shadow cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700'
-			onClick={() => onListSelect(list)}
-		>
+		<div className='flex w-full items-center justify-between px-4 py-2 bg-white dark:bg-gray-800 rounded-lg shadow cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700'>
 			<div className='flex w-full items-center gap-2 md:gap-6'>
 				<div className='flex w-full justify-between items-center gap-2'>
-					<div className='flex w-3/5 items-center gap-2'>
+					<div
+						className='flex w-3/5 items-center gap-2'
+						onClick={() => onListSelect(list)}
+					>
 						<div className='font-medium min-w-[100px] lg:min-w-[200px] text-gray-800 dark:text-gray-200'>
 							{list.name}
 						</div>
@@ -82,8 +83,11 @@ export default function TaskItem({
 								<FiEdit />
 							</button>
 							<button
-								onClick={(e) => handleListDelete(e, list)}
-								className='text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300'
+								onClick={(e) => {
+									e.stopPropagation();
+									setShowDeleteModal(true);
+								}}
+								className='text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 '
 							>
 								<FiTrash />
 							</button>
@@ -91,6 +95,15 @@ export default function TaskItem({
 					)}
 				</div>
 			</div>
+			<DeleteModal
+				open={showDeleteModal}
+				itemType='list'
+				item={list}
+				title='Delete List'
+				message={`Are you sure you want to delete this list? This action will also delete all ${listItemCount} tasks in this list.`}
+				onClose={() => setShowDeleteModal(false)}
+				onDelete={() => handleListDelete(list)}
+			/>
 		</div>
 	);
 }

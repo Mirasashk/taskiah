@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+
 import {
 	FiInbox,
 	FiCalendar,
@@ -44,16 +45,14 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 	const [isListModalOpen, setIsListModalOpen] = useState(false);
 	const [isTagModalOpen, setIsTagModalOpen] = useState(false);
 	const selectedItemRef = useRef(null);
+	const firstItemRef = useRef(null);
+	const scrollContainerRef = useRef(null);
+	const [lastScrollPosition, setLastScrollPosition] = useState(0);
 
 	//variables
 	const today = new Date();
 
 	useEffect(() => {
-		console.log('selected filter', selectedFilter);
-	}, [selectedFilter]);
-
-	useEffect(() => {
-		console.log('Scrolling to selected item');
 		if (selectedItemRef.current && isMobile) {
 			selectedItemRef.current.scrollIntoView({
 				behavior: 'smooth',
@@ -63,7 +62,42 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 		}
 	}, [selectedFilter, selectedList, isMobile]);
 
-	// Functions
+	useEffect(() => {
+		// Push state when filter changes (except initial)
+		if (selectedFilter) {
+			window.history.pushState({ filter: selectedFilter }, '', '');
+		}
+	}, [selectedFilter]);
+
+	useEffect(() => {
+		const handleBackButton = (e) => {
+			// Always prevent default navigation
+			e.preventDefault();
+
+			const previousState = window.history.state;
+			if (!previousState || selectedFilter === 'All Lists') {
+				return;
+			}
+
+			setSelectedTask(null);
+			setSelectedFilter('All Lists');
+			setSelectedList(null);
+			if (selectedItemRef.current) {
+				selectedItemRef.current.scrollIntoView({
+					behavior: 'smooth',
+					block: 'nearest',
+					inline: 'center',
+				});
+			}
+		};
+
+		window.addEventListener('popstate', handleBackButton);
+
+		return () => {
+			window.removeEventListener('popstate', handleBackButton);
+		};
+	}, [selectedFilter]);
+
 	// Functions
 	const todayTasks =
 		tasks?.filter((task) => {
@@ -139,70 +173,71 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 		return (
 			<>
 				{/* Filter Options */}
-				<nav className='flex space-x-4'>
-					<div className='flex space-x-4 items-end mt-4'>
-						<SideBarItem
-							ref={
-								selectedFilter === 'All Lists'
-									? selectedItemRef
-									: null
-							}
-							icon='list'
-							label='All Lists'
-							count={lists?.length || 0}
-							selected={
-								selectedFilter?.toLowerCase() ===
-								'All Lists'.toLowerCase()
-							}
-							onClick={() => {
-								setSelectedFilter('All Lists');
-								setSelectedList(null);
-							}}
-							isMobile={true}
-						/>
-					</div>
-
-					{/* Static Filters */}
-					<div className='flex space-x-4 items-end mt-2'>
-						{staticFilterOptions.map((option, index) => (
+				<div className='overflow-x-auto overflow-y-hidden -mr-4'>
+					<div
+						className='flex whitespace-nowrap px-4'
+						style={{ minWidth: 'max-content' }}
+					>
+						<div className='flex items-end mt-4'>
 							<SideBarItem
-								key={index}
 								ref={
-									selectedFilter?.toLowerCase() ===
-									option.label.toLowerCase()
+									selectedFilter === 'All Lists'
 										? selectedItemRef
 										: null
 								}
-								icon={option.icon}
-								label={option.label}
-								count={option.count}
+								icon='list'
+								label='All Lists'
+								count={lists?.length || 0}
 								selected={
 									selectedFilter?.toLowerCase() ===
-									option.label.toLowerCase()
+									'All Lists'.toLowerCase()
 								}
 								onClick={() => {
-									setSelectedFilter(option.label);
-									setSelectedList(myTasksList);
+									setSelectedFilter('All Lists');
+									setSelectedList(null);
 								}}
 								isMobile={true}
 							/>
-						))}
-					</div>
-
-					{/* My Lists Section */}
-					<div className='flex space-x-4'>
-						<div className='flex items-center'>
-							<div className='h-8 w-px mt-6 bg-gray-300 dark:bg-gray-600 mx-2'></div>
 						</div>
 
-						<div className='flex space-x-4 items-end mt-2'>
+						{/* Static Filters */}
+						<div className='flex items-end mt-2 space-x-4'>
+							{staticFilterOptions.map((option, index) => (
+								<SideBarItem
+									key={index}
+									ref={
+										selectedFilter?.toLowerCase() ===
+										option.label.toLowerCase()
+											? selectedItemRef
+											: null
+									}
+									icon={option.icon}
+									label={option.label}
+									count={option.count}
+									selected={
+										selectedFilter?.toLowerCase() ===
+										option.label.toLowerCase()
+									}
+									onClick={() => {
+										setSelectedFilter(option.label);
+										setSelectedList(myTasksList);
+									}}
+									isMobile={true}
+								/>
+							))}
+						</div>
+
+						{/* My Lists Section */}
+						<div className='flex items-end mt-2 space-x-4'>
+							<div className='flex items-center'>
+								<div className='h-8 w-px bg-gray-300 dark:bg-gray-600'></div>
+							</div>
+
 							{lists
 								.filter((list) => myLists.includes(list.id))
 								?.sort((a, b) => {
-									// My Tasks should always be first
 									if (a.name === 'My Tasks') return -1;
 									if (b.name === 'My Tasks') return 1;
-									// For other lists, sort by name
 									return a.name.localeCompare(b.name);
 								})
 								.map((list) => (
@@ -235,84 +270,53 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 									/>
 								))}
 						</div>
-					</div>
 
-					{/* Shared Lists Section */}
-					{sharedLists?.length > 0 && (
-						<div className='flex space-x-4 items-end mt-2'>
-							<div className='flex items-center'>
-								<div className='h-8 w-px bg-gray-300 dark:bg-gray-600 mx-2'></div>
-							</div>
-							{lists
-								.filter((list) => sharedLists.includes(list.id))
-								.map((list) => (
-									<SideBarItem
-										key={list.id}
-										ref={
-											selectedList?.id === list.id
-												? selectedItemRef
-												: null
-										}
-										icon='share'
-										label={list.name}
-										count={
-											tasks?.filter(
-												(task) =>
-													task.listId === list.id &&
-													task.status !== 'completed'
-											).length || 0
-										}
-										selected={
-											selectedFilter?.toLowerCase() ===
-												list.name.toLowerCase() &&
-											selectedList?.id === list.id
-										}
-										onClick={() => {
-											setSelectedList(list);
-											setSelectedFilter(list.name);
-										}}
-										isMobile={true}
-									/>
-								))}
-						</div>
-					)}
-
-					{/* Tags Section
-					<div className='flex space-x-4'>
-						<div className='flex items-center'>
-							<div className='h-8 w-px bg-gray-300 dark:bg-gray-600 mx-2'></div>
-						</div>
-
-						{tags?.map((tag) => (
-							<SideBarItem
-								key={tag.id}
-								icon='tag'
-								label={tag.name}
-								color={tag.color}
-								count={0}
-								selected={selectedFilter === tag.name}
-								onClick={() => {
-									setSelectedFilter(tag.name);
-									setSelectedList(myTasksList);
-								}}
-								isMobile={true}
-							/>
-						))}
-						<div className='flex flex-col items-center justify-start p-2 rounded-lg min-w-[80px] text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'>
-							<button
-								onClick={() => setIsTagModalOpen(true)}
-								className='flex flex-col items-center justify-start p-2 rounded-lg min-w-[80px] text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'
-							>
-								<div className='flex justify-center w-8 h-8 mb-1'>
-									<FiTag />
+						{/* Shared Lists Section */}
+						{sharedLists?.length > 0 && (
+							<div className='flex items-end mt-2 space-x-4'>
+								<div className='flex items-center'>
+									<div className='h-8 w-px bg-gray-300 dark:bg-gray-600'></div>
 								</div>
-								<span className='text-xs font-medium'>
-									Add Tag
-								</span>
-							</button>
-						</div>
-					</div> */}
-				</nav>
+								{lists
+									.filter((list) =>
+										sharedLists.includes(list.id)
+									)
+									.map((list) => (
+										<SideBarItem
+											key={list.id}
+											ref={
+												selectedList?.id === list.id
+													? selectedItemRef
+													: null
+											}
+											icon='share'
+											label={list.name}
+											count={
+												tasks?.filter(
+													(task) =>
+														task.listId ===
+															list.id &&
+														task.status !==
+															'completed'
+												).length || 0
+											}
+											selected={
+												selectedFilter?.toLowerCase() ===
+													list.name.toLowerCase() &&
+												selectedList?.id === list.id
+											}
+											onClick={() => {
+												setSelectedList(list);
+												setSelectedFilter(list.name);
+											}}
+											isMobile={true}
+										/>
+									))}
+							</div>
+						)}
+					</div>
+				</div>
+
 				{renderListModal()}
 				{renderTagModal()}
 			</>

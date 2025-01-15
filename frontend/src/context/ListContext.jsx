@@ -50,15 +50,24 @@ export function ListProvider({ children }) {
 				listsQuery,
 				(querySnapshot) => {
 					querySnapshot.docChanges().forEach((change) => {
+						console.log('change', change);
 						if (change.type === 'modified') {
 							const data = {
 								...change.doc.data(),
 								id: change.doc.id,
 							};
+
+							setLists((prevLists) =>
+								prevLists.map((list) =>
+									list.id === data.id ? data : list
+								)
+							);
 						}
 
-						if (change.type === 'added') {
-							console.log('change', change);
+						if (
+							change.type === 'added' ||
+							change.type === 'removed'
+						) {
 							const lists = [];
 							const newMyTasksList = [];
 							const newMyLists = [];
@@ -123,15 +132,12 @@ export function ListProvider({ children }) {
 	}, [userData?.id]);
 
 	// Save selected list to localStorage
-	useEffect(() => {
-		if (selectedList?.id) {
-			localStorage.setItem('selectedListId', selectedList.id);
-		}
-	}, [selectedList]);
-
-	useEffect(() => {
-		console.log('selectedList', selectedList);
-	}, [selectedList]);
+	// useEffect(() => {
+	// 	console.log('selectedList', selectedList);
+	// 	if (selectedList?.id) {
+	// 		localStorage.setItem('selectedListId', selectedList.id);
+	// 	}
+	// }, [selectedList]);
 
 	const getTags = async (userId) => {
 		const response = await listService.getTagsByUserId(userId);

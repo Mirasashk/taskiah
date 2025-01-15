@@ -30,7 +30,8 @@ const TaskList = ({ setIsEditing }) => {
 	const filteredTasks = useFilterTasks(tasks, selectedFilter, selectedList);
 	const sortedTasks = useSortTasks(filteredTasks, sortKey, sortDirection);
 	const [isListModalOpen, setIsListModalOpen] = useState(false);
-
+	const [isListEditModalOpen, setIsListEditModalOpen] = useState(false);
+	const [listToEdit, setListToEdit] = useState(null);
 	const options = useMemo(
 		() => [
 			{ label: 'Created date', value: 'createdAt' },
@@ -68,7 +69,8 @@ const TaskList = ({ setIsEditing }) => {
 	};
 
 	const handleListEdit = (list) => {
-		setSelectedList(list);
+		setListToEdit(list);
+		setIsListEditModalOpen(true);
 	};
 
 	const handleListDelete = (list) => {
@@ -77,6 +79,22 @@ const TaskList = ({ setIsEditing }) => {
 
 	const getListItemCount = (list) => {
 		return tasks?.filter((task) => task.listId === list.id).length || 0;
+	};
+
+	const renderListEditModal = (list) => {
+		return (
+			<Modal
+				isOpen={isListEditModalOpen}
+				onClose={() => setIsListEditModalOpen(false)}
+				title='Edit List'
+			>
+				<CreateListForm
+					onClose={() => setIsListEditModalOpen(false)}
+					list={listToEdit}
+					showUserSearch={false}
+				/>
+			</Modal>
+		);
 	};
 
 	const renderListModal = () => {
@@ -171,6 +189,7 @@ const TaskList = ({ setIsEditing }) => {
 					</div>
 				</div>
 				{renderListModal()}
+				{renderListEditModal()}
 			</div>
 		);
 	}

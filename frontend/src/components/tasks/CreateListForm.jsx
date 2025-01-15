@@ -5,7 +5,7 @@ import { listService } from '../../services/listApi';
 import { useUser } from '../../context/UserContext';
 import { useListContext } from '../../context/ListContext';
 import { userService } from '../../services/userApi';
-const CreateListForm = ({ onClose, list }) => {
+const CreateListForm = ({ onClose, list, showUserSearch = true }) => {
 	const [formData, setFormData] = useState({
 		name: '',
 		ownerId: '',
@@ -14,6 +14,7 @@ const CreateListForm = ({ onClose, list }) => {
 	const { userData } = useUser();
 
 	useEffect(() => {
+		console.log('list', list);
 		if (list) {
 			setFormData(list);
 			if (list.sharedWith.length > 0) {
@@ -38,17 +39,21 @@ const CreateListForm = ({ onClose, list }) => {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		const listResponse = await listService.createList(formData);
-		const listId = listResponse.data.listId;
-		selectedUsers.forEach(async (user) => {
-			await listService.postSharedListInvite({
-				listId: listId,
-				email: user.email,
-				message: `${userData.username} has invited you to join ${formData.name}`,
-				accepted: false,
-				status: 'pending',
+		if (list) {
+			await listService.updateList(list.id, formData);
+		} else {
+			const listResponse = await listService.createList(formData);
+			const listId = listResponse.data.listId;
+			selectedUsers.forEach(async (user) => {
+				await listService.postSharedListInvite({
+					listId: listId,
+					email: user.email,
+					message: `${userData.username} has invited you to join ${formData.name}`,
+					accepted: false,
+					status: 'pending',
+				});
 			});
-		});
+		}
 		onClose();
 	};
 
@@ -64,13 +69,15 @@ const CreateListForm = ({ onClose, list }) => {
 						setFormData({ ...formData, name: e.target.value })
 					}
 				/>
-				<div>
-					<label htmlFor='sharedWith'>Invite Users:</label>
-					<UserSearch
-						selectedUsers={selectedUsers}
-						onSelectUsers={setSelectedUsers}
-					/>
-				</div>
+				{showUserSearch && (
+					<div>
+						<label htmlFor='sharedWith'>Invite Users:</label>
+						<UserSearch
+							selectedUsers={selectedUsers}
+							onSelectUsers={setSelectedUsers}
+						/>
+					</div>
+				)}
 				<div className='flex justify-center mt-4'>
 					<button
 						type='submit'
