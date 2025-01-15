@@ -201,7 +201,7 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 						</div>
 
 						{/* Static Filters */}
-						<div className='flex items-end mt-2 space-x-4'>
+						<div className='flex items-end mt-2 space-x-4 pr-4'>
 							{staticFilterOptions.map((option, index) => (
 								<SideBarItem
 									key={index}
@@ -227,56 +227,66 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 							))}
 						</div>
 
-						{/* My Lists Section */}
-						<div className='flex items-end mt-2 space-x-4'>
-							<div className='flex items-center'>
-								<div className='h-8 w-px bg-gray-300 dark:bg-gray-600'></div>
-							</div>
+						{myTasksList && (
+							<>
+								{/* My Lists Section */}
+								<div className='flex items-end mt-2 space-x-4'>
+									<div className='flex items-center'>
+										<div className='h-16 w-px bg-gray-300 dark:bg-gray-600'></div>
+									</div>
 
-							{lists
-								.filter((list) => myLists.includes(list.id))
-								?.sort((a, b) => {
-									if (a.name === 'My Tasks') return -1;
-									if (b.name === 'My Tasks') return 1;
-									return a.name.localeCompare(b.name);
-								})
-								.map((list) => (
-									<SideBarItem
-										key={list.id}
-										ref={
-											selectedList?.id === list.id
-												? selectedItemRef
-												: null
-										}
-										icon='list'
-										label={list.name}
-										count={
-											tasks?.filter(
-												(task) =>
-													task.listId === list.id &&
-													task.status !== 'completed'
-											).length || 0
-										}
-										selected={
-											selectedFilter?.toLowerCase() ===
-												list.name.toLowerCase() &&
-											selectedList?.id === list.id
-										}
-										onClick={() => {
-											setSelectedList(list);
-											setSelectedFilter(list.name);
-										}}
-										isMobile={true}
-									/>
-								))}
-						</div>
+									{lists
+										.filter((list) =>
+											myLists.includes(list.id)
+										)
+										?.sort((a, b) => {
+											if (a.name === 'My Tasks')
+												return -1;
+											if (b.name === 'My Tasks') return 1;
+											return a.name.localeCompare(b.name);
+										})
+										.map((list) => (
+											<SideBarItem
+												key={list.id}
+												ref={
+													selectedList?.id === list.id
+														? selectedItemRef
+														: null
+												}
+												icon='list'
+												label={list.name}
+												count={
+													tasks?.filter(
+														(task) =>
+															task.listId ===
+																list.id &&
+															task.status !==
+																'completed'
+													).length || 0
+												}
+												selected={
+													selectedFilter?.toLowerCase() ===
+														list.name.toLowerCase() &&
+													selectedList?.id === list.id
+												}
+												onClick={() => {
+													setSelectedList(list);
+													setSelectedFilter(
+														list.name
+													);
+												}}
+												isMobile={true}
+											/>
+										))}
+								</div>
+							</>
+						)}
 
 						{/* Shared Lists Section */}
 						{sharedLists?.length > 0 && (
 							<div className='flex items-end mt-2 space-x-4'>
-								<div className='flex items-center'>
-									<div className='h-8 w-px bg-gray-300 dark:bg-gray-600'></div>
-								</div>
+								<div className='h-16 w-px bg-gray-300 dark:bg-gray-600'></div>
+
 								{lists
 									.filter((list) =>
 										sharedLists.includes(list.id)
