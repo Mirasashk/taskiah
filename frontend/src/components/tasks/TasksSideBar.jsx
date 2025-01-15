@@ -218,7 +218,8 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 										count={
 											tasks?.filter(
 												(task) =>
-													task.listId === list.id
+													task.listId === list.id &&
+													task.status !== 'completed'
 											).length || 0
 										}
 										selected={
@@ -257,7 +258,8 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 										count={
 											tasks?.filter(
 												(task) =>
-													task.listId === list.id
+													task.listId === list.id &&
+													task.status !== 'completed'
 											).length || 0
 										}
 										selected={
