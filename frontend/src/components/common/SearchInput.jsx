@@ -16,8 +16,10 @@ const SearchInput = forwardRef(
 		// Expose clearSearch and searchTerm to parent component through ref
 		useImperativeHandle(ref, () => ({
 			clearSearch: () => {
+				console.log('clear search');
 				setSearchTerm('');
 				onSearchResults([]);
+				setShowSearchResults(false);
 			},
 			getCurrentSearchTerm: () => searchTerm,
 		}));

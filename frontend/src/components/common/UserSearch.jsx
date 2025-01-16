@@ -4,7 +4,12 @@ import SearchInput from './SearchInput';
 import UserInviteModal from './UserInviteModal';
 import { getUserPhotoURL } from '../../utils/UserPhoto';
 
-const UserSearch = ({ selectedUsers, onSelectUsers }) => {
+const UserSearch = ({
+	selectedUsers,
+	onSelectUsers,
+	editMode = false,
+	onUserToRemove = null,
+}) => {
 	const searchInputRef = useRef();
 	const [showSearchResults, setShowSearchResults] = useState(false);
 	const [searchResults, setSearchResults] = useState([]);
@@ -39,21 +44,22 @@ const UserSearch = ({ selectedUsers, onSelectUsers }) => {
 
 	const handleSearchResults = (results) => {
 		if (results.length > 0) {
-			console.log(
-				'File: UserSearch.jsx, Line: 22, results changed to ',
-				results
-			);
 			setShowSearchResults(true);
 			setSearchResults(results);
 		} else {
 			setSearchResults([]);
-			setShowSearchResults(true);
+			const currentSearchTerm =
+				searchInputRef.current?.getCurrentSearchTerm();
+			setShowSearchResults(
+				currentSearchTerm && currentSearchTerm.trim() !== ''
+			);
 		}
 	};
 
 	const clearSearch = () => {
-		setSearchResults([]);
 		searchInputRef.current?.clearSearch();
+		setSearchResults([]);
+		setShowSearchResults(false);
 	};
 
 	const handleSelectUser = (user) => {
@@ -76,24 +82,34 @@ const UserSearch = ({ selectedUsers, onSelectUsers }) => {
 	};
 
 	const handleRemoveUser = (user) => {
-		onSelectUsers(selectedUsers.filter((u) => u.email !== user.email));
+		if (editMode) {
+			onUserToRemove(user);
+		} else {
+			onSelectUsers(selectedUsers.filter((u) => u.email !== user.email));
+		}
 	};
 
 	const renderSearchResults = () => {
+		const currentSearchTerm =
+			searchInputRef.current?.getCurrentSearchTerm();
+
 		if (
 			searchResults.length === 0 &&
-			searchInputRef.current?.getCurrentSearchTerm() !== null
+			currentSearchTerm &&
+			currentSearchTerm.trim() !== ''
 		) {
 			return (
-				<div className='flex flex-col gap-2'>
-					<div>No results found</div>
-					<div className='flex justify-center'>
-						<button
-							onClick={() => setOpenUserInvite(true)}
-							className='bg-blue-800 text-white dark:hover:bg-blue-900 p-2 rounded-md w-1/2'
-						>
-							Invite User
-						</button>
+				<div className='dark:bg-gray-600 bg-gray-100 p-2 rounded-md flex flex-col gap-2'>
+					<div className='flex flex-col gap-2'>
+						<div>No results found</div>
+						<div className='flex justify-center'>
+							<button
+								onClick={() => setOpenUserInvite(true)}
+								className='bg-blue-800 text-white dark:hover:bg-blue-900 p-2 rounded-md w-1/2'
+							>
+								Invite User
+							</button>
+						</div>
 					</div>
 				</div>
 			);
@@ -115,10 +131,15 @@ const UserSearch = ({ selectedUsers, onSelectUsers }) => {
 							className='w-10 h-10 rounded-full'
 						/>
 					</div>
-					<div className='flex-1'>
-						{user.firstName} {user.lastName}
+					<div className='flex flex-col'>
+						<div className='flex-1'>
+							{user.firstName.charAt(0).toUpperCase() +
+								user.firstName.slice(1)}{' '}
+							{user.lastName.charAt(0).toUpperCase() +
+								user.lastName.slice(1)}
+						</div>
+						<div className='flex-1'>{user.email}</div>
 					</div>
-					<div className='flex-1'>{user.email}</div>
 				</div>
 			</div>
 		));
@@ -132,7 +153,10 @@ const UserSearch = ({ selectedUsers, onSelectUsers }) => {
 					onClick={() => handleRemoveUser(user)}
 				>
 					<div className='flex items-center gap-1'>
-						{user.firstName} {user.lastName}
+						{user.firstName.charAt(0).toUpperCase() +
+							user.firstName.slice(1)}{' '}
+						{user.lastName.charAt(0).toUpperCase() +
+							user.lastName.slice(1)}
 						<TiDelete size={24} />
 					</div>
 				</div>
@@ -148,11 +172,7 @@ const UserSearch = ({ selectedUsers, onSelectUsers }) => {
 				setShowSearchResults={setShowSearchResults}
 			/>
 			<div className='flex flex-col gap-2'>
-				{showSearchResults && (
-					<div className='dark:bg-gray-600 bg-gray-100 p-2 rounded-md flex flex-col gap-2'>
-						{renderSearchResults()}
-					</div>
-				)}
+				{showSearchResults && <>{renderSearchResults()}</>}
 
 				{selectedUsers.length > 0 && (
 					<div className='flex flex-row flex-wrap gap-2'>

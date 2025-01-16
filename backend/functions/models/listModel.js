@@ -1,4 +1,5 @@
 const { db } = require('../config/firebase');
+const { FieldValue } = require('firebase-admin/firestore');
 
 /**
  * Represents a list in the system
@@ -11,6 +12,7 @@ const { db } = require('../config/firebase');
  * @method getListsBySharedWith
  * @method getListsByTaskId
  * @method getListsByTagId
+ * @method deleteSharedWithList
  */
 class List {
 	/**
@@ -198,6 +200,17 @@ class List {
 			id: doc.id,
 			...doc.data(),
 		}));
+	}
+
+	/**
+	 * Deletes a shared with list
+	 * @param {string} listId - The ID of the list
+	 * @param {string} userId - The ID of the user
+	 * @returns {Promise<void>}
+	 */
+	static async deleteSharedWithList(listId, userId) {
+		const listRef = db.collection('lists').doc(listId);
+		await listRef.update({ sharedWith: FieldValue.arrayRemove(userId) });
 	}
 }
 

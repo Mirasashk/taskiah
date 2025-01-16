@@ -26,6 +26,9 @@ export const listService = {
 			listId: invite.listId,
 		}),
 
+	removeSharedUser: (listId, userId) =>
+		axiosInstance.delete(`/lists/${listId}/shared/${userId}`),
+
 	rejectSharedListInvite: (id) =>
 		axiosInstance.put(`/lists/invites/${id}/reject`),
 
