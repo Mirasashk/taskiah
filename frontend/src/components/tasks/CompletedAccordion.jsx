@@ -63,6 +63,7 @@ const CompletedAccordion = ({ tasks, recentlyCompleted }) => {
 								task={task}
 								onTaskSelect={handleTaskSelect}
 								onTaskEdit={handleTaskEdit}
+								showDelete={false}
 							/>
 						</div>
 					))}
