@@ -77,36 +77,33 @@ export default function TaskItem({
 
 	return (
 		<div
-			className={`flex items-center justify-between px-4 py-2 bg-white dark:bg-gray-800 rounded-lg shadow cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-500`}
+			className={`flex items-center justify-between px-4 py-2 bg-white dark:bg-gray-800 rounded-lg shadow cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-500 gap-4`}
 		>
-			<div className='flex items-center gap-2 md:gap-6'>
-				<div className='flex items-center gap-2'>
-					{showDelete && (
-						<input
-							type='checkbox'
-							checked={
-								isCompleting || task.status === 'completed'
-							}
-							onChange={(e) => handleToggle(e, task)}
-							className='w-4 h-4'
-						/>
-					)}
-					<span
+			<div className='flex flex-grow items-center gap-2 md:gap-4'>
+				{showDelete && (
+					<input
+						type='checkbox'
+						checked={isCompleting || task.status === 'completed'}
+						onChange={(e) => handleToggle(e, task)}
+						className='w-4 h-4'
+					/>
+				)}
+				<div
+					className='flex items-center gap-2 w-full'
+					onClick={() => onTaskSelect(task)}
+				>
+					<div
 						className={`transition-all duration-500 ${
 							isCompleting || task.status === 'completed'
 								? 'line-through text-gray-500 dark:text-gray-400'
 								: 'text-gray-900 dark:text-white'
 						}`}
 					>
-						<div
-							className='flex flex-col justify-center md:pt-0 md:flex-row md:items-center md:gap-8'
-							onClick={() => onTaskSelect(task)}
-						>
-							<div className='font-medium'>
-								{task.title.substring(0, 23) +
-									(task.title.length > 23 ? '...' : '')}
+						<div className='flex flex-grow w-full flex-col justify-center md:pt-0 md:flex-row md:items-center md:gap-8'>
+							<div className='flex no-wrap font-medium'>
+								{task.title}
 							</div>
-							<div className='flex flex-wrap gap-2 md:gap-4 text-xs md:mt-0'>
+							<div className='flex flex-shrink-0 gap-2 md:gap-4 text-xs md:mt-0'>
 								{task.priority == 'high' && (
 									<div className='flex items-center gap-2'>
 										<div className='flex items-center gap-1'>
@@ -115,9 +112,9 @@ export default function TaskItem({
 												Priority:
 											</label>
 										</div>
-										<span className='text-xs text-gray-500 dark:text-gray-400'>
+										<div className='text-xs text-gray-500 dark:text-gray-400'>
 											{task.priority}
-										</span>
+										</div>
 									</div>
 								)}
 								{task.dueDate && (
@@ -125,14 +122,14 @@ export default function TaskItem({
 										<label className='text-xs text-gray-500 dark:text-gray-400'>
 											Due:
 										</label>
-										<span className='text-xs text-gray-500 dark:text-gray-400'>
+										<div className='text-xs text-gray-500 dark:text-gray-400'>
 											{task.dueDate}
-										</span>
+										</div>
 									</div>
 								)}
 							</div>
 						</div>
-					</span>
+					</div>
 				</div>
 			</div>
 			<div className='flex items-center gap-4'>

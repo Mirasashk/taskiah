@@ -10,12 +10,13 @@ import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { IoMdShare } from 'react-icons/io';
 import DeleteModal from '../common/DeleteModal';
 
-export default function TaskItem({
+export default function ListItem({
 	list,
 	onListSelect,
 	onListEdit,
 	isEditable = true,
 	listItemCount,
+	onListShare,
 }) {
 	const { toggleTask, deleteTask } = useTaskContext();
 	const isMobile = useMediaQuery('(max-width: 768px)');

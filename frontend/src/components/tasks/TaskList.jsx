@@ -15,7 +15,7 @@ import TaskListItem from './TaskListItem';
 import { FiPlus } from 'react-icons/fi';
 import CreateListForm from './CreateListForm';
 import CompletedAccordion from './CompletedAccordion';
-
+import ShareListModalContent from './ShareListModalContent';
 const TaskList = ({ setIsEditing }) => {
 	const { isLoading, error, tasks, setSelectedTask, setSelectedFilter } =
 		useTaskContext();
@@ -32,6 +32,7 @@ const TaskList = ({ setIsEditing }) => {
 	const [isListModalOpen, setIsListModalOpen] = useState(false);
 	const [isListEditModalOpen, setIsListEditModalOpen] = useState(false);
 	const [listToEdit, setListToEdit] = useState(null);
+	const [isListShareModalOpen, setIsListShareModalOpen] = useState(false);
 	const options = useMemo(
 		() => [
 			{ label: 'Created date', value: 'createdAt' },
@@ -77,6 +78,11 @@ const TaskList = ({ setIsEditing }) => {
 		setSelectedList(list);
 	};
 
+	const handleListShare = (list) => {
+		setListToEdit(list);
+		setIsListShareModalOpen(true);
+	};
+
 	const getListItemCount = (list) => {
 		return tasks?.filter((task) => task.listId === list.id).length || 0;
 	};
@@ -92,6 +98,21 @@ const TaskList = ({ setIsEditing }) => {
 					onClose={() => setIsListEditModalOpen(false)}
 					list={listToEdit}
 					showUserSearch={false}
+				/>
+			</Modal>
+		);
+	};
+
+	const renderListShareModal = (list) => {
+		return (
+			<Modal
+				isOpen={isListShareModalOpen}
+				onClose={() => setIsListShareModalOpen(false)}
+				title='Share List'
+			>
+				<ShareListModalContent
+					list={listToEdit}
+					onClose={() => setIsListShareModalOpen(false)}
 				/>
 			</Modal>
 		);
@@ -162,6 +183,9 @@ const TaskList = ({ setIsEditing }) => {
 											listItemCount={getListItemCount(
 												list
 											)}
+											onListShare={() =>
+												handleListShare(list)
+											}
 										/>
 									);
 								})}
@@ -182,6 +206,9 @@ const TaskList = ({ setIsEditing }) => {
 											listItemCount={getListItemCount(
 												list
 											)}
+											onListShare={() =>
+												handleListShare(list)
+											}
 										/>
 									);
 								})}
@@ -190,6 +217,7 @@ const TaskList = ({ setIsEditing }) => {
 				</div>
 				{renderListModal()}
 				{renderListEditModal()}
+				{renderListShareModal()}
 			</div>
 		);
 	}

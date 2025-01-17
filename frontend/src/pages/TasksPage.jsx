@@ -6,13 +6,13 @@ import TaskDetailSideBar from '../components/tasks/TaskDetailSideBar';
 import { useTaskContext } from '../context/TaskContext';
 import { useListContext } from '../context/ListContext';
 import Modal from '../components/common/Modal';
-
+import { useMediaQuery } from '../hooks/useMediaQuery';
 const TasksPage = () => {
 	const [filteredTasks, setFilteredTasks] = useState();
 	const { setSelectedList } = useListContext();
 	const [isEditing, setIsEditing] = useState(false);
 	const { selectedTask, setSelectedTask, updateTask } = useTaskContext();
-
+	const isMobile = useMediaQuery('(max-width: 768px)');
 	const handleOnClose = () => {
 		setSelectedTask(null);
 		setIsEditing(false);
@@ -102,7 +102,7 @@ const TasksPage = () => {
 				</div>
 			</div>
 			{/* Mobile Task Detail Modal */}
-			{renderMobileTaskDetail()}
+			{isMobile && renderMobileTaskDetail()}
 		</div>
 	);
 };

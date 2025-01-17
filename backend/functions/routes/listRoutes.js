@@ -15,6 +15,7 @@ const {
 	rejectListInvite,
 	deleteList,
 	updateList,
+	deleteSharedWithList,
 } = require('../controllers/listController');
 
 /**
@@ -56,6 +57,10 @@ router.put('/:id', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
 	await deleteList(req.params.id, res);
+});
+
+router.delete('/:listId/shared/:userId', async (req, res) => {
+	await deleteSharedWithList(req.params.listId, req.params.userId, res);
 });
 
 module.exports = router;

@@ -3,7 +3,7 @@ import {View} from 'react-native';
 import {Text} from 'react-native-paper';
 import StatsCard from './StatsCard';
 import {DashboardStyles} from './styles/DashboardStyles';
-
+import {useTheme} from 'react-native-paper';
 /**
  * @typedef {Object} StatsSectionProps
  * @property {Function} onTaskPress - Callback function when active tasks card is pressed
@@ -18,28 +18,41 @@ import {DashboardStyles} from './styles/DashboardStyles';
  * @param {StatsSectionProps} props - Component props
  * @returns {React.ReactElement} Stats section component
  */
-const StatsSection = ({onTaskPress, stats}) => (
-  <View style={DashboardStyles.statsContainer}>
-    <Text variant="titleLarge">Tasks</Text>
-    <StatsCard
-      title="Active tasks"
-      subtitle={stats.active.toString()}
-      icon="clipboard-list-outline"
-      onPress={() => onTaskPress('active')}
-    />
-    <StatsCard
-      title="Important tasks"
-      subtitle={stats.completed.toString()}
-      icon="alert-circle-outline"
-      onPress={() => onTaskPress('important')}
-    />
-    <StatsCard
-      title="Past due tasks"
-      subtitle={stats.overdue.toString()}
-      icon="calendar-alert"
-      onPress={() => onTaskPress('pastdue')}
-    />
-  </View>
-);
+const StatsSection = ({onTaskPress, stats}) => {
+  const theme = useTheme();
+
+  return (
+    <View style={DashboardStyles.statsContainer}>
+      <Text variant="titleLarge">Dashboard</Text>
+      <StatsCard
+        title="Active tasks"
+        value={stats.active.toString()}
+        icon="clock-outline"
+        trend="up"
+        trendValue={100}
+        onPress={() => onTaskPress('active')}
+        iconColor={theme.colors.primary}
+      />
+      <StatsCard
+        title="Completed This Week"
+        value={stats.completed.toString()}
+        icon="checkbox-marked-outline"
+        trend="up"
+        trendValue={100}
+        onPress={() => onTaskPress('important')}
+        iconColor={theme.colors.tertiary}
+      />
+      <StatsCard
+        title="Overdue"
+        value={stats.overdue.toString()}
+        icon="calendar-alert"
+        trend="up"
+        trendValue={100}
+        onPress={() => onTaskPress('pastdue')}
+        iconColor={theme.colors.error}
+      />
+    </View>
+  );
+};
 
 export default StatsSection;

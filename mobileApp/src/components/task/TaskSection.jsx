@@ -32,8 +32,7 @@ const TaskSection = ({
   const theme = useTheme();
   const styles = TaskSectionStyles(theme);
   const [expand, setExpand] = useState(expanded);
-  const {toggleTask, deleteTask, filter, deletedTasks, completedTasks} =
-    useTaskContext();
+  const {toggleTask, deleteTask, filter} = useTaskContext();
 
   const handlePress = () => {
     if (tasks.length > 0) {
@@ -65,32 +64,14 @@ const TaskSection = ({
       />
       {expand && (
         <Card.Content>
-          {filter === 'Deleted' && completedTasksList === false
-            ? deletedTasks.map(task => (
-                <TaskItem
-                  key={task.id}
-                  task={task}
-                  onToggleComplete={handleToggleComplete}
-                  onDelete={() => handleDelete(task)}
-                />
-              ))
-            : filteredTasks?.length > 0
-              ? filteredTasks.map(task => (
-                  <TaskItem
-                    key={task.id}
-                    task={task}
-                    onToggleComplete={handleToggleComplete}
-                    onDelete={() => handleDelete(task)}
-                  />
-                ))
-              : tasks.map(task => (
-                  <TaskItem
-                    key={task.id}
-                    task={task}
-                    onToggleComplete={handleToggleComplete}
-                    onDelete={() => handleDelete(task)}
-                  />
-                ))}
+          {tasks.map(task => (
+            <TaskItem
+              key={task.id}
+              task={task}
+              onToggleComplete={handleToggleComplete}
+              onDelete={() => handleDelete(task)}
+            />
+          ))}
         </Card.Content>
       )}
     </Card>

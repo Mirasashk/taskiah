@@ -1,11 +1,7 @@
 import {initializeApp} from '@react-native-firebase/app';
 import {getAuth, connectAuthEmulator} from '@react-native-firebase/auth';
 import {getFirestore} from '@react-native-firebase/firestore';
-import {
-  getStorage,
-  connectStorageEmulator,
-} from '@react-native-firebase/storage';
-
+import {getStorage} from '@react-native-firebase/storage';
 import Config from 'react-native-config';
 
 // Initialize Firebase with config
@@ -20,7 +16,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const firestore = getFirestore(app);
+const db = getFirestore(app);
 const storage = getStorage(app);
 
 // Connect to emulators in development
@@ -31,8 +27,11 @@ if (__DEV__) {
 
   if (Config.STORAGE_EMULATOR_HOST) {
     const [host, port] = Config.STORAGE_EMULATOR_HOST.split(':');
-    connectStorageEmulator(storage, host, parseInt(port));
+    storage.useEmulator(host, parseInt(port));
   }
+
+  // Connect to Firestore emulator
+  db.useEmulator('10.0.2.2', 8082);
 }
 
-export {auth, firestore, storage};
+export {auth, db, storage};

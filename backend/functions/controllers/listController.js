@@ -106,6 +106,18 @@ const updateList = async (id, listData, res) => {
 	res.status(200).json(list);
 };
 
+/**
+ * Deletes a shared with list
+ * @param {string} listId - The ID of the list
+ * @param {string} userId - The ID of the user
+ * @param {Object} res - The response object
+ * @returns {Promise<Object>} The list data
+ */
+const deleteSharedWithList = async (listId, userId, res) => {
+	const list = await List.deleteSharedWithList(listId, userId);
+	res.status(200).json(list);
+};
+
 module.exports = {
 	addList,
 	getListByOwnerId,
@@ -116,4 +128,5 @@ module.exports = {
 	rejectListInvite,
 	deleteList,
 	updateList,
+	deleteSharedWithList,
 };

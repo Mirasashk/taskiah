@@ -1,5 +1,5 @@
 import React, {useState, useContext} from 'react';
-import {StyleSheet, TouchableOpacity} from 'react-native';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import {Appbar, Avatar, Text, useTheme} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useAuth} from '../../context/AuthContext';
@@ -8,6 +8,7 @@ import {ThemeContext} from '../../context/ThemeContext';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {STACK_SCREENS} from '../../routes/PrivateStack';
 import {DrawerActions} from '@react-navigation/native';
+import Logo from '../ui/Logo';
 
 /**
  * @typedef {Object} HeaderProps
@@ -22,7 +23,7 @@ import {DrawerActions} from '@react-navigation/native';
 const Header = ({title, onMenuPress}) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const theme = useTheme();
-  const {toggleTheme} = useContext(ThemeContext);
+  const {toggleTheme, isThemeDark} = useContext(ThemeContext);
   const {user, signOut, image} = useAuth();
   const navigation = useNavigation();
   const route = useRoute();
@@ -59,9 +60,10 @@ const Header = ({title, onMenuPress}) => {
           />
         </TouchableOpacity>
 
-        <Text variant="titleLarge" style={styles.title}>
-          {title}
-        </Text>
+        <View
+          style={{flexDirection: 'row', alignItems: 'center', marginTop: 20}}>
+          <Logo isDark={isThemeDark} width={100} height={50} />
+        </View>
 
         <TouchableOpacity onPress={() => setIsModalVisible(true)}>
           <Avatar.Image

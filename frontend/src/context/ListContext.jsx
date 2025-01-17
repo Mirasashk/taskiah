@@ -132,16 +132,19 @@ export function ListProvider({ children }) {
 	}, [userData?.id]);
 
 	// Save selected list to localStorage
-	// useEffect(() => {
-	// 	console.log('selectedList', selectedList);
-	// 	if (selectedList?.id) {
-	// 		localStorage.setItem('selectedListId', selectedList.id);
-	// 	}
-	// }, [selectedList]);
+	useEffect(() => {
+		if (selectedList?.id) {
+			localStorage.setItem('selectedListId', selectedList.id);
+		}
+	}, [selectedList]);
 
 	const getTags = async (userId) => {
 		const response = await listService.getTagsByUserId(userId);
 		setTags(response.data);
+	};
+
+	const removeSharedUser = async (listId, userId) => {
+		await listService.removeSharedUser(listId, userId);
 	};
 
 	const value = {
@@ -153,6 +156,7 @@ export function ListProvider({ children }) {
 		selectedList,
 		setSelectedList,
 		getTags,
+		removeSharedUser,
 	};
 
 	return (

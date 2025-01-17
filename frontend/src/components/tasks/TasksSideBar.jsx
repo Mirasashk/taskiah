@@ -45,9 +45,6 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 	const [isListModalOpen, setIsListModalOpen] = useState(false);
 	const [isTagModalOpen, setIsTagModalOpen] = useState(false);
 	const selectedItemRef = useRef(null);
-	const firstItemRef = useRef(null);
-	const scrollContainerRef = useRef(null);
-	const [lastScrollPosition, setLastScrollPosition] = useState(0);
 
 	//variables
 	const today = new Date();
@@ -230,7 +227,7 @@ const TasksSidebar = ({ onFilterTasks, isMobile = false }) => {
 						{myTasksList && (
 							<>
 								{/* My Lists Section */}
-								<div className='flex items-end mt-2 space-x-4'>
+								<div className='flex items-end mt-2 space-x-4 pr-4'>
 									<div className='flex items-center'>
 										<div className='h-16 w-px bg-gray-300 dark:bg-gray-600'></div>
 									</div>

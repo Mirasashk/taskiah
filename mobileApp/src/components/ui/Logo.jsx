@@ -8,7 +8,7 @@
 import React from 'react';
 import {View, Image, StyleSheet} from 'react-native';
 
-const Logo = ({isDark}) => (
+const Logo = ({isDark, width = 300, height = 100}) => (
   <View style={styles.container}>
     <Image
       source={
@@ -16,7 +16,7 @@ const Logo = ({isDark}) => (
           ? require('../../assets/images/Logo_white.png')
           : require('../../assets/images/Logo_black.png')
       }
-      style={styles.image}
+      style={[styles.image, {width, height}]}
     />
   </View>
 );
