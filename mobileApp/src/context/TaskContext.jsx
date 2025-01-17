@@ -1,203 +1,262 @@
-import {createContext, useContext, useState, useEffect} from 'react';
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+} from 'react';
+import {db} from '../config/firebase';
 import {taskService} from '../services/taskApi';
-import {AuthContext} from './AuthContext';
-import {createTaskNotification} from '../utils/notifications';
+import {useAuth} from './AuthContext';
+import {useListContext} from './ListContext';
+import Task from '../models/TaskModel';
+import {asyncStorage} from '../utils/secureStorage';
 
-/**
- * Context for managing tasks throughout the application.
- * Provides task CRUD operations and filtering capabilities.
- */
 const TaskContext = createContext(null);
 
-/**
- * Provider component that manages task state and operations.
- *
- * @component
- * @param {Object} props Component props
- * @param {React.ReactNode} props.children - Child components
- */
 export function TaskProvider({children}) {
   const [tasks, setTasks] = useState([]);
-  const [filteredTasks, setFilteredTasks] = useState([]);
-  const [completedTasks, setCompletedTasks] = useState([]);
-  const [deletedTasks, setDeletedTasks] = useState([]);
-  const [filter, setFilter] = useState('All tasks');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const {user} = useAuth();
+  const {lists = []} = useListContext() || {};
   const [selectedTask, setSelectedTask] = useState(null);
-  const [loading, setLoading] = useState(false);
 
-  const {user} = useContext(AuthContext);
+  const [selectedFilter, setSelectedFilter] = useState(() => {
+    const savedFilter = asyncStorage.getItem('selectedFilter');
+    return savedFilter || 'All Lists';
+  });
 
   useEffect(() => {
-    if (user) {
-      getTasks();
+    if (selectedFilter) {
+      asyncStorage.setItem('selectedFilter', selectedFilter.toString());
     }
-  }, [user]);
+  }, [selectedFilter]);
 
+  // Firestore Listener for getting tasks by listId
   useEffect(() => {
-    console.log('filter', filter);
-    filterTasks(filter);
-  }, [filter]);
+    // Reset tasks if no user data
+    if (!user?.id) {
+      setTasks([]);
+      setIsLoading(false);
+      return;
+    }
 
-  /**
-   * Adds a new task with associated notification.
-   *
-   * @async
-   * @param {Object} task - Task to be added
-   * @param {string} task.title - Title of the task
-   * @param {string} [task.description] - Description of the task
-   * @param {Date} [task.dueDate] - Due date of the task
-   * @throws {Error} When task creation fails
-   */
-  const addTask = async task => {
+    const listsIds = lists.map(list => list.id);
+
+    // If there are no lists, set empty tasks and return
+    if (listsIds.length === 0) {
+      setTasks([]);
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const notification = createTaskNotification(task);
-      task.notifications = {[notification.type]: notification};
+      setIsLoading(true);
+      const validListIds = lists
+        .filter(
+          list =>
+            list &&
+            list.id &&
+            (list.ownerId === user.id ||
+              (list.sharedWith && list.sharedWith.includes(user.id))),
+        )
+        .map(list => list.id);
 
-      const response = await taskService.createTask(task);
-      const sortedTasks = [...tasks, response.data].sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+      // If there are no valid lists, return empty tasks
+      if (validListIds.length === 0) {
+        setTasks([]);
+        setIsLoading(false);
+        return;
+      }
+
+      // Create a query for active tasks
+      const activeTasksQuery = db
+        .collection('tasks')
+        .where('listId', 'in', validListIds)
+        .where('status', '==', 'active')
+        .orderBy('createdAt', 'desc');
+
+      const deletedTasksQuery = db
+        .collection('tasks')
+        .where('listId', 'in', validListIds)
+        .where('status', '==', 'completed')
+        .orderBy('createdAt', 'desc');
+
+      // Combine results from both queries
+      const unsubActive = activeTasksQuery.onSnapshot(
+        activeSnapshot => {
+          const activeTasks = [];
+          activeSnapshot.forEach(doc => {
+            const data = doc.data();
+            if (!data.ownerId || !data.listId) {
+              console.warn(`Task ${doc.id} is missing required fields`);
+              return;
+            }
+            activeTasks.push({
+              id: doc.id,
+              ...data,
+              status: data.status || 'active',
+              createdAt: data.createdAt || new Date().toISOString(),
+            });
+          });
+
+          const unsubDeleted = deletedTasksQuery.onSnapshot(
+            deletedSnapshot => {
+              const deletedTasks = [];
+              deletedSnapshot.forEach(doc => {
+                const data = doc.data();
+                if (!data.ownerId || !data.listId) {
+                  console.warn(`Task ${doc.id} is missing required fields`);
+                  return;
+                }
+                deletedTasks.push({
+                  id: doc.id,
+                  ...data,
+                  status: data.status || 'completed',
+                  createdAt: data.createdAt || new Date().toISOString(),
+                });
+              });
+
+              // Combine all tasks
+              setTasks([...activeTasks, ...deletedTasks]);
+              setIsLoading(false);
+            },
+            error => {
+              console.error('Error in deleted tasks listener:', error);
+              setError(error.message);
+              setIsLoading(false);
+            },
+          );
+
+          return () => unsubDeleted();
+        },
+        error => {
+          console.error('Error in active tasks listener:', error);
+          setError(error.message);
+          setIsLoading(false);
+        },
       );
 
-      setTasks(sortedTasks);
+      return () => unsubActive();
     } catch (error) {
-      console.error('Error adding task:', error);
-      throw error;
+      console.error('Error setting up tasks query:', error);
+      setError(error.message);
+      setIsLoading(false);
     }
-  };
+  }, [user?.id, lists]);
 
-  /**
-   * Filters tasks based on specified criteria.
-   *
-   * @param {string} filterCriteria - The filter to apply ('important'|'pastdue'|'all')
-   */
-  const filterTasks = filterCriteria => {
-    const sortByDate = (a, b) => new Date(b.createdAt) - new Date(a.createdAt);
-
-    let filtered = tasks;
-    if (filterCriteria === 'important') {
-      filtered = tasks.filter(task => task.priority === 'high');
-    } else if (filterCriteria === 'pastdue') {
-      filtered = tasks.filter(task => task.dueDate < new Date());
-    }
-
-    setFilter(filterCriteria);
-    setFilteredTasks(filtered.sort(sortByDate));
-  };
-
-  /**
-   * Deletes a task
-   * @param {Object} task - Task to delete
-   */
-  const deleteTask = async task => {
-    if (task.status === 'deleted') {
-      console.log('deleteTask', task.id);
-      await taskService.deleteTask(task.id).then(() => {
-        getTasks();
-      });
-    } else {
-      const deletedStatus = {
-        status: 'deleted',
+  const addTaskToFirestore = async task => {
+    try {
+      const notification = await addNotification(task);
+      task.notifications = {
+        [notification.type]: notification,
       };
-      await taskService.updateTask(task.id, deletedStatus).then(() => {
-        getTasks();
-      });
+      await Task.createTask(task);
+    } catch (error) {
+      setError(error.message);
     }
   };
 
-  /**
-   * Toggles a task's status
-   * @param {string} taskId - Task ID
-   * @param {Object} taskData - Task data
-   */
-  const toggleTask = async (taskId, taskData) => {
-    setTasks(
-      tasks.map(task => (task.id === taskId ? {...task, ...taskData} : task)),
-    );
-    await taskService.updateTask(taskId, taskData);
-    await getTasks();
-    setLoading(false);
-  };
+  const deleteTask = useCallback(async task => {
+    try {
+      await taskService.updateTask(task.id, {status: 'deleted'});
+    } catch (error) {
+      setError(error.message);
+    }
+  });
 
-  /**
-   * Retrieves tasks
-   */
-  const getTasks = async () => {
-    const response = await taskService.getTasks(user.id);
+  const toggleTask = useCallback(async (taskId, taskData) => {
+    try {
+      setTasks(prev =>
+        prev.map(task => (task.id === taskId ? {...task, ...taskData} : task)),
+      );
+      await taskService.updateTask(taskId, taskData);
+    } catch (error) {
+      setError(error.message);
+    }
+  });
 
-    // sort tasks by createdAt date
-    const deletedTasks = response.data.filter(
-      task => task.status === 'deleted',
-    );
-    setDeletedTasks(deletedTasks);
-
-    const completedTasks = response.data.filter(
-      task => task.status === 'completed',
-    );
-    setCompletedTasks(completedTasks);
-
-    const filteredTasks = response.data.filter(
-      task => task.status !== 'deleted' && task.status !== 'completed',
-    );
-
-    const sortedTasks = filteredTasks.sort(
-      (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
-    );
-    setTasks(sortedTasks);
-  };
-
-  /**
-   * Deletes all tasks for a user
-   * @param {string} userId - User ID
-   */
-  const deleteAllTasks = async userId => {
-    await taskService.deleteAllTasks(userId);
-    await getTasks(userId);
-  };
-
-  /**
-   * Updates a task
-   * @param {string} taskId - Task ID
-   * @param {Object} newTaskData - New task data
-   */
-  const updateTask = async (taskId, newTaskData) => {
-    setLoading(true);
-    await taskService.updateTask(taskId, newTaskData);
-    await getTasks();
-    setLoading(false);
-  };
+  const updateTask = useCallback(async (taskId, newTaskData) => {
+    try {
+      await taskService.updateTask(taskId, newTaskData);
+    } catch (error) {
+      setError(error.message);
+    }
+  });
 
   const value = {
     tasks,
-    filter,
-    filteredTasks,
-    deletedTasks,
-    completedTasks,
+    isLoading,
+    error,
     selectedTask,
-    loading,
     setSelectedTask,
-    setFilteredTasks,
-    setFilter,
-    addTask,
+    selectedFilter,
+    setSelectedFilter,
+    addTaskToFirestore,
     deleteTask,
     toggleTask,
     updateTask,
-    getTasks,
-    filterTasks,
-    deleteAllTasks,
   };
+
+  if (error) {
+    console.error('TaskContext Error:', error);
+  }
 
   return <TaskContext.Provider value={value}>{children}</TaskContext.Provider>;
 }
 
-/**
- * Custom hook for accessing task context
- * @returns {Object} Task context value
- * @throws {Error} If used outside TaskProvider
- */
 export const useTaskContext = () => {
   const context = useContext(TaskContext);
   if (!context) {
     throw new Error('useTaskContext must be used within a TaskProvider');
   }
   return context;
+};
+
+const addNotification = async task => {
+  const setNotificationType = task => {
+    if (task.priority === 'high') {
+      return 'important';
+    } else if (task.dueDate) {
+      return 'dueDate';
+    } else {
+      return 'reminder';
+    }
+  };
+
+  const setMessage = task => {
+    switch (type) {
+      case 'important':
+        return `${task.title} is a high priority task`;
+      case 'dueDate':
+        return `${task.title} is due on ${task.dueDate}`;
+      case 'reminder':
+        return `This is a reminder for ${task.title}`;
+    }
+  };
+
+  const setNotifyOn = task => {
+    // set notify date 1 day before due date
+    if (task.dueDate) {
+      const dueDate = new Date(task.dueDate);
+      dueDate.setDate(dueDate.getDate() - 1);
+      return dueDate.toISOString();
+    } else {
+      return null;
+    }
+  };
+
+  const type = setNotificationType(task);
+  const message = setMessage(task);
+  const notifyOn = setNotifyOn(task);
+
+  const notification = {
+    message: message,
+    type: type,
+    notifyOn: notifyOn,
+  };
+
+  return notification;
 };

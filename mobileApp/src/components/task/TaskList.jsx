@@ -18,30 +18,13 @@ import {useNavigation} from '@react-navigation/native';
  */
 const TaskList = () => {
   const theme = useTheme();
-  const {
-    tasks,
-    getTasks,
-    filter,
-    filteredTasks,
-    completedTasks,
-    deletedTasks,
-    deleteTask,
-  } = useTaskContext();
+  const {tasks, getTasks, filter, deleteTask} = useTaskContext();
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const navigation = useNavigation();
 
   const handleRefresh = useCallback(async () => {
     await getTasks();
   }, [getTasks]);
-
-  const getTaskList = () => {
-    if (filter === 'All tasks') {
-      return tasks;
-    } else if (filter === 'Deleted') {
-      return deletedTasks;
-    }
-    return filteredTasks;
-  };
 
   const handleDelete = task => {
     deleteTask(task);
@@ -79,18 +62,10 @@ const TaskList = () => {
       <PullToRefresh onRefresh={handleRefresh}>
         <View>
           <TaskSection
-            title={`${filter} (${getTaskList().length})`}
-            tasks={getTaskList()}
+            title={`${filter} `}
+            tasks={tasks}
             rightComponent={listActions()}
             expanded={true}
-            deleteTask={task => handleDelete(task)}
-          />
-          <TaskSection
-            title={`Completed tasks (${completedTasks.length})`}
-            tasks={completedTasks}
-            completedTasksList={true}
-            rightComponent={listActions('completed')}
-            expanded={false}
             deleteTask={task => handleDelete(task)}
           />
         </View>

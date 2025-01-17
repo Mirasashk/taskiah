@@ -7,6 +7,9 @@ import TabLabel from '../components/task/TabLabel';
 import {useTaskContext} from '../context/TaskContext';
 import {getTabNavigatorConfig} from '../config/navigation';
 import {Dimensions} from 'react-native';
+import {useListContext} from '../context/ListContext';
+import {View, Text} from 'react-native';
+import AllLists from '../components/task/AllLists';
 const Tab = createMaterialTopTabNavigator();
 
 /**
@@ -16,10 +19,9 @@ const Tab = createMaterialTopTabNavigator();
  */
 const TasksScreen = () => {
   const theme = useTheme();
-  const {tasks, addTask, deleteTask, getTasks} = useTaskContext();
-  const [visible, setVisible] = useState(false);
-  const [newTaskTitle, setNewTaskTitle] = useState('');
-  const tabLength = 2;
+  const {lists, myTasksList, myLists, sharedLists} = useListContext();
+
+  const tabLength = lists.length + 1;
 
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
@@ -33,42 +35,44 @@ const TasksScreen = () => {
   return (
     <Tab.Navigator
       testID="tasks-screen"
-      initialRouteName="Active"
+      initialRouteName="All Lists"
       screenOptions={{
         ...getTabNavigatorConfig(theme),
         tabBarStyle: {width: Dimensions.get('window').width},
         tabBarScrollEnabled: true,
-        tabBarItemStyle: {width: Dimensions.get('window').width / tabLength},
+        tabBarItemStyle: {
+          width: 'auto',
+        },
+        tabBarIndicatorStyle: {
+          backgroundColor: theme.colors.primary,
+          height: 3,
+        },
+        tabBarPressColor: 'transparent',
       }}>
-      <Tab.Screen
-        name="Active"
-        component={TaskList}
-        options={{
-          tabBarLabel: ({focused}) => (
-            <TabLabel focused={focused} label="Active" theme={theme} />
-          ),
-        }}
-      />
-
-      <Tab.Screen
-        name="AddList"
-        component={AddListTab}
-        options={{
-          tabBarItemStyle: {
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-          },
-          tabBarLabel: ({focused}) => (
-            <TabLabel
-              focused={focused}
-              label="Add List"
-              theme={theme}
-              showIcon={true}
-            />
-          ),
-        }}
-      />
+      <Tab.Screen name="All Lists" component={AllLists} />
+      {lists
+        .filter(list => list.id === myTasksList.id)
+        .map(list => (
+          <Tab.Screen
+            key={list.id}
+            name={list.name.slice(0, 10)}
+            component={TaskList}
+          />
+        ))}
+      {myLists.map(list => (
+        <Tab.Screen
+          key={list.id}
+          name={list.name.slice(0, 10)}
+          component={TaskList}
+        />
+      ))}
+      {sharedLists.map(list => (
+        <Tab.Screen
+          key={list.id}
+          name={list.name.slice(0, 10)}
+          component={TaskList}
+        />
+      ))}
     </Tab.Navigator>
   );
 };

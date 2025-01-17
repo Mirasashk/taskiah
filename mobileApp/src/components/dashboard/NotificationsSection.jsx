@@ -5,7 +5,7 @@ import {DashboardStyles} from './styles/DashboardStyles';
 import NotificationCard from './NotificationCard';
 import {useNotification} from '../../context/NotificationContext';
 import {useTaskContext} from '../../context/TaskContext';
-import {useTheme} from 'react-native-paper';
+import {useTheme, Card} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
 
 const notificationTypes = theme => ({
@@ -63,8 +63,10 @@ const NotificationsSection = () => {
 
   return (
     <View style={DashboardStyles.notificationsContainer}>
-      <Text variant="titleLarge">Notifications</Text>
-      {renderNotifications()}
+      <Card mode="contained" elevation={1}>
+        <Card.Title title="Notifications" />
+        {renderNotifications()}
+      </Card>
     </View>
   );
 };

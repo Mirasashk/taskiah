@@ -36,14 +36,12 @@ const NotificationCard = ({title, subtitle, icon, iconColor, onPress}) => {
 
   return (
     <View>
-      <Card mode="contained" elevation={1} onPress={onPress}>
-        <Card.Title
-          title={title}
-          subtitle={subtitle}
-          left={renderAvatar}
-          right={renderChevron}
-        />
-      </Card>
+      <Card.Title
+        title={title}
+        subtitle={subtitle}
+        left={renderAvatar}
+        right={renderChevron}
+      />
     </View>
   );
 };
