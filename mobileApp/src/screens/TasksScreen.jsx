@@ -10,6 +10,8 @@ import {Dimensions} from 'react-native';
 import {useListContext} from '../context/ListContext';
 import {View, Text} from 'react-native';
 import AllLists from '../components/task/AllLists';
+import MyListTabs from '../components/task/AllListBottomNavigation';
+
 const Tab = createMaterialTopTabNavigator();
 
 /**
@@ -38,40 +40,37 @@ const TasksScreen = () => {
       initialRouteName="All Lists"
       screenOptions={{
         ...getTabNavigatorConfig(theme),
-        tabBarStyle: {width: Dimensions.get('window').width},
+        tabBarStyle: {
+          width: Dimensions.get('window').width,
+        },
         tabBarScrollEnabled: true,
         tabBarItemStyle: {
           width: 'auto',
+          paddingHorizontal: 10,
         },
         tabBarIndicatorStyle: {
           backgroundColor: theme.colors.primary,
           height: 3,
         },
-        tabBarPressColor: 'transparent',
       }}>
-      <Tab.Screen name="All Lists" component={AllLists} />
+      <Tab.Screen name="All Lists" component={MyListTabs} />
+
       {lists
         .filter(list => list.id === myTasksList.id)
         .map(list => (
-          <Tab.Screen
-            key={list.id}
-            name={list.name.slice(0, 10)}
-            component={TaskList}
-          />
+          <Tab.Screen key={list.id} name={list.name.slice(0, 30)}>
+            {props => <TaskList {...props} list={list} />}
+          </Tab.Screen>
         ))}
       {myLists.map(list => (
-        <Tab.Screen
-          key={list.id}
-          name={list.name.slice(0, 10)}
-          component={TaskList}
-        />
+        <Tab.Screen key={list.id} name={list.name.slice(0, 30)}>
+          {props => <TaskList {...props} list={list} />}
+        </Tab.Screen>
       ))}
       {sharedLists.map(list => (
-        <Tab.Screen
-          key={list.id}
-          name={list.name.slice(0, 10)}
-          component={TaskList}
-        />
+        <Tab.Screen key={list.id} name={list.name.slice(0, 30)}>
+          {props => <TaskList {...props} list={list} />}
+        </Tab.Screen>
       ))}
     </Tab.Navigator>
   );
