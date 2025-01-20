@@ -19,7 +19,7 @@ import {TaskProvider} from './context/TaskContext';
 import {ThemeContext} from './context/ThemeContext';
 import {NotificationProvider} from './context/NotificationContext';
 import {CustomLightTheme, CustomDarkTheme} from './theme';
-
+import {UserProvider} from './context/UserContext';
 import {ListProvider} from './context/ListContext';
 
 // Routes
@@ -77,15 +77,17 @@ const App = () => {
       <SafeAreaProvider>
         <AuthProvider>
           <ListProvider>
-            <TaskProvider>
-              <NotificationProvider>
-                <ThemeContext.Provider value={preferences}>
-                  <PaperProvider theme={theme}>
-                    <AppContent />
-                  </PaperProvider>
-                </ThemeContext.Provider>
-              </NotificationProvider>
-            </TaskProvider>
+            <UserProvider>
+              <TaskProvider>
+                <NotificationProvider>
+                  <ThemeContext.Provider value={preferences}>
+                    <PaperProvider theme={theme}>
+                      <AppContent />
+                    </PaperProvider>
+                  </ThemeContext.Provider>
+                </NotificationProvider>
+              </TaskProvider>
+            </UserProvider>
           </ListProvider>
         </AuthProvider>
       </SafeAreaProvider>

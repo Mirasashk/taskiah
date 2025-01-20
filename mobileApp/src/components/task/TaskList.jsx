@@ -16,15 +16,11 @@ import {useNavigation} from '@react-navigation/native';
  * @component
  * @returns {React.ReactElement} The rendered TaskList component
  */
-const TaskList = () => {
+const TaskList = ({list}) => {
   const theme = useTheme();
-  const {tasks, getTasks, filter, deleteTask} = useTaskContext();
+  const {tasks, filter} = useTaskContext();
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const navigation = useNavigation();
-
-  const handleRefresh = useCallback(async () => {
-    await getTasks();
-  }, [getTasks]);
 
   const handleDelete = task => {
     deleteTask(task);
@@ -59,17 +55,18 @@ const TaskList = () => {
         {backgroundColor: theme.colors.surfaceContainerHigh},
       ]}
       testID="task-list">
-      <PullToRefresh onRefresh={handleRefresh}>
-        <View>
-          <TaskSection
-            title={`${filter} `}
-            tasks={tasks}
-            rightComponent={listActions()}
-            expanded={true}
-            deleteTask={task => handleDelete(task)}
-          />
-        </View>
-      </PullToRefresh>
+      <View>
+        <TaskSection
+          title={`${list?.name} `}
+          tasks={tasks.filter(task => task.listId === list.id)}
+          rightComponent={listActions()}
+          expanded={true}
+          deleteTask={task => handleDelete(task)}
+          onPress={() => {
+            navigation.navigate('TaskAddNew', {listId: list.id});
+          }}
+        />
+      </View>
       <TaskFilterModal
         visible={filterModalVisible}
         onDismiss={() => setFilterModalVisible(false)}
