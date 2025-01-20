@@ -14,6 +14,9 @@ import ListActions from './ListActions';
 import {TaskListStyles} from './styles/TaskListStyles';
 import TaskSection from './TaskSection';
 import {useNavigation} from '@react-navigation/native';
+import CustomBottomSheetModal from '../common/CustomBottomSheetModal';
+import AddTaskForm from './AddTaskForm';
+import TaskDetailForm from './TaskDetailForm';
 /**
  * Renders the main task list component with filtering and refresh capabilities.
  * Displays tasks in sections (active and completed) with the ability to filter, sort,
@@ -30,7 +33,8 @@ const TaskList = ({list}) => {
   const [showTasks, setShowTasks] = useState(true);
   const [showCompleted, setShowCompleted] = useState(false);
   const navigation = useNavigation();
-
+  const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
   useEffect(() => {
     setCompletedTasks(
       tasks
@@ -74,6 +78,11 @@ const TaskList = ({list}) => {
     toggleTask(task.id, {status: 'archived'});
   };
 
+  const handleTaskPress = task => {
+    setSelectedTask(task);
+    setIsBottomSheetVisible(true);
+  };
+
   return (
     <View
       style={[
@@ -91,6 +100,7 @@ const TaskList = ({list}) => {
           expanded={showTasks}
           onExpand={() => setShowTasks(!showTasks)}
           onDeleteTask={task => handleClearTask(task)}
+          onTaskPress={handleTaskPress}
         />
         {completedTasks.length > 0 && (
           <TaskSection
@@ -100,6 +110,7 @@ const TaskList = ({list}) => {
             expanded={showCompleted}
             onExpand={() => setShowCompleted(!showCompleted)}
             onDeleteTask={task => handleClearTask(task)}
+            onTaskPress={handleTaskPress}
           />
         )}
       </View>
@@ -117,9 +128,39 @@ const TaskList = ({list}) => {
           backgroundColor: theme.colors.primary,
         }}
         onPress={() => {
-          navigation.navigate('TaskAddNew');
+          setSelectedTask(null);
+          setIsBottomSheetVisible(true);
         }}
       />
+      {/* <FAB
+        icon="plus"
+        color={theme.colors.onPrimary}
+        style={{
+          position: 'absolute',
+          bottom: 16,
+          right: 16,
+          backgroundColor: theme.colors.primary,
+        }}
+        onPress={() => {
+          navigation.navigate('TaskAddNew', {listId: list.id});
+        }}
+      /> */}
+
+      <CustomBottomSheetModal
+        isVisible={isBottomSheetVisible}
+        onClose={() => {
+          setIsBottomSheetVisible(false);
+          setSelectedTask(null);
+        }}
+        snapPoints={['60%', '80%', '100%']}>
+        <View>
+          {selectedTask ? (
+            <TaskDetailForm mode="edit" task={selectedTask} />
+          ) : (
+            <AddTaskForm listId={list.id} />
+          )}
+        </View>
+      </CustomBottomSheetModal>
     </View>
   );
 };

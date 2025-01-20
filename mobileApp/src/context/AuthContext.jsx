@@ -1,8 +1,8 @@
 import React, {createContext, useState, useContext, useEffect} from 'react';
 import {AppState, InteractionManager} from 'react-native';
-import {auth} from '../config/firebase';
+import {myAuth} from '../config/firebase';
 import {getUserProfile, createUserProfile} from '../services/userApi';
-import {storage} from '../config/firebase';
+import {myStorage} from '../config/firebase';
 
 import {processUserData} from '../utils/authUtils';
 import {
@@ -107,7 +107,7 @@ export const AuthProvider = ({children}) => {
       }
     };
 
-    const unsubscribe = auth.onAuthStateChanged(handleAuthStateChange);
+    const unsubscribe = myAuth.onAuthStateChanged(handleAuthStateChange);
     return unsubscribe;
   }, []);
 
@@ -129,7 +129,7 @@ export const AuthProvider = ({children}) => {
    */
   const login = async (email, password, bioChecked) => {
     try {
-      const {user: firebaseUser} = await auth.signInWithEmailAndPassword(
+      const {user: firebaseUser} = await myAuth.signInWithEmailAndPassword(
         email,
         password,
       );
@@ -147,7 +147,7 @@ export const AuthProvider = ({children}) => {
   const loginWithBiometric = async token => {
     try {
       setLoading(true);
-      const {user: firebaseUser} = await auth.signInWithCustomToken(token);
+      const {user: firebaseUser} = await myAuth.signInWithCustomToken(token);
 
       return firebaseUser;
     } catch (error) {
@@ -162,7 +162,7 @@ export const AuthProvider = ({children}) => {
    */
   const signOut = async () => {
     try {
-      await auth.signOut();
+      await myAuth.signOut();
       setUser(null);
     } catch (error) {
       console.error('Sign out error:', error);
@@ -177,7 +177,7 @@ export const AuthProvider = ({children}) => {
    */
   const signUp = async userData => {
     try {
-      const {user: firebaseUser} = await auth.createUserWithEmailAndPassword(
+      const {user: firebaseUser} = await myAuth.createUserWithEmailAndPassword(
         userData.email,
         userData.password,
       );

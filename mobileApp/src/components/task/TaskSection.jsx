@@ -30,6 +30,7 @@ const TaskSection = ({
   onExpand,
   completedTasksList = false,
   onDeleteTask,
+  onTaskPress,
 }) => {
   const theme = useTheme();
   const styles = TaskSectionStyles(theme);
@@ -55,6 +56,15 @@ const TaskSection = ({
     onDeleteTask(taskId);
   };
 
+  const renderItem = ({item}) => (
+    <TaskItem
+      task={item}
+      onToggleComplete={handleToggleComplete}
+      onDelete={() => handleDelete(item.id)}
+      onPress={onTaskPress}
+    />
+  );
+
   return (
     <Card style={styles.card} onPress={handlePress}>
       <Card.Title
@@ -70,7 +80,8 @@ const TaskSection = ({
               key={task.id}
               task={task}
               onToggleComplete={() => handleToggleComplete(task)}
-              onDelete={() => handleDelete(task)}
+              onDelete={() => handleDelete(task.id)}
+              onPress={onTaskPress}
             />
           ))}
         </Card.Content>

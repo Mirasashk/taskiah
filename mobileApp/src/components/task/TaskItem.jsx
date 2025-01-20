@@ -1,7 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {View, StyleSheet} from 'react-native';
 import {Text, IconButton} from 'react-native-paper';
-import {useNavigation} from '@react-navigation/native';
 
 import TaskCheckbox from './TaskCheckbox';
 
@@ -17,11 +16,11 @@ import TaskCheckbox from './TaskCheckbox';
  * @param {('active'|'completed'|'deleted')} props.task.status - Current status of the task
  * @param {Function} props.onToggleComplete - Callback when task completion is toggled
  * @param {Function} props.onDelete - Callback when task is deleted
+ * @param {Function} props.onPress - Callback when task is pressed
  * @returns {React.ReactElement} The rendered TaskItem component
  */
-const TaskItem = ({task, onToggleComplete, onDelete}) => {
+const TaskItem = ({task, onToggleComplete, onDelete, onPress}) => {
   const [isChecked, setIsChecked] = useState(false);
-  const navigation = useNavigation();
 
   useEffect(() => {
     setIsChecked(task.status === 'completed');
@@ -32,10 +31,6 @@ const TaskItem = ({task, onToggleComplete, onDelete}) => {
     onToggleComplete(task);
   };
 
-  const handleTaskPress = () => {
-    navigation.navigate('TaskDetail', {task});
-  };
-
   return (
     <View style={styles.cardContent}>
       <View style={styles.leftContent}>
@@ -44,7 +39,7 @@ const TaskItem = ({task, onToggleComplete, onDelete}) => {
           <Text
             variant="titleMedium"
             style={[styles.title, isChecked && styles.completedText]}
-            onPress={handleTaskPress}>
+            onPress={() => onPress?.(task)}>
             {task.title}
           </Text>
         </View>

@@ -6,21 +6,19 @@ export const TaskDetailFormStyles = theme =>
       flex: 1,
     },
     card: {
-      backgroundColor: theme.colors.surfaceContainerHigh,
+      backgroundColor: theme.colors.SurfaceContainerLow,
       borderRadius: 0,
       height: '100%',
     },
-    textInput: {
-      backgroundColor: theme.colors.surfaceContainerHigh,
-    },
+    textInput: {backgroundColor: theme.colors.SurfaceContainerLow},
     textInputContent: {
-      backgroundColor: theme.colors.surfaceContainerHigh,
+      backgroundColor: theme.colors.SurfaceContainerLow,
     },
     updateButton: {
-      width: '50%',
       alignSelf: 'center',
       marginTop: 2,
     },
+
     completeButton: {
       position: 'absolute',
       margin: 16,
