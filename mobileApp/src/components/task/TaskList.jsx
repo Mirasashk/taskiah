@@ -1,6 +1,12 @@
-import React, {useState, useCallback} from 'react';
+import React, {useState, useCallback, useEffect} from 'react';
 import {View, FlatList} from 'react-native';
-import {Text, useTheme, IconButton, FAB} from 'react-native-paper';
+import {
+  Text,
+  useTheme,
+  IconButton,
+  FAB,
+  TouchableRipple,
+} from 'react-native-paper';
 import {useTaskContext} from '../../context/TaskContext';
 import TaskFilterModal from './TaskFilterModal';
 import PullToRefresh from '../PullToRefresh/PullToRefresh';
@@ -18,26 +24,34 @@ import {useNavigation} from '@react-navigation/native';
  */
 const TaskList = ({list}) => {
   const theme = useTheme();
-  const {tasks, filter} = useTaskContext();
+  const {tasks, toggleTask} = useTaskContext();
+  const [completedTasks, setCompletedTasks] = useState([]);
   const [filterModalVisible, setFilterModalVisible] = useState(false);
+  const [showTasks, setShowTasks] = useState(true);
+  const [showCompleted, setShowCompleted] = useState(false);
   const navigation = useNavigation();
 
-  const handleDelete = task => {
-    deleteTask(task);
-  };
+  useEffect(() => {
+    setCompletedTasks(
+      tasks
+        .filter(task => task.listId === list.id)
+        .filter(task => task.status === 'completed'),
+    );
+  }, [tasks, list]);
 
   const listActions = section => {
     if (section === 'completed') {
       return (
-        <View
-          style={{
-            flexDirection: 'row',
-            paddingRight: 10,
-            alignItems: 'center',
-          }}>
-          <Text>{`(Clear All)`}</Text>
-          <IconButton icon="delete" size={24} />
-        </View>
+        <TouchableRipple onPress={handleClearAll} style={{marginRight: 16}}>
+          <Text
+            style={{
+              color: showCompleted
+                ? theme.colors.primary
+                : theme.colors.onSurface,
+            }}>
+            {`Remove All`}
+          </Text>
+        </TouchableRipple>
       );
     }
     return (
@@ -46,6 +60,18 @@ const TaskList = ({list}) => {
         onSortPress={() => {}}
       />
     );
+  };
+
+  const handleClearAll = () => {
+    console.log('handleClearAll', completedTasks);
+    completedTasks.forEach(task => {
+      toggleTask(task.id, {status: 'archived'});
+    });
+  };
+
+  const handleClearTask = task => {
+    console.log('handleClearTask', task);
+    toggleTask(task.id, {status: 'archived'});
   };
 
   return (
@@ -58,14 +84,24 @@ const TaskList = ({list}) => {
       <View>
         <TaskSection
           title={`${list?.name} `}
-          tasks={tasks.filter(task => task.listId === list.id)}
+          tasks={tasks.filter(
+            task => task.listId === list.id && task.status === 'active',
+          )}
           rightComponent={listActions()}
-          expanded={true}
-          deleteTask={task => handleDelete(task)}
-          onPress={() => {
-            navigation.navigate('TaskAddNew', {listId: list.id});
-          }}
+          expanded={showTasks}
+          onExpand={() => setShowTasks(!showTasks)}
+          onDeleteTask={task => handleClearTask(task)}
         />
+        {completedTasks.length > 0 && (
+          <TaskSection
+            title={`Completed (${completedTasks.length})`}
+            tasks={completedTasks}
+            rightComponent={listActions('completed')}
+            expanded={showCompleted}
+            onExpand={() => setShowCompleted(!showCompleted)}
+            onDeleteTask={task => handleClearTask(task)}
+          />
+        )}
       </View>
       <TaskFilterModal
         visible={filterModalVisible}

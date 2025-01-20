@@ -94,10 +94,11 @@ export function TaskProvider({children}) {
               console.warn(`Task ${doc.id} is missing required fields`);
               return;
             }
+            console.log('activeTasks', data);
             activeTasks.push({
               id: doc.id,
               ...data,
-              status: data.status || 'active',
+              status: data.status,
               createdAt: data.createdAt || new Date().toISOString(),
             });
           });
@@ -114,7 +115,7 @@ export function TaskProvider({children}) {
                 deletedTasks.push({
                   id: doc.id,
                   ...data,
-                  status: data.status || 'completed',
+                  status: data.status,
                   createdAt: data.createdAt || new Date().toISOString(),
                 });
               });

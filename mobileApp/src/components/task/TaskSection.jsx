@@ -27,31 +27,32 @@ const TaskSection = ({
   rightComponent,
   onPress,
   expanded = true,
+  onExpand,
   completedTasksList = false,
+  onDeleteTask,
 }) => {
   const theme = useTheme();
   const styles = TaskSectionStyles(theme);
-  const [expand, setExpand] = useState(expanded);
-  const {toggleTask, deleteTask, filter} = useTaskContext();
+  const {toggleTask} = useTaskContext();
 
   const handlePress = () => {
     if (tasks.length > 0) {
-      setExpand(!expand);
+      onExpand();
     }
   };
 
-  const handleToggleComplete = taskId => {
-    const task = tasks.find(task => task.id === taskId);
-    if (task.status === 'completed') {
-      toggleTask(taskId, {status: 'active'});
-    } else {
-      toggleTask(taskId, {status: 'completed'});
-    }
+  const handleToggleComplete = task => {
+    setTimeout(() => {
+      if (task.status === 'completed') {
+        toggleTask(task.id, {status: 'active'});
+      } else {
+        toggleTask(task.id, {status: 'completed'});
+      }
+    }, 1000);
   };
 
   const handleDelete = taskId => {
-    console.log('handleDelete', taskId);
-    deleteTask(taskId);
+    onDeleteTask(taskId);
   };
 
   return (
@@ -62,13 +63,13 @@ const TaskSection = ({
         right={() => rightComponent}
         onPress={onPress}
       />
-      {expand && (
+      {expanded && (
         <Card.Content>
           {tasks.map(task => (
             <TaskItem
               key={task.id}
               task={task}
-              onToggleComplete={handleToggleComplete}
+              onToggleComplete={() => handleToggleComplete(task)}
               onDelete={() => handleDelete(task)}
             />
           ))}

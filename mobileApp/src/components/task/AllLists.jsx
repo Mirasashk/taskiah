@@ -1,9 +1,10 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, ScrollView, TouchableOpacity} from 'react-native';
 import {Text, Card, useTheme, Avatar, FAB} from 'react-native-paper';
 import {useAuth} from '../../context/AuthContext';
 import {useListContext} from '../../context/ListContext';
 import {useUserContext} from '../../context/UserContext';
+import {useTaskContext} from '../../context/TaskContext';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import UserDetailsModal from '../user/UserDetailsModal';
 import {useNavigation} from '@react-navigation/native';
@@ -13,6 +14,7 @@ export const AllLists = () => {
   const {relationships} = useUserContext();
   const theme = useTheme();
   const {user} = useAuth();
+  const {tasks} = useTaskContext();
   const [selectedUser, setSelectedUser] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [listOwner, setListOwner] = useState(false);
@@ -28,81 +30,89 @@ export const AllLists = () => {
   );
 
   const renderCard = React.useCallback(
-    ({list, owner}) => (
-      <TouchableOpacity
-        key={list.id}
-        onPress={() => {
-          navigation.navigate(list.name.slice(0, 30));
-        }}>
-        <Card style={{backgroundColor: theme.colors.surface}}>
-          <Card.Title
-            title={list.name}
-            right={renderChevron}
-            style={{minHeight: 50}}
-          />
-          <Card.Content>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 16,
-              }}>
-              <Text variant="bodyMedium">{list.tasks.length} tasks</Text>
-              <Text variant="bodyMedium">
-                {list.tasks.filter(task => task.completed).length} completed
-              </Text>
-              <Text variant="bodyMedium">
-                {
-                  list.tasks.filter(
-                    task =>
-                      task.dueDate === new Date().toISOString().split('T')[0],
-                  ).length
-                }{' '}
-                due today
-              </Text>
-            </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}>
-              {owner && list.sharedWith.length > 0 ? (
-                <Text style={{paddingTop: 12}} variant="bodyMedium">
-                  {list.sharedWith.map(userId =>
-                    renderUserAvatar({userId, list}),
-                  )}
+    ({list, owner}) => {
+      const activeTasksCount = tasks.filter(
+        task => task.listId === list.id && task.status === 'active',
+      ).length;
+      const completedTasksCount = tasks.filter(
+        task => task.listId === list.id && task.status === 'completed',
+      ).length;
+      return (
+        <TouchableOpacity
+          key={list.id}
+          onPress={() => {
+            navigation.navigate(list.name.slice(0, 30));
+          }}>
+          <Card style={{backgroundColor: theme.colors.surface}}>
+            <Card.Title
+              title={list.name}
+              right={renderChevron}
+              style={{minHeight: 50}}
+            />
+            <Card.Content>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 16,
+                }}>
+                <Text variant="bodyMedium">{activeTasksCount} tasks</Text>
+                <Text variant="bodyMedium">
+                  {completedTasksCount} completed
                 </Text>
-              ) : null}
+                <Text variant="bodyMedium">
+                  {
+                    list.tasks.filter(
+                      task =>
+                        task.dueDate === new Date().toISOString().split('T')[0],
+                    ).length
+                  }{' '}
+                  due today
+                </Text>
+              </View>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}>
+                {owner && list.sharedWith.length > 0 ? (
+                  <Text style={{paddingTop: 12}} variant="bodyMedium">
+                    {list.sharedWith.map(userId =>
+                      renderUserAvatar({userId, list}),
+                    )}
+                  </Text>
+                ) : null}
 
-              {!owner && list.ownerId ? (
-                <Text style={{paddingTop: 12}} variant="bodyMedium">
-                  {renderUserAvatar({
-                    userId: relationships.find(
-                      relationship => relationship.userId === list.ownerId,
-                    ).userId,
-                    list,
-                  })}
-                </Text>
-              ) : null}
-              {!owner && list.sharedWith.length > 1 ? (
-                <Text style={{paddingTop: 12}} variant="bodyMedium">
-                  {list.sharedWith.map(userId =>
-                    userId != user.id
-                      ? renderUserAvatar({
-                          userId: relationships.find(
-                            relationship => relationship.userId === userId,
-                          ).userId,
-                          list,
-                        })
-                      : null,
-                  )}
-                </Text>
-              ) : null}
-            </View>
-          </Card.Content>
-        </Card>
-      </TouchableOpacity>
-    ),
+                {!owner && list.ownerId ? (
+                  <Text style={{paddingTop: 12}} variant="bodyMedium">
+                    {renderUserAvatar({
+                      userId: relationships.find(
+                        relationship => relationship.userId === list.ownerId,
+                      ).userId,
+                      list,
+                    })}
+                  </Text>
+                ) : null}
+                {!owner && list.sharedWith.length > 1 ? (
+                  <Text style={{paddingTop: 12}} variant="bodyMedium">
+                    {list.sharedWith.map(userId =>
+                      userId != user.id
+                        ? renderUserAvatar({
+                            userId: relationships.find(
+                              relationship => relationship.userId === userId,
+                            ).userId,
+                            list,
+                          })
+                        : null,
+                    )}
+                  </Text>
+                ) : null}
+              </View>
+            </Card.Content>
+          </Card>
+        </TouchableOpacity>
+      );
+    },
     [theme.colors.surface, renderChevron],
   );
 
@@ -151,19 +161,6 @@ export const AllLists = () => {
           {sharedLists.map(list => renderCard({list, owner: false}))}
         </View>
       </ScrollView>
-      {/* <FAB
-        icon="plus"
-        color={theme.colors.onPrimary}
-        style={{
-          position: 'absolute',
-          bottom: 16,
-          right: 16,
-          backgroundColor: theme.colors.primary,
-        }}
-        onPress={() => {
-          navigation.navigate('TaskAddNew');
-        }}
-      /> */}
 
       <UserDetailsModal
         visible={modalVisible}

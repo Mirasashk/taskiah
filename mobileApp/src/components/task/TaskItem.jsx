@@ -29,7 +29,7 @@ const TaskItem = ({task, onToggleComplete, onDelete}) => {
 
   const handleToggleComplete = () => {
     setIsChecked(!isChecked);
-    onToggleComplete(task.id);
+    onToggleComplete(task);
   };
 
   const handleTaskPress = () => {
