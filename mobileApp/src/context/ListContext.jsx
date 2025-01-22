@@ -44,9 +44,11 @@ export function ListProvider({children}) {
       // Combine results from both queries
       const unsubOwned = ownedListsQuery.onSnapshot(
         ownedSnapshot => {
+          console.log('ownedSnapshot', ownedSnapshot);
           const ownedLists = [];
           ownedSnapshot.forEach(doc => {
             ownedLists.push({...doc.data(), id: doc.id});
+            console.log('ownedLists', doc.data());
           });
 
           const unsubShared = sharedListsQuery.onSnapshot(
@@ -54,6 +56,7 @@ export function ListProvider({children}) {
               const sharedLists = [];
               sharedSnapshot.forEach(doc => {
                 sharedLists.push({...doc.data(), id: doc.id});
+                console.log('sharedLists', doc.data());
               });
 
               // Combine and deduplicate lists

@@ -3,6 +3,7 @@ import {View} from 'react-native';
 import {
   Card,
   Button,
+  IconButton,
   TextInput,
   Portal,
   useTheme,
@@ -19,16 +20,28 @@ import {STATUS_OPTIONS, PRIORITY_OPTIONS} from '../../config/taskConstants';
 import {useContext} from 'react';
 import {TaskDetailFormStyles} from './styles/TaskDetailFormStyles';
 import {LoadingView} from '../common/LoadingView';
-const TaskDetailForm = ({mode = 'edit', initialTask = {}}) => {
-  const {updateTask, addTask, loading} = useTaskContext();
+
+const TaskDetailForm = ({
+  mode = 'edit',
+  initialTask = {},
+  listId,
+  task: propTask,
+  onClose,
+}) => {
+  const {updateTask, addTaskToFirestore, loading} = useTaskContext();
   const theme = useTheme();
   const {user} = useContext(AuthContext);
   const navigation = useNavigation();
   const styles = TaskDetailFormStyles(theme);
   const route = useRoute();
-  const task = route.params?.task;
+  const routeTask = route.params?.task;
 
-  const [taskState, setTaskState] = useState(!task ? initialTask : task);
+  const [taskState, setTaskState] = useState(() => {
+    if (mode === 'edit') {
+      return propTask || routeTask || initialTask;
+    }
+    return initialTask;
+  });
 
   const [showStatus, setShowStatus] = useState(false);
   const [showPriority, setShowPriority] = useState(false);
@@ -59,53 +72,54 @@ const TaskDetailForm = ({mode = 'edit', initialTask = {}}) => {
 
   const handleSubmit = useCallback(async () => {
     try {
-      if (mode === 'edit' && task?.id) {
-        await updateTask(task.id, taskState);
-      } else {
-        if (taskState.title) {
-          await addTask(taskState);
-        } else {
-          throw new Error('Task title is required');
-        }
+      if (!taskState.title?.trim()) {
+        setErrorText('Task title is required');
+        return;
       }
-      navigation.goBack();
+
+      if (mode === 'edit' && taskState.id) {
+        await updateTask(taskState.id, taskState);
+      } else {
+        await addTaskToFirestore(taskState);
+      }
+      onClose();
     } catch (error) {
       setErrorText(error.message);
       console.error('Error saving task:', error);
     }
-  }, [mode, task?.id, taskState, updateTask, addTask, navigation]);
+  }, [mode, taskState, updateTask, addTaskToFirestore, navigation]);
 
-  const getCategoryOptions = useCallback(
-    () =>
-      user.categories
-        ? Object.values(user.categories).map(category => ({
-            label: category.name,
-            value: category.name,
-          }))
-        : [
-            {
-              label: 'You do not have any categories click here to add one',
-              value: 'none',
-            },
-          ],
-    [user.categories],
-  );
+  //   const getCategoryOptions = useCallback(
+  //     () =>
+  //       user.categories
+  //         ? Object.values(user.categories).map(category => ({
+  //             label: category.name,
+  //             value: category.name,
+  //           }))
+  //         : [
+  //             {
+  //               label: 'You do not have any categories click here to add one',
+  //               value: 'none',
+  //             },
+  //           ],
+  //     [user.categories],
+  //   );
 
-  const getTagOptions = useCallback(
-    () =>
-      user.tags
-        ? Object.values(user.tags).map(tag => ({
-            label: tag.name,
-            value: tag.name,
-          }))
-        : [
-            {
-              label: 'You do not have any tags click here to add one',
-              value: 'none',
-            },
-          ],
-    [user.tags],
-  );
+  //   const getTagOptions = useCallback(
+  //     () =>
+  //       user.tags
+  //         ? Object.values(user.tags).map(tag => ({
+  //             label: tag.name,
+  //             value: tag.name,
+  //           }))
+  //         : [
+  //             {
+  //               label: 'You do not have any tags click here to add one',
+  //               value: 'none',
+  //             },
+  //           ],
+  //     [user.tags],
+  //   );
 
   const getDisplayValue = value => {
     return value ? value.charAt(0).toUpperCase() + value.slice(1) : '';
@@ -117,99 +131,114 @@ const TaskDetailForm = ({mode = 'edit', initialTask = {}}) => {
 
   return (
     <View>
-      <Card style={styles.card}>
-        <Card.Content>
-          <TextInput
-            mode="contained"
-            value={taskState.title}
-            activeUnderlineColor={theme.colors.primary}
-            style={styles.textInput}
-            underlineColor={theme.colors.surfaceContainerHigh}
-            contentStyle={styles.textInputContent}
-            onChangeText={text => handleFieldChange('title', text)}
-            placeholder="Task title"
+      <TextInput
+        mode="contained"
+        value={taskState.title}
+        activeUnderlineColor={theme.colors.primary}
+        style={styles.textInput}
+        multiline={true}
+        underlineColor={theme.colors.surfaceContainerHigh}
+        contentStyle={styles.textInputContent}
+        onChangeText={text => handleFieldChange('title', text)}
+        placeholder="Task title"
+        autoFocus={mode === 'create'}
+      />
+
+      <TextInput
+        mode="contained"
+        value={taskState.description}
+        activeUnderlineColor={theme.colors.primary}
+        underlineColor={theme.colors.surfaceContainerHigh}
+        numberOfLines={10}
+        multiline={true}
+        contentStyle={styles.textInputContent}
+        style={[styles.textInput, {marginBottom: 10}]}
+        onChangeText={text => handleFieldChange('description', text)}
+        placeholder="Task description"
+        left={
+          <TextInput.Icon
+            icon="text"
+            size={16}
+            color={theme.colors.onSurface}
+          />
+        }
+      />
+
+      <View style={{gap: 16, marginBottom: 24}}>
+        {mode === 'edit' && (
+          <TaskDetailField
+            label="Status:"
+            value={getDisplayValue(taskState.status)}
+            onPress={() => setShowStatus(true)}
+          />
+        )}
+        <View style={{flexDirection: 'row'}}>
+          <TaskDetailField
+            label="Priority:"
+            value={getDisplayValue(taskState.priority)}
+            onPress={() => setShowPriority(true)}
           />
 
-          <TextInput
-            mode="contained"
-            value={taskState.description}
-            activeUnderlineColor={theme.colors.primary}
-            underlineColor={theme.colors.surfaceContainerHigh}
-            numberOfLines={10}
-            multiline={true}
-            contentStyle={styles.textInputContent}
-            style={[styles.textInput, {marginBottom: 10}]}
-            onChangeText={text => handleFieldChange('description', text)}
-            placeholder="Task description"
-            left={
-              <TextInput.Icon
-                icon="text"
-                size={16}
-                color={theme.colors.onSurface}
-              />
+          <TaskDetailField
+            label="Due Date:"
+            value={
+              dueDate
+                ? `${dueDate.toLocaleDateString()} at ${dueDate.toLocaleTimeString()}`
+                : 'Set Due Date'
             }
+            onPress={() => setShowDueDate(true)}
+            icon={{
+              source: 'calendar-clock',
+              size: 20,
+              color: theme.colors.onSurface,
+            }}
           />
-
-          <View style={{gap: 16, marginBottom: 24}}>
-            {mode === 'edit' && (
-              <TaskDetailField
-                label="Status:"
-                value={getDisplayValue(taskState.status)}
-                onPress={() => setShowStatus(true)}
-              />
-            )}
-            <TaskDetailField
-              label="Priority:"
-              value={getDisplayValue(taskState.priority)}
-              onPress={() => setShowPriority(true)}
-            />
-            <TaskDetailField
+        </View>
+        {/* <TaskDetailField
               label="Category:"
               value={taskState.category || 'Add category'}
               onPress={() => setShowCategory(true)}
               isPrimary={true}
-            />
-            <TaskDetailField
+            /> */}
+        {/* <TaskDetailField
               label="Tags:"
               value={taskState.tag || 'Add tag'}
               onPress={() => setShowTag(true)}
               isPrimary={true}
-            />
-            <TaskDetailField
-              label="Due Date:"
-              value={
-                dueDate
-                  ? `${dueDate.toLocaleDateString()} at ${dueDate.toLocaleTimeString()}`
-                  : 'Set Due Date'
-              }
-              onPress={() => setShowDueDate(true)}
-              icon={{
-                source: 'calendar-clock',
-                size: 20,
-                color: theme.colors.onSurface,
-              }}
-            />
-          </View>
-          {errorText && <Text style={styles.errorText}>{errorText}</Text>}
+            /> */}
+      </View>
+      {errorText && <Text style={styles.errorText}>{errorText}</Text>}
+      <View
+        style={{
+          flexDirection: 'row',
+          gap: 16,
+          alignItems: 'center',
+          width: '100%',
+          justifyContent: 'center',
+        }}>
+        <Button
+          style={[styles.updateButton, {width: '40%'}]}
+          mode="contained"
+          onPress={handleSubmit}>
+          {mode === 'edit' ? 'Update' : 'Create'}
+        </Button>
+        {mode === 'edit' && (
           <Button
-            style={styles.updateButton}
+            style={[
+              styles.updateButton,
+              {width: '40%', backgroundColor: theme.colors.secondary},
+            ]}
             mode="contained"
-            onPress={handleSubmit}>
-            {mode === 'edit' ? 'Update' : 'Create'}
+            icon="check"
+            contentStyle={{flexDirection: 'row-reverse'}}
+            onPress={() => {
+              handleFieldChange('status', 'completed');
+              handleSubmit();
+            }}>
+            Mark Complete
           </Button>
-        </Card.Content>
-      </Card>
-      {mode === 'edit' && (
-        <FAB
-          style={styles.completeButton}
-          icon="check"
-          size="small"
-          label="Mark Complete"
-          onPress={() =>
-            handleFieldChange('status', 'completed') && handleSubmit()
-          }
-        />
-      )}
+        )}
+      </View>
       {showDueDate && (
         <DateTimePicker
           visible={showDueDate}
@@ -245,7 +274,7 @@ const TaskDetailForm = ({mode = 'edit', initialTask = {}}) => {
           onDismiss={() => setShowPriority(false)}
         />
 
-        <TaskEditDialog
+        {/* <TaskEditDialog
           title="Tags"
           options={getTagOptions()}
           onValueChange={value => {
@@ -255,9 +284,9 @@ const TaskDetailForm = ({mode = 'edit', initialTask = {}}) => {
           value={taskState.tag}
           visible={showTag}
           onDismiss={() => setShowTag(false)}
-        />
+        /> */}
 
-        <TaskEditDialog
+        {/* <TaskEditDialog
           title="Category"
           options={getCategoryOptions()}
           onValueChange={value => {
@@ -267,7 +296,7 @@ const TaskDetailForm = ({mode = 'edit', initialTask = {}}) => {
           value={taskState.category}
           visible={showCategory}
           onDismiss={() => setShowCategory(false)}
-        />
+        /> */}
       </Portal>
     </View>
   );

@@ -1,16 +1,6 @@
 import {db} from '../config/firebase';
-import {
-  doc,
-  setDoc,
-  addDoc,
-  collection,
-  query,
-  where,
-  onSnapshot,
-  updateDoc,
-  arrayUnion,
-  runTransaction,
-} from 'firebase/firestore';
+import {arrayUnion} from '@react-native-firebase/firestore';
+
 import Notification from './NotificationModel';
 
 /**
@@ -116,21 +106,22 @@ class Task {
     await task.validate();
 
     try {
-      const taskRef = doc(collection(db, 'tasks'));
-      const listRef = doc(db, 'lists', task.listId);
+      const tasksCollection = db.collection('tasks');
+      const newTaskRef = tasksCollection.doc(); // Create a new document reference with auto-generated ID
+      const listRef = db.collection('lists').doc(task.listId);
 
-      await runTransaction(db, async transaction => {
+      await db.runTransaction(async transaction => {
         // Create the task
-        transaction.set(taskRef, task.toJSON());
+        transaction.set(newTaskRef, task.toJSON());
 
         // Update the list's tasks array
         transaction.update(listRef, {
-          tasks: arrayUnion(taskRef.id),
+          tasks: arrayUnion(newTaskRef.id),
           updatedAt: new Date().toISOString(),
         });
       });
 
-      return taskRef.id;
+      return newTaskRef.id;
     } catch (error) {
       console.error('Error in createTask transaction:', error);
       throw error;

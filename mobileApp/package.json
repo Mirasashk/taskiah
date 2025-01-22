@@ -1,5 +1,5 @@
 {
-  "name": "mobileapp",
+  "name": "taskiah",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -10,7 +10,8 @@
     "test": "jest",
     "test:coverage": "jest --coverage",
     "bundle-android": "ENVFILE=.env.production react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res",
-    "android:dev": "ENVFILE=.env.development react-native run-android",
+    "bundle-dev": "ENVFILE=.env.development react-native bundle --platform android --dev true --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res",
+    "android:dev": "npm run bundle-dev && ENVFILE=.env.development react-native run-android",
     "android:staging": "ENVFILE=.env.staging react-native run-android",
     "android:prod": "ENVFILE=.env.production react-native run-android",
     "ios:dev": "ENVFILE=.env.development react-native run-ios",
@@ -21,6 +22,7 @@
     "start:prod": "ENVFILE=.env.production react-native start"
   },
   "dependencies": {
+    "@gorhom/bottom-sheet": "^5",
     "@react-native-async-storage/async-storage": "^2.1.0",
     "@react-native-firebase/app": "^21.6.1",
     "@react-native-firebase/auth": "^21.6.1",

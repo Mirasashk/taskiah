@@ -1,18 +1,18 @@
-import * as React from 'react';
+import React, {useState} from 'react';
 import {BottomNavigation, Text} from 'react-native-paper';
 import {AllLists as AllMyLists} from './AllLists';
 import AddListTab from './AddListTab';
 
 import {useTheme} from 'react-native-paper';
 
-const AllListsRoute = () => <AllMyLists />;
+const AllListsRoute = () => <AllMyLists key="allLists" />;
 
-const AddListRoute = () => <AddListTab />;
+const AddListRoute = () => <AddListTab key="addList" />;
 
 const AllListBottomNavigation = () => {
   const theme = useTheme();
-  const [index, setIndex] = React.useState(0);
-  const [routes] = React.useState([
+  const [index, setIndex] = useState(0);
+  const [routes] = useState([
     {
       key: 'allLists',
       title: 'All Lists',

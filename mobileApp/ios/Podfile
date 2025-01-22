@@ -16,7 +16,7 @@ if linkage != nil
   use_frameworks! :linkage => linkage.to_sym
 end
 
-target 'mobileapp' do
+target 'taskiah' do
   config = use_native_modules!
 
   use_react_native!(
@@ -27,7 +27,7 @@ target 'mobileapp' do
 
   pod 'react-native-config', :path => '../node_modules/react-native-config'
 
-  target 'mobileappTests' do
+  target 'taskiahTests' do
     inherit! :complete
     # Pods for testing
   end

@@ -12,6 +12,7 @@ import {useAuth} from './AuthContext';
 import {useListContext} from './ListContext';
 import Task from '../models/TaskModel';
 import {asyncStorage} from '../utils/secureStorage';
+import {and} from '@react-native-firebase/firestore';
 
 const TaskContext = createContext(null);
 
@@ -20,7 +21,7 @@ export function TaskProvider({children}) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const {user} = useAuth();
-  const {lists = []} = useListContext() || {};
+  const {lists} = useListContext();
   const [selectedTask, setSelectedTask] = useState(null);
 
   const [selectedFilter, setSelectedFilter] = useState(() => {
@@ -43,16 +44,15 @@ export function TaskProvider({children}) {
       return;
     }
 
-    const listsIds = lists.map(list => list.id);
-
     // If there are no lists, set empty tasks and return
-    if (listsIds.length === 0) {
+    if (lists.length === 0) {
       setTasks([]);
       setIsLoading(false);
       return;
     }
 
     try {
+      console.log('Getting tasks');
       setIsLoading(true);
       const validListIds = lists
         .filter(
@@ -63,7 +63,7 @@ export function TaskProvider({children}) {
               (list.sharedWith && list.sharedWith.includes(user.id))),
         )
         .map(list => list.id);
-
+      console.log('validListIds', validListIds);
       // If there are no valid lists, return empty tasks
       if (validListIds.length === 0) {
         setTasks([]);
@@ -75,20 +75,14 @@ export function TaskProvider({children}) {
       const activeTasksQuery = db
         .collection('tasks')
         .where('listId', 'in', validListIds)
-        .where('status', '==', 'active')
-        .orderBy('createdAt', 'desc');
-
-      const deletedTasksQuery = db
-        .collection('tasks')
-        .where('listId', 'in', validListIds)
-        .where('status', '==', 'completed')
-        .orderBy('createdAt', 'desc');
+        .where('status', 'in', ['active', 'completed', 'pending']); // List all non-archived statuses
 
       // Combine results from both queries
       const unsubActive = activeTasksQuery.onSnapshot(
         activeSnapshot => {
           const activeTasks = [];
-          activeSnapshot.forEach(doc => {
+
+          activeSnapshot?.forEach(doc => {
             const data = doc.data();
             if (!data.ownerId || !data.listId) {
               console.warn(`Task ${doc.id} is missing required fields`);
@@ -97,43 +91,20 @@ export function TaskProvider({children}) {
             activeTasks.push({
               id: doc.id,
               ...data,
-              status: data.status || 'active',
+              status: data.status,
               createdAt: data.createdAt || new Date().toISOString(),
             });
           });
 
-          const unsubDeleted = deletedTasksQuery.onSnapshot(
-            deletedSnapshot => {
-              const deletedTasks = [];
-              deletedSnapshot.forEach(doc => {
-                const data = doc.data();
-                if (!data.ownerId || !data.listId) {
-                  console.warn(`Task ${doc.id} is missing required fields`);
-                  return;
-                }
-                deletedTasks.push({
-                  id: doc.id,
-                  ...data,
-                  status: data.status || 'completed',
-                  createdAt: data.createdAt || new Date().toISOString(),
-                });
-              });
-
-              // Combine all tasks
-              setTasks([...activeTasks, ...deletedTasks]);
-              setIsLoading(false);
-            },
-            error => {
-              console.error('Error in deleted tasks listener:', error);
-              setError(error.message);
-              setIsLoading(false);
-            },
-          );
-
-          return () => unsubDeleted();
+          setTasks(activeTasks);
+          setIsLoading(false);
         },
         error => {
-          console.error('Error in active tasks listener:', error);
+          console.error('Firestore query error:', error);
+          // If this is an index error, it will show in the error message
+          if (error.code === 'failed-precondition') {
+            console.log('Index needed:', error.message);
+          }
           setError(error.message);
           setIsLoading(false);
         },
