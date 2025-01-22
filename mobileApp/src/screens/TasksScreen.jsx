@@ -43,6 +43,7 @@ const TasksScreen = () => {
         tabBarStyle: {
           width: Dimensions.get('window').width,
         },
+        swipeEnabled: true,
         tabBarScrollEnabled: true,
         tabBarItemStyle: {
           width: 'auto',

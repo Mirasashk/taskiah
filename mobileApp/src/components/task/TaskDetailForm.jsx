@@ -20,12 +20,13 @@ import {STATUS_OPTIONS, PRIORITY_OPTIONS} from '../../config/taskConstants';
 import {useContext} from 'react';
 import {TaskDetailFormStyles} from './styles/TaskDetailFormStyles';
 import {LoadingView} from '../common/LoadingView';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+
 const TaskDetailForm = ({
   mode = 'edit',
   initialTask = {},
   listId,
   task: propTask,
+  onClose,
 }) => {
   const {updateTask, addTaskToFirestore, loading} = useTaskContext();
   const theme = useTheme();
@@ -71,21 +72,22 @@ const TaskDetailForm = ({
 
   const handleSubmit = useCallback(async () => {
     try {
+      if (!taskState.title?.trim()) {
+        setErrorText('Task title is required');
+        return;
+      }
+
       if (mode === 'edit' && taskState.id) {
         await updateTask(taskState.id, taskState);
       } else {
-        if (taskState.title) {
-          await addTaskToFirestore(taskState);
-        } else {
-          throw new Error('Task title is required');
-        }
+        await addTaskToFirestore(taskState);
       }
-      navigation.goBack();
+      onClose();
     } catch (error) {
       setErrorText(error.message);
       console.error('Error saving task:', error);
     }
-  }, [mode, taskState.id, updateTask, addTaskToFirestore, navigation]);
+  }, [mode, taskState, updateTask, addTaskToFirestore, navigation]);
 
   //   const getCategoryOptions = useCallback(
   //     () =>

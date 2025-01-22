@@ -1,19 +1,11 @@
 import React, {useState, useCallback, useEffect} from 'react';
-import {View, FlatList} from 'react-native';
-import {
-  Text,
-  useTheme,
-  IconButton,
-  FAB,
-  TouchableRipple,
-} from 'react-native-paper';
+import {View, ScrollView} from 'react-native';
+import {Text, useTheme, FAB, TouchableRipple} from 'react-native-paper';
 import {useTaskContext} from '../../context/TaskContext';
 import TaskFilterModal from './TaskFilterModal';
-import PullToRefresh from '../PullToRefresh/PullToRefresh';
 import ListActions from './ListActions';
 import {TaskListStyles} from './styles/TaskListStyles';
 import TaskSection from './TaskSection';
-import {useNavigation} from '@react-navigation/native';
 import CustomBottomSheetModal from '../common/CustomBottomSheetModal';
 import AddTaskForm from './AddTaskForm';
 import TaskDetailForm from './TaskDetailForm';
@@ -32,7 +24,6 @@ const TaskList = ({list}) => {
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const [showTasks, setShowTasks] = useState(true);
   const [showCompleted, setShowCompleted] = useState(false);
-  const navigation = useNavigation();
   const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   useEffect(() => {
@@ -83,14 +74,49 @@ const TaskList = ({list}) => {
     setIsBottomSheetVisible(true);
   };
 
+  const handleCustomBottomSheetModalClose = () => {
+    setIsBottomSheetVisible(false);
+    setSelectedTask(null);
+  };
+
+  const renderCustomBottomSheetModal = () => {
+    console.log('isBottomSheetVisible', isBottomSheetVisible);
+    return (
+      <CustomBottomSheetModal
+        isVisible={isBottomSheetVisible}
+        onClose={handleCustomBottomSheetModalClose}
+        snapPoints={['60%', '80%', '100%']}>
+        <View>
+          {selectedTask ? (
+            <TaskDetailForm
+              mode="edit"
+              task={selectedTask}
+              onClose={handleCustomBottomSheetModalClose}
+            />
+          ) : (
+            <AddTaskForm
+              listId={list.id}
+              onClose={handleCustomBottomSheetModalClose}
+            />
+          )}
+        </View>
+      </CustomBottomSheetModal>
+    );
+  };
+
   return (
     <View
       style={[
         TaskListStyles.container,
-        {backgroundColor: theme.colors.surfaceContainerHigh},
+        {
+          backgroundColor: theme.colors.surfaceContainerHigh,
+        },
       ]}
       testID="task-list">
-      <View>
+      <ScrollView
+        contentContainerStyle={{
+          paddingBottom: 100,
+        }}>
         <TaskSection
           title={`${list?.name} `}
           tasks={tasks.filter(
@@ -113,7 +139,7 @@ const TaskList = ({list}) => {
             onTaskPress={handleTaskPress}
           />
         )}
-      </View>
+      </ScrollView>
       <TaskFilterModal
         visible={filterModalVisible}
         onDismiss={() => setFilterModalVisible(false)}
@@ -132,35 +158,8 @@ const TaskList = ({list}) => {
           setIsBottomSheetVisible(true);
         }}
       />
-      {/* <FAB
-        icon="plus"
-        color={theme.colors.onPrimary}
-        style={{
-          position: 'absolute',
-          bottom: 16,
-          right: 16,
-          backgroundColor: theme.colors.primary,
-        }}
-        onPress={() => {
-          navigation.navigate('TaskAddNew', {listId: list.id});
-        }}
-      /> */}
 
-      <CustomBottomSheetModal
-        isVisible={isBottomSheetVisible}
-        onClose={() => {
-          setIsBottomSheetVisible(false);
-          setSelectedTask(null);
-        }}
-        snapPoints={['60%', '80%', '100%']}>
-        <View>
-          {selectedTask ? (
-            <TaskDetailForm mode="edit" task={selectedTask} />
-          ) : (
-            <AddTaskForm listId={list.id} />
-          )}
-        </View>
-      </CustomBottomSheetModal>
+      {renderCustomBottomSheetModal()}
     </View>
   );
 };

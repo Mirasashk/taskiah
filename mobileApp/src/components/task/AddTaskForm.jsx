@@ -3,7 +3,7 @@ import TaskDetailForm from './TaskDetailForm';
 import {useContext} from 'react';
 import {AuthContext} from '../../context/AuthContext';
 
-const AddTaskForm = ({listId}) => {
+const AddTaskForm = ({listId, onClose}) => {
   const {user} = useContext(AuthContext);
 
   const DEFAULT_TASK = {
@@ -23,7 +23,12 @@ const AddTaskForm = ({listId}) => {
   };
 
   return (
-    <TaskDetailForm mode="create" initialTask={initialTask} listId={listId} />
+    <TaskDetailForm
+      mode="create"
+      initialTask={initialTask}
+      listId={listId}
+      onClose={onClose}
+    />
   );
 };
 
