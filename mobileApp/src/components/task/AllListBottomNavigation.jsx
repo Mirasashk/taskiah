@@ -1,13 +1,8 @@
-import React, {useState} from 'react';
-import {BottomNavigation, Text} from 'react-native-paper';
+import React, {useState, useCallback} from 'react';
+import {BottomNavigation} from 'react-native-paper';
 import {AllLists as AllMyLists} from './AllLists';
 import AddListTab from './AddListTab';
-
 import {useTheme} from 'react-native-paper';
-
-const AllListsRoute = () => <AllMyLists key="allLists" />;
-
-const AddListRoute = () => <AddListTab key="addList" />;
 
 const AllListBottomNavigation = () => {
   const theme = useTheme();
@@ -19,7 +14,6 @@ const AllListBottomNavigation = () => {
       focusedIcon: 'ballot',
       unfocusedIcon: 'ballot-outline',
     },
-
     {
       key: 'addList',
       title: 'Add List',
@@ -28,22 +22,32 @@ const AllListBottomNavigation = () => {
     },
   ]);
 
-  const renderScene = BottomNavigation.SceneMap({
-    allLists: AllListsRoute,
-    addList: AddListRoute,
-  });
+  const renderScene = useCallback(({route, jumpTo}) => {
+    switch (route.key) {
+      case 'allLists':
+        return <AllMyLists navigation={{jumpTo}} />;
+      case 'addList':
+        return <AddListTab navigation={{jumpTo}} />;
+      default:
+        return null;
+    }
+  }, []);
 
   return (
     <BottomNavigation
       navigationState={{index, routes}}
       onIndexChange={setIndex}
       renderScene={renderScene}
-      sceneAnimationEnabled={true}
-      sceneAnimationType="shifting"
+      shifting={true}
+      compact={true}
       keyboardHidesNavigationBar={true}
       barStyle={{backgroundColor: theme.colors.surfaceContainerHigh}}
       activeColor={theme.colors.primary}
       inactiveColor={theme.colors.onSurface}
+      getLabelText={({route}) => route.title}
+      getIcon={({route, focused}) =>
+        focused ? route.focusedIcon : route.unfocusedIcon
+      }
     />
   );
 };

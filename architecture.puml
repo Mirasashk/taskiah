@@ -1,0 +1,60 @@
+@startuml Shared Context Architecture
+
+package "shared-contexts" {
+    package "src/contexts" {
+        [ListContext] as LC
+        [Types] as T
+    }
+    
+    package "src/adapters" {
+        interface "StorageAdapter" as SA
+        interface "FirebaseAdapter" as FA
+    }
+}
+
+package "Mobile App" {
+    [MobileStorageAdapter] as MSA
+    [LegacyFirebaseAdapter] as LFA
+    [Mobile ListProvider] as MLP
+    database "AsyncStorage" as AS
+    database "Firebase (Legacy)" as FBL
+}
+
+package "Web Frontend" {
+    [WebStorageAdapter] as WSA
+    [ModernFirebaseAdapter] as MFA
+    [Web ListProvider] as WLP
+    database "LocalStorage" as LS
+    database "Firebase (Modern)" as FBM
+}
+
+' Implementations
+MSA ..|> SA
+LFA ..|> FA
+WSA ..|> SA
+MFA ..|> FA
+
+' Usage relationships
+MLP --> LC
+WLP --> LC
+
+' Storage relationships
+MSA --> AS
+WSA --> LS
+LFA --> FBL
+MFA --> FBM
+
+' Provider relationships
+MLP ..> MSA
+MLP ..> LFA
+WLP ..> WSA
+WLP ..> MFA
+
+legend right
+    |= Symbol |= Meaning |
+    |  -->   | Uses/Depends on |
+    |  ..|>  | Implements |
+    |  ..>   | Creates/Configures |
+endlegend
+
+@enduml 

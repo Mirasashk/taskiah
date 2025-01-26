@@ -2,16 +2,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import { listService } from '../services/listApi';
 import { useUser } from './UserContext';
 import { db } from '../config/firebase';
-import {
-	doc,
-	updateDoc,
-	arrayUnion,
-	onSnapshot,
-	query,
-	where,
-	collection,
-	or,
-} from 'firebase/firestore';
+import { onSnapshot, query, where, collection, or } from 'firebase/firestore';
 
 const ListContext = createContext(null); // Initialize with null
 

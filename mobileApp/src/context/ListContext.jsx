@@ -18,6 +18,77 @@ export function ListProvider({children}) {
   // Load saved list ID from localStorage
   const savedListId = asyncStorage.getItem('selectedListId');
 
+  // Helper function to update a list in state arrays
+  const updateListInState = (listData, listId) => {
+    const updatedList = {...listData, id: listId};
+
+    setLists(prevLists => {
+      const listIndex = prevLists.findIndex(l => l.id === listId);
+      if (listIndex === -1) {
+        return [...prevLists, updatedList];
+      }
+      const newLists = [...prevLists];
+      newLists[listIndex] = updatedList;
+      return newLists;
+    });
+
+    // Update myTasksList if needed
+    if (listData.name === 'My Tasks' && listData.ownerId === user.id) {
+      setMyTasksList(updatedList);
+      if (!selectedList) {
+        setSelectedList(updatedList);
+      }
+    }
+
+    // Update myLists
+    if (listData.ownerId === user.id && listData.name !== 'My Tasks') {
+      setMyLists(prevMyLists => {
+        const listIndex = prevMyLists.findIndex(l => l.id === listId);
+        if (listIndex === -1) {
+          return [...prevMyLists, updatedList];
+        }
+        const newMyLists = [...prevMyLists];
+        newMyLists[listIndex] = updatedList;
+        return newMyLists;
+      });
+    }
+
+    // Update sharedLists
+    if (listData.sharedWith?.includes(user.id)) {
+      setSharedLists(prevSharedLists => {
+        const listIndex = prevSharedLists.findIndex(l => l.id === listId);
+        if (listIndex === -1) {
+          return [...prevSharedLists, updatedList];
+        }
+        const newSharedLists = [...prevSharedLists];
+        newSharedLists[listIndex] = updatedList;
+        return newSharedLists;
+      });
+    }
+
+    // Update selectedList if it's the current one
+    if (selectedList?.id === listId) {
+      setSelectedList(updatedList);
+    }
+  };
+
+  // Helper function to remove a list from state arrays
+  const removeListFromState = listId => {
+    setLists(prevLists => prevLists.filter(l => l.id !== listId));
+    setMyLists(prevMyLists => prevMyLists.filter(l => l.id !== listId));
+    setSharedLists(prevSharedLists =>
+      prevSharedLists.filter(l => l.id !== listId),
+    );
+
+    if (myTasksList?.id === listId) {
+      setMyTasksList(null);
+    }
+
+    if (selectedList?.id === listId) {
+      setSelectedList(myTasksList || null);
+    }
+  };
+
   useEffect(() => {
     if (!user?.id) {
       setLists([]);
@@ -29,8 +100,6 @@ export function ListProvider({children}) {
     }
 
     try {
-      console.log('user data in list context', user);
-
       // Query for lists owned by the user
       const ownedListsQuery = db
         .collection('lists')
@@ -41,70 +110,42 @@ export function ListProvider({children}) {
         .collection('lists')
         .where('sharedWith', 'array-contains', user.id);
 
-      // Combine results from both queries
+      // Listen for owned lists changes
       const unsubOwned = ownedListsQuery.onSnapshot(
-        ownedSnapshot => {
-          console.log('ownedSnapshot', ownedSnapshot);
-          const ownedLists = [];
-          ownedSnapshot.forEach(doc => {
-            ownedLists.push({...doc.data(), id: doc.id});
-            console.log('ownedLists', doc.data());
+        snapshot => {
+          snapshot.docChanges().forEach(change => {
+            if (change.type === 'added' || change.type === 'modified') {
+              updateListInState(change.doc.data(), change.doc.id);
+            } else if (change.type === 'removed') {
+              removeListFromState(change.doc.id);
+            }
           });
-
-          const unsubShared = sharedListsQuery.onSnapshot(
-            sharedSnapshot => {
-              const sharedLists = [];
-              sharedSnapshot.forEach(doc => {
-                sharedLists.push({...doc.data(), id: doc.id});
-                console.log('sharedLists', doc.data());
-              });
-
-              // Combine and deduplicate lists
-              const allLists = [...ownedLists, ...sharedLists];
-              const uniqueLists = Array.from(
-                new Map(allLists.map(list => [list.id, list])).values(),
-              );
-
-              setLists(uniqueLists);
-
-              // Process lists for different categories
-              const myTasksList = uniqueLists.find(
-                list => list.name === 'My Tasks',
-              );
-              const newMyLists = uniqueLists.filter(
-                list => list.ownerId === user.id && list.name !== 'My Tasks',
-              );
-              const newSharedLists = uniqueLists.filter(list =>
-                list.sharedWith.includes(user.id),
-              );
-
-              setMyTasksList(myTasksList || null);
-              setMyLists(newMyLists);
-              setSharedLists(newSharedLists);
-
-              // Handle selected list
-              if (savedListId) {
-                const savedList = uniqueLists.find(
-                  list => list.id === savedListId,
-                );
-                setSelectedList(savedList || myTasksList || null);
-              } else if (!selectedList && myTasksList) {
-                setSelectedList(myTasksList);
-              }
-            },
-            error => {
-              console.error('Error in shared lists listener:', error);
-            },
-          );
-
-          return () => unsubShared();
         },
         error => {
           console.error('Error in owned lists listener:', error);
         },
       );
 
-      return () => unsubOwned();
+      // Listen for shared lists changes
+      const unsubShared = sharedListsQuery.onSnapshot(
+        snapshot => {
+          snapshot.docChanges().forEach(change => {
+            if (change.type === 'added' || change.type === 'modified') {
+              updateListInState(change.doc.data(), change.doc.id);
+            } else if (change.type === 'removed') {
+              removeListFromState(change.doc.id);
+            }
+          });
+        },
+        error => {
+          console.error('Error in shared lists listener:', error);
+        },
+      );
+
+      return () => {
+        unsubOwned();
+        unsubShared();
+      };
     } catch (error) {
       console.error('Error setting up lists query:', error);
     }
